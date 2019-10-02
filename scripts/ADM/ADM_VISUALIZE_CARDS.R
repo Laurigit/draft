@@ -23,5 +23,7 @@ joini[is.na(Converted_Cost) & Rarity != "Basic Land", colOrder := -1]
 #lisataan riveja countin mukaan, jotta osataan piirtaa oikee maara kortteja
 levita_data <- joini[rep(seq_len(nrow(joini)), Count), ]
 #joini[]
+levita_data[, image_id := paste0("img", seq_len(.N))]
+levita_data[, is_basic_land := ifelse(Name %in% c("Mountain", "Island", "Forest", "Wastes", "Swamp", "Plains"), TRUE, FALSE)]
 ADM_VISUALIZE_CARDS <- levita_data
 #ADM_VISUALIZE_CARDS[is.na(Converted_Cost)]
