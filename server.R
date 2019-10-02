@@ -55,6 +55,40 @@ server <- function(input, output) {
   }
 
 
+  values <- reactiveValues(
+    lastUpdated = "NULL",
+    lastAccepted = "NULL"
+  )
+
+  observe({
+    #input <- NULL
+   # input <- c("eka", "toka", "img1", "img3332")
+    #imagelist <- names(input)
+    imagelist <- ADM_VISUALIZE_CARDS[Pakka_form_ID == 70, image_id]
+  #  print(ADM_VISUALIZE_CARDS[image_id %in% imagelist, Name])
+    #imagelist_filtered <- imagelist[str_sub(imagelist,1, 3)  == "img"]
+    #imagelist_filtered_no_prev <- imagelist_filtered[! imagelist_filtered %in%  values$lastAccepted]
+    lapply(imagelist, function(x) {
+      observe({
+        input[[x]]
+     #   print(ADM_VISUALIZE_CARDS[image_id %in% x, Name])
+       # print(str(input[[x]]))
+        values$lastUpdated <- x
+      })
+    })
+    isolate(values$lastAccepted <-  values$lastUpdated)
+
+  })
+
+  output$show_last <- renderPrint({
+
+ADM_VISUALIZE_CARDS[image_id == values$lastUpdated  , Name]
+
+  #  str(input[[values$lastUpdated]])
+
+  })
+
+
 }
 
 

@@ -162,7 +162,10 @@ lapply(1:max_kortit, function(i) {
                offset = offset_counter,
               # HTML(paste0('<div id="logo"><img src= "', nimi, '_card.jpg"> </div>'))
                imageOutput(nimi,
-                           height = "60px")
+                           height = "60px",
+                           dblclick = dblclickOpts(id = nimi)
+                         #  hover = hoverOpts(id = nimi)
+                           )
                )
 
        # column(width = 2, offset = offsetti,     box(id = paste0("box ", boxno),  HTML('<img src="Kitchen Finks_card.jpg">')))
