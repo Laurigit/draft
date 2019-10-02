@@ -1,0 +1,2 @@
+#SRC_CARDS_DIM
+SRC_CARDS_DIM <- dbSelectAll("CARDS_DIM")
