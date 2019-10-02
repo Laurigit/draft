@@ -20,12 +20,7 @@ library(shinydashboard)
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    # output$mytable = renderDataTable({
-    #   dataSet <- read_clip_tbl(x=read_clip(),
-    #                            row.names = NULL,
-    #                            sep = "\t",
-    #                            stringsAsFactors = FALSE)
-    # })
+
 
 
 

@@ -121,7 +121,7 @@ print("BOXES")
 lapply(1:max_kortit, function(i) {
   offset_counter <<- 0
   reset_next_round <<- FALSE
-  print("fluidRow")
+
   fluidRow(
     lapply(1:max_cc, function(j){
       if (reset_next_round == TRUE) {
@@ -239,15 +239,6 @@ lapply(1:max_kortit, function(i) {
 
 
 })
-
-#   for (sarake in 1:max_cc) {
-#     boxno <-  boxno + 1
-# print(boxno)
-#
-#   }
-
-
-
 
 
 })
