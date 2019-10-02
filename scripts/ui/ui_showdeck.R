@@ -1,5 +1,6 @@
 #tab_leaderboard
 tabItem(tabName = "tab_showdeck",
+        numericInput("pif","pif", 70, 1, 1000),
         #imageOutput("img2985"),
        # uiOutput("kortti"),
        verbatimTextOutput("show_last"),

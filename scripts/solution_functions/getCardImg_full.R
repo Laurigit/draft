@@ -1,14 +1,14 @@
 #cardNameInput <- "Kitchen Finks"
 #getCardImg_full(cardNameInput)
-getCardImg_full <- function(cardNameInput) {
+getCardImg_full <- function(cardMID) {
   #check if exists
-  fixedName <- stringi::stri_trans_general(cardNameInput, "Latin-ASCII")
-  if (!file.exists(paste0("../common_data/", cardNameInput, "_card.jpg"))) {
+  #fixedName <- stringi::stri_trans_general(cardNameInput, "Latin-ASCII")
+  if (!file.exists(paste0("../common_data/", cardMID, "_card.jpg"))) {
 
 
     #cardNameInput <- "Vampire Aristocrat"
-    urlName <- gsub(" ", "+", x = cardNameInput)
-    url <- paste0("https://api.scryfall.com/cards/named?exact=", urlName)
+
+    url <- paste0("https://api.scryfall.com/cards/multiverse/", cardMID)
     raw.result <- GET(url = url)
     result_json <- fromJSON(rawToChar(raw.result$content))
 
@@ -16,12 +16,12 @@ getCardImg_full <- function(cardNameInput) {
 
 
 
-    download.file(url = image_url, destfile = paste0("../common_data/", cardNameInput, "_card.jpg"), mode = "wb")
+    download.file(url = image_url, destfile = paste0("../common_data/", cardMID, "_card.jpg"), mode = "wb")
   }
-  if (!file.exists(paste0("./www/", fixedName, "_card.jpg"))) {
-    file.copy(from = paste0("../common_data/", cardNameInput, "_card.jpg"),
-              to = paste0("./www/", cardNameInput, "_card.jpg"))
-    file.copy(from = paste0("./www/", cardNameInput,"_card.jpg"),
-              to = paste0("./www/", fixedName, "_card.jpg"))
+  if (!file.exists(paste0("./www/", cardMID, "_card.jpg"))) {
+    file.copy(from = paste0("../common_data/", cardMID, "_card.jpg"),
+              to = paste0("./www/", cardMID, "_card.jpg"))
+    file.copy(from = paste0("./www/", cardMID,"_card.jpg"),
+              to = paste0("./www/", cardMID, "_card.jpg"))
   }
 }

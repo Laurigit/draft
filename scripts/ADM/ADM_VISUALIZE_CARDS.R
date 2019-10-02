@@ -2,9 +2,9 @@
 required_data(c("STG_CARDS_DIM", "STG_CARDS"))
 
 sscols_DIM <- STG_CARDS_DIM
-sscols <- STG_CARDS[, .(Pakka_form_ID, Card_ID, Count, Maindeck)]
+sscols <- STG_CARDS[, .(Pakka_form_ID, MID, Count, Maindeck)]
 
-joini <- sscols_DIM[sscols, on = "Card_ID"]
+joini <- sscols_DIM[sscols, on = "MID"]
 
 joini[, colOrder := Converted_Cost]
 #basic_land_types <- joini[Rarity == "Basic Land", .(Basic_land_types = uniqueN(Name)), by = Pakka_form_ID]

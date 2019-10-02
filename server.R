@@ -64,7 +64,7 @@ server <- function(input, output) {
     #input <- NULL
    # input <- c("eka", "toka", "img1", "img3332")
     #imagelist <- names(input)
-    imagelist <- ADM_VISUALIZE_CARDS[Pakka_form_ID == 70, image_id]
+    imagelist <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$pif, image_id]
   #  print(ADM_VISUALIZE_CARDS[image_id %in% imagelist, Name])
     #imagelist_filtered <- imagelist[str_sub(imagelist,1, 3)  == "img"]
     #imagelist_filtered_no_prev <- imagelist_filtered[! imagelist_filtered %in%  values$lastAccepted]

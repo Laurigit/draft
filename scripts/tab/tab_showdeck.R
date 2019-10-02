@@ -9,17 +9,17 @@ required_data("ADM_VISUALIZE_CARDS")
 observe({
   if(is.null(input$sb)) return(NULL)
 
-  kortit <-  ADM_VISUALIZE_CARDS[Pakka_form_ID == 70, .(Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id)]
-
+  kortit <-  ADM_VISUALIZE_CARDS[Pakka_form_ID == input$pif, .(Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
+  print("KORTIT")
   for (i in 1:nrow(kortit))
    # for (i in 1:1)
   {
-    print(i)
+
     local({
       my_i <- i
       image_id <- kortit[i, image_id]
      # print(image_id)
-      image_nm <- paste0(kortit[i, Name], "_card.jpg")
+      image_nm <- paste0(kortit[i, MID], "_card.jpg")
      # print(image_nm)
       output[[image_id]] <-  renderImage({
 
@@ -32,10 +32,11 @@ observe({
   }
 })
 
-get_sorted_cards <- function(ADM_VISUALIZE_CARDS, Pakka_form_ID = 70) {
-  sata <- ADM_VISUALIZE_CARDS[Pakka_form_ID == 70, .(Converted_Cost, Name, colOrder, is_basic_land, Maindeck, image_id)]
+get_sorted_cards <- function(ADM_VISUALIZE_CARDS, input_Pakka_form_ID = 129) {
+  sata <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input_Pakka_form_ID, .(Converted_Cost, Name, colOrder, is_basic_land, Maindeck, image_id, MID)]
 
-  lapply(sata[, Name], function(x) {
+  lapply(sata[, MID], function(x) {
+
     getCardImg_full(x)
   })
 
@@ -53,38 +54,47 @@ get_sorted_cards <- function(ADM_VISUALIZE_CARDS, Pakka_form_ID = 70) {
   side[, order_No := seq_len(.N) + max_order_no, by = Converted_Cost]
 
 
-  kaadettu_main_ids <- dcast.data.table(add_basics, formula =   order_No ~ colOrder, value.var = "image_id" )[, Maindeck := TRUE]
-  kaadettu_side_ids <-  dcast.data.table(side, formula =   order_No ~ colOrder, value.var = "image_id" )[, Maindeck := FALSE]
+  kaadettu_main_ids <- dcast.data.table(add_basics, formula =   order_No ~ colOrder, value.var = "image_id" )
+  kaadettu_side_ids <-  dcast.data.table(side, formula =   order_No ~ colOrder, value.var = "image_id" )
   #append side ja maini
-  kaadettu_ids <- rbind(kaadettu_main_ids, kaadettu_side_ids, fill = TRUE)
+  kaadettu_ids <- rbind(kaadettu_main_ids, kaadettu_side_ids, fill = TRUE)[, order_No := NULL]
+  kaadettu_ids[, order_No := seq_len(.N)]
 
-  kaadettu_main_nimi <- dcast.data.table(add_basics, formula =   order_No ~ colOrder, value.var = "Name" )[, Maindeck := TRUE]
-  kaadettu_side_nimi <-  dcast.data.table(side, formula =   order_No ~ colOrder, value.var = "Name" )[, Maindeck := FALSE]
+
+  kaadettu_main_nimi <- dcast.data.table(add_basics, formula =   order_No ~ colOrder, value.var = "Name" )
+  kaadettu_side_nimi <-  dcast.data.table(side, formula =   order_No ~ colOrder, value.var = "Name" )
   #append side ja maini
-  kaadettu_nimi <- rbind(kaadettu_main_nimi, kaadettu_side_nimi, fill = TRUE)
+  kaadettu_nimi <- rbind(kaadettu_main_nimi, kaadettu_side_nimi, fill = TRUE)[, order_No := NULL]
+  kaadettu_nimi[, order_No := seq_len(.N)]
   reslist <- NULL
   reslist$nimi <- kaadettu_nimi
   reslist$id <- kaadettu_ids
+  reslist$maxcc <- sata[!is.na(Converted_Cost), max(Converted_Cost)]
   return(reslist)
 }
 
 
 
 output$boxes <- renderUI({
- kaadettu <-  get_sorted_cards(ADM_VISUALIZE_CARDS)$id
-print( get_sorted_cards(ADM_VISUALIZE_CARDS)$nimi)
-
-
+  # input <- NULL
+  # input$pfi <- 72
+ # kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, 129)
+ kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, input$pif)
+ kaadettu <- kaadettu_all$id
+print( get_sorted_cards(ADM_VISUALIZE_CARDS, input$pif)$nimi)
+print(input$pif)
+print("BOXES")
   columnWidth <- 1
 
-  max_cc <- sata[!is.na(Converted_Cost), max(Converted_Cost)]
+  max_cc <- kaadettu_all$maxcc
   print(max_cc)
   max_kortit <- kaadettu[, max(order_No)]
   print(max_kortit)
   boxno <- 0
   offset_laskenta <- kaadettu
+
   offset_laskenta[is.na(offset_laskenta)] <- columnWidth
-  offset_laskenta_sscol <- offset_laskenta[,2:(max_cc + 1)]
+  offset_laskenta_sscol <- offset_laskenta[,1:(max_cc)]
   convToNumOffset <- as.data.table(lapply(offset_laskenta_sscol, as.numeric))
   convToNumOffset[is.na(convToNumOffset)] <- 0
   convToNumOffset[, rivi := seq_len(.N)]
@@ -104,7 +114,7 @@ lapply(1:max_kortit, function(i) {
         offset_counter <<- 0
         reset_next_round <<- FALSE
       }
-      nimi <- kaadettu[order_No == i, j + 1, with = FALSE]
+      nimi <- kaadettu[order_No == i, j, with = FALSE]
 
       #check if basic land
       if (nimi %in% c("Mountain", "Forest", "Swamp", "Plains", "Island")) {

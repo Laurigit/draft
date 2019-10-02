@@ -11,7 +11,7 @@ connDB <- function(con) {
                      password = 'betmtg_pw',
                      host = '35.228.73.82',
                      port = 3306,
-                     dbname = 'betmtg')
+                     dbname = 'betmtg2')
   })
   return(con)
 }
