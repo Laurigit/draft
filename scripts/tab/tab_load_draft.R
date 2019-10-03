@@ -10,8 +10,7 @@ observeEvent(input$reload, {
   draftiTaulu <- data.table(MID = leike)
   draftiTaulu[, PICK_ORDER := seq_len(.N)]
   draftiTaulu[, PICK_DT := as.IDate(Sys.Date(), tz = "EET")]
-  omistaja_ID_calc <- ifelse(session$user == "Martti", "M", "L")
-  draftiTaulu[, OMISTAJA_ID := omistaja_ID_calc]
+  draftiTaulu[, OMISTAJA_ID := omistaja_ID_calc$value]
 
   #find next draft no
   draft_data <- dbQ("SELECT max(DRAFT_ID) as max_draft, OMISTAJA_ID from DRAFT_CARDS GROUP BY OMISTAJA_ID",  con)
@@ -21,6 +20,7 @@ observeEvent(input$reload, {
     drafti_no <- as.numeric(draft_data[OMISTAJA_ID == omistaja_ID_calc, max_draft]) + 1
   }
   draftiTaulu[, DRAFT_ID := drafti_no]
+  draftiTaulu[, PICKED := 0]
 
   draftMID$MID <- draftiTaulu
 
@@ -106,52 +106,7 @@ con <- connDB(con)
 
 
 
-#näytä imaget sidebarissa
-output$draftitSideBar <- renderUI({
-  con <- connDB(con)
-  input$reload
 
-
-  #tee uniikit imageIdt
-  uudet_kortit <- data.table(MID =  draftMID$MID[, MID])
-  uudet_kortit[, image_id := paste0("DraftBar", seq_len(.N))]
-
-  for (i in 1:nrow(uudet_kortit)) {
-
-    local({
-      my_i <- i
-      image_id <- uudet_kortit[i, image_id]
-      # print(image_id)
-      image_nm <- paste0(uudet_kortit[i, MID], "_card.jpg")
-      # print(image_nm)
-      output[[image_id]] <-  renderImage({
-
-        # output[[image_id]] <-  renderImage({
-        list(src = paste0("./www/",image_nm),#image_nm,
-             alt = "Image failed to render"
-        )
-      }, deleteFile = FALSE)
-    })
-  }
-
-
-
-  fluidRow(
-    column(width = 11, offset = 1,
-    lapply( 1:nrow(uudet_kortit), function(x) {
-            MIDi <- uudet_kortit[x, image_id]
-             imageOutput(MIDi,
-                         height = "50px",
-                         dblclick = dblclickOpts(id = MIDi)
-                         #  hover = hoverOpts(id = nimi)
-             )
-
-
-    })
-    )
-  )
-
-})
 
 
 

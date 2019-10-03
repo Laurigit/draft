@@ -25,7 +25,7 @@ observe({
 
   my_current_pakkaids <- STG_DECKS_DIM[Omistaja_NM == session$user  & !(Retired == 1 & Side == 0) & Side != -1, Pakka_ID]
   my_current_pfis <- ADM_VISUALIZE_CARDS[Pakka_ID %in% my_current_pakkaids, max(Pakka_form_ID), by = Pakka_ID]
-  kortit <-  ADM_VISUALIZE_CARDS[Pakka_form_ID %in% my_current_pfis[, V1], .(Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
+  kortit <-  ADM_VISUALIZE_CARDS[Pakka_ID == 1 & Pakka_form_ID %in% my_current_pfis[, V1], .(Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
   print("KORTIT")
   for (i in 1:nrow(kortit))
    # for (i in 1:1)
@@ -102,15 +102,16 @@ get_sorted_cards <- function(ADM_VISUALIZE_CARDS, input_Pakka_form_ID = 257) {
 
 
 output$boxes <- renderUI({
+  req(input$myDecks)
   # input <- NULL
   # input$pfi <- 72
  # kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, 129)
   show_pfi <- STG_CARDS[Pakka_ID == input$myDecks, max(Pakka_form_ID)]
  kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, show_pfi)
  kaadettu <- kaadettu_all$id
-print( get_sorted_cards(ADM_VISUALIZE_CARDS, show_pfi)$nimi)
+#print( get_sorted_cards(ADM_VISUALIZE_CARDS, show_pfi)$nimi)
 
-print("BOXES")
+#print("BOXES")
   columnWidth <- 1
 
   max_cc <- kaadettu_all$maxcc
@@ -152,13 +153,17 @@ lapply(1:max_kortit, function(i) {
         main_height <- "20px"
         side_height <- "60px"
         showLands <- FALSE
+      } else if (input$main_side == "Neither") {
+        main_height <- "20px"
+        side_height <- "20px"
+        showLands <- FALSE
       } else {
         main_height <- "60px"
         side_height <- "60px"
         showLands <- TRUE
       }
       #check if basic land
-      if (nimi %in% c("Mountain", "Forest", "Swamp", "Plains", "Island"))  {
+      if (nimi %in% c("Mountain", "Forest", "Swamp", "Plains", "Island", "Wastes"))  {
         value_input <-  kaadettu_all$blands[Name == nimi, N]
         if (nimi == "Island") {
             land_color <- "blue"
@@ -170,7 +175,11 @@ lapply(1:max_kortit, function(i) {
           land_color <- "black"
         }else if ((nimi == "Mountain")) {
           land_color <- "red"
-        }
+
+      }else if ((nimi == "Wastes")) {
+        land_color <- "purple"
+      }
+
 
         column(width = columnWidth,
               if ( showLands == TRUE) {

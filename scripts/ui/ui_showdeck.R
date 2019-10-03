@@ -2,7 +2,7 @@
 tabItem(tabName = "tab_showdeck",
         numericInput("pif","pif", 70, 1, 1000),
         uiOutput("deck_selector"),
-        radioButtons("main_side", "main or side", choices = list("Main", "Side", "Both")),
+        radioButtons("main_side", "main or side", choices = list("Main", "Side", "Both", "Neither")),
         #imageOutput("img2985"),
        # uiOutput("kortti"),
 

@@ -14,6 +14,7 @@ library(shinydashboard)
 
 
 user_logged <- reactiveValues(count = 0)
+omistaja_ID_calc <- reactiveValues(value = NULL)
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
@@ -38,7 +39,7 @@ server <- function(input, output, session) {
   }
   isolate(user_logged$count <- user_logged$count + 1)
   session$user <- isolate(func_login(user_logged$count, session$clientData))
-
+  omistaja_ID_calc$value <- ifelse(session$user == "Martti", "M", "L")
 
 
 
@@ -72,11 +73,33 @@ server <- function(input, output, session) {
     lastAccepted = "NULL"
   )
 
+  deck_changes <- reactiveValues(draft = data.table(MID = numeric(),
+                                                    PAKKA_ID = numeric()))
+
+  observeEvent( values$lastUpdated, {
+
+    print("TOIMIII")
+    req(input$myDecks)
+    req(ReactDraftCards$cards_left)
+
+    print("TOIMIII2")
+    changed_MID <- values$lastUpdated
+    new_row <- isolate(data.table(MID = changed_MID, PAKKA_ID = input$myDecks))
+    total_data <- isolate(rbind(deck_changes$draft, new_row))
+    deck_changes$draft <- total_data
+    #delete from draft
+
+    ReactDraftCards$cards_left <- isolate( ReactDraftCards$cards_left[image_id != changed_MID])
+  })
+
+
   observe({
+    req(ReactDraftCards$image_ids)
     #input <- NULL
    # input <- c("eka", "toka", "img1", "img3332")
     #imagelist <- names(input)
-    imagelist <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$pif, image_id]
+   # imagelist <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$pif, image_id]
+    imagelist <-   ReactDraftCards$image_ids[, image_id]
   #  print(ADM_VISUALIZE_CARDS[image_id %in% imagelist, Name])
     #imagelist_filtered <- imagelist[str_sub(imagelist,1, 3)  == "img"]
     #imagelist_filtered_no_prev <- imagelist_filtered[! imagelist_filtered %in%  values$lastAccepted]
@@ -93,8 +116,18 @@ server <- function(input, output, session) {
   })
 
   output$show_last <- renderPrint({
+    req(ReactDraftCards$image_ids)
+    req( values$lastUpdated)
+    print("rivimaara")
+    print(nrow(ReactDraftCards$image_ids))
 
-ADM_VISUALIZE_CARDS[image_id == values$lastUpdated  , Name]
+    if (nrow(ReactDraftCards$image_ids) > 0){
+
+        updated_MID <- ReactDraftCards$image_ids[image_id ==  values$lastUpdated, .(MID)]
+        if (nrow(updated_MID) > 0) {
+           STG_CARDS_DIM[MID == updated_MID[, MID]  , Name]
+        }
+    }
 
   #  str(input[[values$lastUpdated]])
 

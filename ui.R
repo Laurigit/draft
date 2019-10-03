@@ -65,8 +65,10 @@ sidebar <- dashboardSidebar(
   sidebarMenu(id = "sidebarmenu",
               menuItem("Load draft", tabName = "tab_load_draft", icon = icon("gamepad")),
               menuItem("Uusi peli", tabName = "tab_showdeck", icon = icon("gamepad")),
+              verbatimTextOutput("show_last"),
+              uiOutput("select_draft"),
+              uiOutput("draftitSideBar")
 
-              verbatimTextOutput("show_last")
 
   )
 
