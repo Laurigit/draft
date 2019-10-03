@@ -6,5 +6,5 @@ STG_CARDS <- SRC_CARDS[, .(MID = as.numeric(MID),
                            Card_ID = as.numeric(Card_ID),
                            Count = as.numeric(Count),
                            Name,
-                           Maindeck = ifelse(Maindeck == "TRUE", TRUE, FALSE))]
+                           Maindeck)]
 

@@ -68,28 +68,37 @@ server <- function(input, output, session) {
   }
 
 
+
+
   values <- reactiveValues(
     lastUpdated = "NULL",
     lastAccepted = "NULL"
   )
 
   deck_changes <- reactiveValues(draft = data.table(MID = numeric(),
-                                                    PAKKA_ID = numeric()))
+                                                    Pakka_ID = numeric(),
+                                                    DRAFT_CARDS_ID = numeric()))
 
   observeEvent( values$lastUpdated, {
-
+# täällä seurataan tuplaklikkauksia ja hoidetaan niitten seurauksia.
     print("TOIMIII")
     req(input$myDecks)
     req(ReactDraftCards$cards_left)
-
+    req(input[[values$lastUpdated]])
+    print(input[[values$lastUpdated]] )
+    if (input[[values$lastUpdated]]$x >= 0) {
     print("TOIMIII2")
-    changed_MID <- values$lastUpdated
-    new_row <- isolate(data.table(MID = changed_MID, PAKKA_ID = input$myDecks))
+
+    removed_image_id <- values$lastUpdated
+    changed_MID <- ReactDraftCards$image_ids[image_id == values$lastUpdated, MID]
+    draft_card_id <- ReactDraftCards$image_ids[image_id == values$lastUpdated, DRAFT_CARDS_ID]
+    new_row <- isolate(data.table(MID = changed_MID, Pakka_ID = input$myDecks, DRAFT_CARDS_ID = draft_card_id))
     total_data <- isolate(rbind(deck_changes$draft, new_row))
     deck_changes$draft <- total_data
     #delete from draft
 
-    ReactDraftCards$cards_left <- isolate( ReactDraftCards$cards_left[image_id != changed_MID])
+    ReactDraftCards$cards_left <- isolate( ReactDraftCards$cards_left[image_id != removed_image_id])
+    }
   })
 
 
@@ -99,7 +108,10 @@ server <- function(input, output, session) {
    # input <- c("eka", "toka", "img1", "img3332")
     #imagelist <- names(input)
    # imagelist <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$pif, image_id]
+
     imagelist <-   ReactDraftCards$image_ids[, image_id]
+    print("IMAGLIST")
+    print( imagelist)
   #  print(ADM_VISUALIZE_CARDS[image_id %in% imagelist, Name])
     #imagelist_filtered <- imagelist[str_sub(imagelist,1, 3)  == "img"]
     #imagelist_filtered_no_prev <- imagelist_filtered[! imagelist_filtered %in%  values$lastAccepted]
@@ -125,13 +137,23 @@ server <- function(input, output, session) {
 
         updated_MID <- ReactDraftCards$image_ids[image_id ==  values$lastUpdated, .(MID)]
         if (nrow(updated_MID) > 0) {
-           STG_CARDS_DIM[MID == updated_MID[, MID]  , Name]
+           #STG_CARDS_DIM[MID == updated_MID[, MID]  , Name]
+            cardNames <- STG_CARDS_DIM[, .(MID = as.numeric(MID), Name)]
+           DeckNames <- STG_DECKS_DIM[, .(Pakka_ID, Nimi)]
+           if (nrow( deck_changes$draft) > 0) {
+           raw_data <- deck_changes$draft[, .(MID = as.numeric(MID), Pakka_ID = as.numeric(Pakka_ID))]
+           joinaa <- cardNames[raw_data, on = "MID"]
+           joinaa_pid <- DeckNames[joinaa, on = "Pakka_ID"]
+
+           print(joinaa_pid[order(Pakka_ID), .(Nimi, Name)])
+           }
         }
     }
 
   #  str(input[[values$lastUpdated]])
 
   })
+
 
 
 }

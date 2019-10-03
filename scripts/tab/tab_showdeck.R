@@ -22,7 +22,7 @@ output$deck_selector <- renderUI({
 #tee ekana korteista idt
 
 observe({
-
+required_data("STG_DECKS_DIM")
   my_current_pakkaids <- STG_DECKS_DIM[Omistaja_NM == session$user  & !(Retired == 1 & Side == 0) & Side != -1, Pakka_ID]
   my_current_pfis <- ADM_VISUALIZE_CARDS[Pakka_ID %in% my_current_pakkaids, max(Pakka_form_ID), by = Pakka_ID]
   kortit <-  ADM_VISUALIZE_CARDS[Pakka_ID == 1 & Pakka_form_ID %in% my_current_pfis[, V1], .(Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
@@ -48,20 +48,21 @@ observe({
   }
 })
 
-get_sorted_cards <- function(ADM_VISUALIZE_CARDS, input_Pakka_form_ID = 257) {
-  sata <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input_Pakka_form_ID, .(Converted_Cost, Name, colOrder, is_basic_land, Maindeck, image_id, MID)]
+get_sorted_cards <- function(ADM_VISUALIZE_CARDS, input_Pakka_form_ID = 70) {
+
+   sata <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input_Pakka_form_ID, .(Converted_Cost, Name, colOrder, is_basic_land, Maindeck, image_id, MID)]
 
   lapply(sata[, MID], function(x) {
 
     getCardImg_full(x)
   })
 
-  sorted <- sata[order(Converted_Cost, Name)][is_basic_land == FALSE & Maindeck ==  TRUE]#[Converted_Cost > 0 & Converted_Cost < 7]
-  side <- sata[order(Converted_Cost, Name)][is_basic_land == FALSE & Maindeck ==  FALSE]
+  sorted <- sata[order(Converted_Cost, Name)][is_basic_land == FALSE & Maindeck ==  1]#[Converted_Cost > 0 & Converted_Cost < 7]
+  side <- sata[order(Converted_Cost, Name)][is_basic_land == FALSE & Maindeck ==  0]
   #add basic lands
   blands <- sata[is_basic_land == TRUE, .N, by = Name][order(-N)]
   if (nrow(blands) > 0) {
-  land_rows <- data.table(Name = blands[, Name], Converted_Cost = NA, colOrder = -1, is_basic_land = TRUE, Maindeck = TRUE, image_id = blands[, Name], MID = blands[, Name])
+  land_rows <- data.table(Name = blands[, Name], Converted_Cost = NA, colOrder = -1, is_basic_land = TRUE, Maindeck = 1, image_id = blands[, Name], MID = blands[, Name])
   }
   add_basics <- rbind(land_rows, sorted)
 

@@ -5,14 +5,16 @@ output$select_draft <- renderUI({
 
 # omistaja_ID_calc <-  NULL
 # omistaja_ID_calc$value <- "L"
+
   mun_draftatyt <- dbQ(paste0("SELECT count(MID) as count_MID, DRAFT_ID
                               FROM DRAFT_CARDS
                               WHERE PICKED = 0 AND OMISTAJA_ID = \"", omistaja_ID_calc$value,
                        "\" GROUP BY DRAFT_ID"),
                        con)
+
   selectInput(inputId = "todo_Drafts",
               label = "Select Draft_ID",
-              choices = mun_draftatyt[, DRAFT_ID])
+              choices = c(mun_draftatyt[, DRAFT_ID]))
 
 
 })
@@ -23,7 +25,8 @@ ReactDraftCards <- reactiveValues(image_ids = NULL,
                                   cards_left = NULL)
 
 observeEvent(input$todo_Drafts,{
-  uudet_kortit <- dbQ(paste0("SELECT MID
+req(input$todo_Drafts)
+  uudet_kortit <- dbQ(paste0("SELECT MID, id as DRAFT_CARDS_ID
                               FROM DRAFT_CARDS
                              WHERE DRAFT_ID = ", input$todo_Drafts, " AND
                              PICKED = 0 AND
@@ -34,10 +37,10 @@ observeEvent(input$todo_Drafts,{
   #tee uniikit imageIdt
 
   uudet_kortit[, image_id := paste0("DraftBar", seq_len(.N))]
-  ReactDraftCards$image_ids <- uudet_kortit[, .(MID, image_id)]
-  ReactDraftCards$cards_left <- uudet_kortit[, .(MID, image_id)]
+  ReactDraftCards$image_ids <- uudet_kortit[, .(MID, image_id, DRAFT_CARDS_ID)]
+  ReactDraftCards$cards_left <- uudet_kortit[, .(MID, image_id, DRAFT_CARDS_ID)]
 
-})
+}, ignoreNULL = TRUE, ignoreInit = TRUE)
 
 
 output$draftitSideBar <- renderUI({
@@ -87,3 +90,35 @@ print(jaljella_olevat)
   )
 
 })
+
+observe({
+  # req(ReactDraftCards$cards_left)
+  # cards_left <- nrow(ReactDraftCards$cards_left)
+  # if (cards_left == 0) {shinyjs::enable("saveDraftedCards")} else {
+  #   shinyjs::disable("saveDraftedCards")
+  # }
+})
+
+observeEvent(input$saveDraftedCards,{
+  required_data(c("STG_CARDS", "STG_CARDS_DIM"))
+  #need old list
+  #create new decklist
+  #save it with new pfi
+  #old_decklist <- STG_CARDS[Pakka_form_ID == 250]
+  Pakka_IDt <- deck_changes$draft[, .N, by = Pakka_ID][, Pakka_ID]
+  for (pakkaloop in Pakka_IDt) {
+    new_MIDs <- deck_changes$draft[Pakka_ID == pakkaloop, .(MID, DRAFT_CARDS_ID)]
+    new_dl_loop <- createNewDecklist_after_draft(new_MIDs, pakkaloop, STG_CARDS, STG_CARDS_DIM, con)
+    #ammutaan kantaan
+    dbWriteTable(con, "CARDS", new_dl_loop, row.names = FALSE, append = TRUE)
+    required_data("ADM_DI_HIERARKIA")
+    updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
+  }
+
+  #merkkaa dräfätyt
+  draftit <- deck_changes$draft[, .(id = DRAFT_CARDS_ID, PICKED = 1)]
+  dbIoU("DRAFT_CARDS", draftit, con)
+  updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
+
+
+}, ignoreInit = TRUE, ignoreNULL = TRUE)

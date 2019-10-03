@@ -17,7 +17,7 @@ observeEvent(input$reload, {
   if (nrow(draft_data) == 0) {
     drafti_no <- 1
   } else {
-    drafti_no <- as.numeric(draft_data[OMISTAJA_ID == omistaja_ID_calc, max_draft]) + 1
+    drafti_no <- as.numeric(draft_data[OMISTAJA_ID == omistaja_ID_calc$value, max_draft]) + 1
   }
   draftiTaulu[, DRAFT_ID := drafti_no]
   draftiTaulu[, PICKED := 0]
@@ -60,6 +60,7 @@ output$uudet_kortit <- renderUI({
 
 #näytä imaget
 output$draftit <- renderUI({
+
   req(draftMID$MID)
 con <- connDB(con)
   input$reload

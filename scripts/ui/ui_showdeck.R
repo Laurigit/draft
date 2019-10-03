@@ -1,8 +1,8 @@
 #tab_leaderboard
 tabItem(tabName = "tab_showdeck",
-        numericInput("pif","pif", 70, 1, 1000),
         uiOutput("deck_selector"),
-        radioButtons("main_side", "main or side", choices = list("Main", "Side", "Both", "Neither")),
+        radioButtons("main_side", "main or side", choices = list("Main", "Side", "Both", "Neither"),
+                     inline = TRUE),
         #imageOutput("img2985"),
        # uiOutput("kortti"),
 
