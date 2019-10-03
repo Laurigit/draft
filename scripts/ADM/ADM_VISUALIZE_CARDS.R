@@ -2,7 +2,7 @@
 required_data(c("STG_CARDS_DIM", "STG_CARDS"))
 
 sscols_DIM <- STG_CARDS_DIM
-sscols <- STG_CARDS[, .(Pakka_form_ID, MID, Count, Maindeck)]
+sscols <- STG_CARDS[, .(Pakka_form_ID, MID, Count, Maindeck, Pakka_ID)]
 
 joini <- sscols_DIM[sscols, on = "MID"]
 

@@ -1,0 +1,2 @@
+#SRC_DECKS_DIM
+SRC_DECKS_DIM <- dbSelectAll("DECKS_DIM", con)

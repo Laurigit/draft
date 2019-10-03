@@ -4,15 +4,28 @@
 
 required_data("ADM_VISUALIZE_CARDS")
 
+output$deck_selector <- renderUI({
+  required_data("STG_DECKS_DIM")
+
+  # session <- NULL
+  # session$user <- "Lauri"
+  my_decks <- STG_DECKS_DIM[Omistaja_NM == session$user & !(Retired == 1 & Side == 0) & Side != -1, .(Pakka_ID, Side, Nimi)]
+  sorted <- my_decks[order(Side, Pakka_ID)]
+  radioButtons(inputId = "myDecks",
+               label = NULL,
+               choiceNames = sorted[, Nimi],
+               choiceValues = sorted[, Pakka_ID],
+               inline = TRUE)
+})
+
+
 #tee ekana korteista idt
 
 observe({
-  if(is.null(input$sb)) return(NULL)
 
-
-
-
-  kortit <-  ADM_VISUALIZE_CARDS[Pakka_form_ID == input$pif, .(Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
+  my_current_pakkaids <- STG_DECKS_DIM[Omistaja_NM == session$user  & !(Retired == 1 & Side == 0) & Side != -1, Pakka_ID]
+  my_current_pfis <- ADM_VISUALIZE_CARDS[Pakka_ID %in% my_current_pakkaids, max(Pakka_form_ID), by = Pakka_ID]
+  kortit <-  ADM_VISUALIZE_CARDS[Pakka_form_ID %in% my_current_pfis[, V1], .(Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
   print("KORTIT")
   for (i in 1:nrow(kortit))
    # for (i in 1:1)
@@ -92,10 +105,11 @@ output$boxes <- renderUI({
   # input <- NULL
   # input$pfi <- 72
  # kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, 129)
- kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, input$pif)
+  show_pfi <- STG_CARDS[Pakka_ID == input$myDecks, max(Pakka_form_ID)]
+ kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, show_pfi)
  kaadettu <- kaadettu_all$id
-print( get_sorted_cards(ADM_VISUALIZE_CARDS, input$pif)$nimi)
-print(input$pif)
+print( get_sorted_cards(ADM_VISUALIZE_CARDS, show_pfi)$nimi)
+
 print("BOXES")
   columnWidth <- 1
 

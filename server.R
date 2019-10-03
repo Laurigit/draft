@@ -10,17 +10,34 @@
 library(shiny)
 library(clipr)
 library(shinydashboard)
-# Define UI for application that draws a histogram
-
-#install.packages("clipr")
 
 
 
+user_logged <- reactiveValues(count = 0)
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
+server <- function(input, output, session) {
+  func_login <- function(input_user_count, clientDataInput) {
+    cdata <- clientDataInput
+    login <- cdata[["url_search"]]
 
-
+    nimi <- word(login, 2, sep = "=")
+    print("nimi")
+    print(login)
+    print(nimi)
+    if (login == "") {
+      if (input_user_count == 1) {
+        result <- "Lauri"
+      } else {
+        result <- "Martti"
+      }
+    } else {
+      result <- nimi
+    }
+    return(result)
+  }
+  isolate(user_logged$count <- user_logged$count + 1)
+  session$user <- isolate(func_login(user_logged$count, session$clientData))
 
 
 
@@ -71,7 +88,7 @@ server <- function(input, output) {
         values$lastUpdated <- x
       })
     })
-    isolate(values$lastAccepted <-  values$lastUpdated)
+    #isolate(values$lastAccepted <-  values$lastUpdated)
 
   })
 

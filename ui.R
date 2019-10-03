@@ -52,8 +52,9 @@ uusi_peli <- dashboardBody(
 
     ),
   tabItems(
-    source("./scripts/ui/ui_showdeck.R",local = TRUE)$value,
-    source("./scripts/ui/ui_load_draft.R",local = TRUE)$value
+    source("./scripts/ui/ui_load_draft.R",local = TRUE)$value,
+    source("./scripts/ui/ui_showdeck.R",local = TRUE)$value
+
 
   ))
 
@@ -62,8 +63,10 @@ uusi_peli <- dashboardBody(
 #SIDEBAR
 sidebar <- dashboardSidebar(
   sidebarMenu(id = "sidebarmenu",
+              menuItem("Load draft", tabName = "tab_load_draft", icon = icon("gamepad")),
               menuItem("Uusi peli", tabName = "tab_showdeck", icon = icon("gamepad")),
-              menuItem("Load draft", tabName = "tab_load_draft", icon = icon("gamepad"))
+
+              verbatimTextOutput("show_last")
 
   )
 

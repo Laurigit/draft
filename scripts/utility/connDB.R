@@ -15,8 +15,6 @@ connDB <- function(con) {
   })
   return(con)
 }
-con  <-connDB(connDB)
-
 # con <<- dbConnect(MySQL(),  user = 'root', password = 'my-spw', host = '127.0.0.1', port = 3306,  dbname = 'betmtg')
 # con <<- dbConnect(MySQL(),  user = 'root', password = 'my-spw', host = 'localhost', port = 3306,  dbname = 'betmtg')
 #

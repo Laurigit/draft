@@ -1,8 +1,7 @@
 
-dbIoU <- function(table, data_rows) {
-  con <- connDB(con)
+dbIoU <- function(table, data_rows, con) {
 
-  keyCols <- suppressWarnings( dbQ(paste0("SHOW KEYS FROM ",table, " WHERE Key_name = 'PRIMARY'"))[, Column_name])
+  keyCols <- suppressWarnings( dbQ(paste0("SHOW KEYS FROM ",table, " WHERE Key_name = 'PRIMARY'"), con)[, Column_name])
   #data_rows <- data.table(PELI_ID = 1:6, BETTER_ID = 1:4, ODDS = as.integer(runif(n = 24, min = 0, max = 100)), BET_DT = now() )
   colnames_vect <- colnames(data_rows)
   colnames <- paste0(colnames_vect, collapse = ", ")
