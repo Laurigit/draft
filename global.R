@@ -7,6 +7,9 @@ library(RMySQL)
 library(shinyjs)
 library(readtext)
 library(qdapRegex)
+library(magick)
+
+
 
 sourcelist <- data.table(polku = c(dir("./scripts/", recursive = TRUE)))
 sourcelist[, rivi := seq_len(.N)]

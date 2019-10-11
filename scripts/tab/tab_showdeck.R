@@ -2,7 +2,7 @@
 
 
 
-required_data("ADM_VISUALIZE_CARDS")
+required_data(c("ADM_VISUALIZE_CARDS", "ADM_LAND_IMAGES"))
 
 output$deck_selector <- renderUI({
   required_data("STG_DECKS_DIM")
@@ -23,9 +23,15 @@ output$deck_selector <- renderUI({
 
 observe({
 required_data("STG_DECKS_DIM")
+  required_data("ADM_VISUALIZE_CARDS")
+#  session <- NULL
+ # session$user <- "Lauri"
   my_current_pakkaids <- STG_DECKS_DIM[Omistaja_NM == session$user  & !(Retired == 1 & Side == 0) & Side != -1, Pakka_ID]
   my_current_pfis <- ADM_VISUALIZE_CARDS[Pakka_ID %in% my_current_pakkaids, max(Pakka_form_ID), by = Pakka_ID]
-  kortit <-  ADM_VISUALIZE_CARDS[Pakka_ID == 1 & Pakka_form_ID %in% my_current_pfis[, V1], .(Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
+  kortit <-  ADM_VISUALIZE_CARDS[ Pakka_form_ID %in% my_current_pfis[, V1], .(image_file, Pakka_ID, Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
+
+
+  #create land image files
   print("KORTIT")
   for (i in 1:nrow(kortit))
    # for (i in 1:1)
@@ -34,13 +40,14 @@ required_data("STG_DECKS_DIM")
     local({
       my_i <- i
       image_id <- kortit[i, image_id]
+      image_filu <- kortit[i, image_file]
      # print(image_id)
-      image_nm <- paste0(kortit[i, MID], "_card.jpg")
+
      # print(image_nm)
       output[[image_id]] <-  renderImage({
 
         # output[[image_id]] <-  renderImage({
-          list(src = paste0("./www/",image_nm),#image_nm,
+          list(src = paste0("./www/",image_filu),#image_nm,
                alt = "Image failed to render"
                )
         }, deleteFile = FALSE)
@@ -48,57 +55,6 @@ required_data("STG_DECKS_DIM")
   }
 })
 
-get_sorted_cards <- function(ADM_VISUALIZE_CARDS, input_Pakka_form_ID = 70) {
-
-   sata <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input_Pakka_form_ID, .(Converted_Cost, Name, colOrder, is_basic_land, Maindeck, image_id, MID)]
-
-  lapply(sata[, MID], function(x) {
-
-    getCardImg_full(x)
-  })
-
-  sorted <- sata[order(Converted_Cost, Name)][is_basic_land == FALSE & Maindeck ==  1]#[Converted_Cost > 0 & Converted_Cost < 7]
-  side <- sata[order(Converted_Cost, Name)][is_basic_land == FALSE & Maindeck ==  0]
-  #add basic lands
-  blands <- sata[is_basic_land == TRUE, .N, by = Name][order(-N)]
-  if (nrow(blands) > 0) {
-  land_rows <- data.table(Name = blands[, Name], Converted_Cost = NA, colOrder = -1, is_basic_land = TRUE, Maindeck = 1, image_id = blands[, Name], MID = blands[, Name])
-  }
-  add_basics <- rbind(land_rows, sorted)
-
-  #laske jarjestyes
-  add_basics[, order_No := seq_len(.N), by = Converted_Cost]
-  max_order_no <- add_basics[, max(order_No)]
-  side[, order_No := seq_len(.N) + max_order_no, by = Converted_Cost]
-
-
-  kaadettu_main_ids <- dcast.data.table(add_basics, formula =   order_No ~ colOrder, value.var = "image_id" )
-
-  #tarkista eka, etta sideissa on kortteja
-   if(nrow(side) > 0){
-  kaadettu_side_ids <-  dcast.data.table(side, formula =   order_No ~ colOrder, value.var = "image_id" )
-  kaadettu_side_nimi <-  dcast.data.table(side, formula =   order_No ~ colOrder, value.var = "Name" )
-  }
-  #append side ja maini ja sidevälirivi
-  siderivi <- data.table("-1" = "Side")
-  kaadettu_ids <- rbind(kaadettu_main_ids, siderivi, kaadettu_side_ids, fill = TRUE)[, order_No := NULL]
-  kaadettu_ids[, order_No := seq_len(.N)]
-
-
-
-  kaadettu_main_nimi <- dcast.data.table(add_basics, formula =   order_No ~ colOrder, value.var = "Name" )
-
-  #append side ja maini
-  kaadettu_nimi <- rbind(kaadettu_main_nimi, kaadettu_side_nimi, fill = TRUE)[, order_No := NULL]
-  kaadettu_nimi[, order_No := seq_len(.N)]
-  reslist <- NULL
-  reslist$nimi <- kaadettu_nimi
-  reslist$id <- kaadettu_ids
-  reslist$maxcc <- sata[!is.na(Converted_Cost), max(Converted_Cost)]
-  reslist$blands <- blands
-  reslist$last_main_row <- max_order_no
-  return(reslist)
-}
 
 
 
@@ -106,6 +62,7 @@ output$boxes <- renderUI({
   req(input$myDecks)
   # input <- NULL
   # input$pfi <- 72
+  #input$myDecks <- 1
  # kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, 129)
   show_pfi <- STG_CARDS[Pakka_ID == input$myDecks, max(Pakka_form_ID)]
  kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, show_pfi)
@@ -134,7 +91,8 @@ output$boxes <- renderUI({
 
   offset_counter<- 0
   reset_next_round <- FALSE
-lapply(1:max_kortit, function(i) {
+
+  lapply(1:max_kortit, function(i) {
   offset_counter <<- 0
   reset_next_round <<- FALSE
 
@@ -164,39 +122,40 @@ lapply(1:max_kortit, function(i) {
         showLands <- TRUE
       }
       #check if basic land
-      if (nimi %in% c("Mountain", "Forest", "Swamp", "Plains", "Island", "Wastes"))  {
-        value_input <-  kaadettu_all$blands[Name == nimi, N]
-        if (nimi == "Island") {
-            land_color <- "blue"
-        } else if ((nimi == "Forest")) {
-          land_color <- "green"
-        }else if ((nimi == "Plains")) {
-          land_color <- "yellow"
-        }else if ((nimi == "Swamp")) {
-          land_color <- "black"
-        }else if ((nimi == "Mountain")) {
-          land_color <- "red"
-
-      }else if ((nimi == "Wastes")) {
-        land_color <- "purple"
-      }
-
-
-        column(width = columnWidth,
-              if ( showLands == TRUE) {
-               box(title = NULL,
-                   paste0(value_input, " ", nimi),
-                 background = land_color,
-                width = NULL,
-            collapsible = FALSE,
-            height = "40px"
-                )
-              } else {
-          HTML("")
-        }
-          )
-       # HTML('<div id = "logo"><h4>paste0(nimi, " ", value_input)</h4>, background = land_color </div>')
-      } else if (nimi %in% "Side") {
+      # if (nimi %in% c("Mountain", "Forest", "Swamp", "Plains", "Island", "Wastes"))  {
+      #   value_input <-  kaadettu_all$blands[Name == nimi, N]
+      #   if (nimi == "Island") {
+      #       land_color <- "blue"
+      #   } else if ((nimi == "Forest")) {
+      #     land_color <- "green"
+      #   }else if ((nimi == "Plains")) {
+      #     land_color <- "yellow"
+      #   }else if ((nimi == "Swamp")) {
+      #     land_color <- "black"
+      #   }else if ((nimi == "Mountain")) {
+      #     land_color <- "red"
+      #
+      # }else if ((nimi == "Wastes")) {
+      #   land_color <- "purple"
+      # }
+      #
+      #
+      #   column(width = columnWidth,
+      #         if ( showLands == TRUE) {
+      #          box(title = NULL,
+      #              paste0(value_input, " ", nimi),
+      #            background = land_color,
+      #           width = NULL,
+      #       collapsible = FALSE,
+      #       height = "40px"
+      #           )
+      #         } else {
+      #     HTML("")
+      #   }
+      #     )
+      #  # HTML('<div id = "logo"><h4>paste0(nimi, " ", value_input)</h4>, background = land_color </div>')
+      #} else
+      if (nimi %in% "Side") {
         print("else if")
         column(width = 12,
 

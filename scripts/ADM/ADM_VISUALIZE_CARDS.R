@@ -1,5 +1,5 @@
 #ADM_VISUALIZE_CARDS
-required_data(c("STG_CARDS_DIM", "STG_CARDS"))
+required_data(c("STG_CARDS_DIM", "STG_CARDS", "ADM_LAND_IMAGES"))
 
 sscols_DIM <- STG_CARDS_DIM
 sscols <- STG_CARDS[, .(Pakka_form_ID, MID, Count, Maindeck, Pakka_ID)]
@@ -12,18 +12,27 @@ joini[, colOrder := Converted_Cost]
 #joinBasic <- joini[basic_land_types, on = "Pakka_form_ID"]
 
 #are there non-basic_lands
-joini[is.na(Converted_Cost) & Rarity != "Basic Land", colOrder := -1]
+joini[is.na(Converted_Cost) , colOrder := -1]
 
-#join_count_nonbasic
-#join_non_basic <-  joinBasic[nonBasics, on = "Pakka_form_ID"]
+#levita non-basic-land kortit. Aggregoi basic land kortit
+joini[, is_basic_land := ifelse(Name %in% c("Mountain", "Island", "Forest", "Wastes", "Swamp", "Plains"), TRUE, FALSE)]
+basics <- joini[is_basic_land == TRUE, .(Count = sum(Count)), by = .(Name, Text, Cost, Converted_Cost, Rarity, Colors, Stats,
+                                                             Pakka_form_ID, Maindeck, Pakka_ID, colOrder, is_basic_land)]
 
-#count max colo_order
-#join_non_basic[, maxColOrder := max(colOrder, na.rm = TRUE), by = Pakka_form_ID]
+#joinaa image id ja MID
+join_image_id_to_lands <- ADM_LAND_IMAGES[basics, on = .(Count, Name)]
 
-#lisataan riveja countin mukaan, jotta osataan piirtaa oikee maara kortteja
-levita_data <- joini[rep(seq_len(nrow(joini)), Count), ]
-#joini[]
+muut <- joini[is_basic_land == FALSE, .(Name, Text, Cost, Converted_Cost, Rarity, Colors, Stats,
+                                         Pakka_form_ID, Maindeck, Pakka_ID, colOrder, Count, MID, is_basic_land)]
+
+
+levita_muut <- muut[rep(seq_len(nrow(muut)), Count), ]
+levita_muut[, image_file := paste0(MID, "_card.jpg")]
+
+#appendaa
+levita_data <-  rbind(levita_muut, join_image_id_to_lands, fill = TRUE)
 levita_data[, image_id := paste0("img", seq_len(.N))]
-levita_data[, is_basic_land := ifelse(Name %in% c("Mountain", "Island", "Forest", "Wastes", "Swamp", "Plains"), TRUE, FALSE)]
+#lisataan riveja countin mukaan, jotta osataan piirtaa oikee maara kortteja
+
 ADM_VISUALIZE_CARDS <- levita_data
 #ADM_VISUALIZE_CARDS[is.na(Converted_Cost)]
