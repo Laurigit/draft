@@ -3,13 +3,18 @@
 
 
 required_data(c("ADM_VISUALIZE_CARDS", "ADM_LAND_IMAGES"))
+output$sideboard_bar <- renderImage({
+  list(src = paste0("./external_files/sideboard.JPG"),#image_nm,
+       alt = "Image failed to render"
+  )
+}, deleteFile = FALSE)
 
 output$deck_selector <- renderUI({
   required_data("STG_DECKS_DIM")
 
   # session <- NULL
   # session$user <- "Lauri"
-  my_decks <- STG_DECKS_DIM[Omistaja_NM == session$user & !(Retired == 1 & Side == 0) & Side != -1, .(Pakka_ID, Side, Nimi)]
+  my_decks <- STG_DECKS_DIM[Pakka_ID == 1 & Omistaja_NM == session$user & !(Retired == 1 & Side == 0) & Side != -1, .(Pakka_ID, Side, Nimi)]
   sorted <- my_decks[order(Side, Pakka_ID)]
   radioButtons(inputId = "myDecks",
                label = NULL,
@@ -54,6 +59,7 @@ required_data("STG_DECKS_DIM")
     })
   }
 })
+
 
 
 
@@ -156,16 +162,17 @@ output$boxes <- renderUI({
       #  # HTML('<div id = "logo"><h4>paste0(nimi, " ", value_input)</h4>, background = land_color </div>')
       #} else
       if (nimi %in% "Side") {
-        print("else if")
-        column(width = 12,
-
-                 box(title = NULL,
-                    "Sideboard",
-                     background = "blue",
-                     width = NULL,
-                     collapsible = FALSE,
-                     height = "150px"
-                 ))
+        column(width = 12, imageOutput("sideboard_bar", width = "1600px", height = "70px"))
+        # print("else if")
+        # column(width = 12,
+        #
+        #          box(title = NULL,
+        #             "Sideboard",
+        #              background = "blue",
+        #              width = NULL,
+        #              collapsible = FALSE,
+        #              height = "150px"
+        #          ))
       } else {
 
       sarake <- max(j, 1)
