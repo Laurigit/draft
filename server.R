@@ -85,19 +85,45 @@ server <- function(input, output, session) {
     req(input$myDecks)
     req(ReactDraftCards$cards_left)
     req(input[[values$lastUpdated]])
-    print(input[[values$lastUpdated]] )
+    print(values$lastUpdated)
+   # print(input[[values$lastUpdated]] )
     if (input[[values$lastUpdated]]$x >= 0) {
     print("TOIMIII2")
 
-    removed_image_id <- values$lastUpdated
-    changed_MID <- ReactDraftCards$image_ids[image_id == values$lastUpdated, MID]
-    draft_card_id <- ReactDraftCards$image_ids[image_id == values$lastUpdated, DRAFT_CARDS_ID]
-    new_row <- isolate(data.table(MID = changed_MID, Pakka_ID = input$myDecks, DRAFT_CARDS_ID = draft_card_id))
-    total_data <- isolate(rbind(deck_changes$draft, new_row))
-    deck_changes$draft <- total_data
-    #delete from draft
+      clicked <- ""
+      #check where was clicked
+      if (nrow(ReactDraftCards$image_ids[image_id ==  values$lastUpdated]) > 0) {
+        clicked <- "Draft"
+      } else if  (nrow(main$cards[image_id ==  values$lastUpdated]) > 0) {
+        clicked <- "Main"
+      } else if  (nrow(side$cards[image_id ==  values$lastUpdated]) > 0) {
+        clicked <- "Side"
+      }
 
-    ReactDraftCards$cards_left <- isolate( ReactDraftCards$cards_left[image_id != removed_image_id])
+      if (clicked == "Draft") {
+
+
+        removed_image_id <- values$lastUpdated
+        changed_MID <- ReactDraftCards$image_ids[image_id == values$lastUpdated, MID]
+        draft_card_id <- ReactDraftCards$image_ids[image_id == values$lastUpdated, DRAFT_CARDS_ID]
+        new_row <- isolate(data.table(MID = changed_MID, Pakka_ID = input$myDecks, DRAFT_CARDS_ID = draft_card_id))
+        total_data <- isolate(rbind(deck_changes$draft, new_row))
+        deck_changes$draft <- total_data
+        #delete from draft
+
+        ReactDraftCards$cards_left <- isolate( ReactDraftCards$cards_left[image_id != removed_image_id])
+      } else if (clicked == "Main") {
+        print("Main clicked")
+
+      } else if (clicked == "Side") {
+        print("Side clicked")
+      }
+
+
+
+
+
+
     }
   })
 
@@ -108,10 +134,12 @@ server <- function(input, output, session) {
    # input <- c("eka", "toka", "img1", "img3332")
     #imagelist <- names(input)
    # imagelist <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$pif, image_id]
-
-    imagelist <-   ReactDraftCards$image_ids[, image_id]
+    mainCards <- main$cards[, image_id]
+    sideCards <- side$cards[, image_id]
+    draftCards <-   ReactDraftCards$image_ids[, image_id]
+    imagelist <- c(draftCards, mainCards, sideCards)
     print("IMAGLIST")
-    print( imagelist)
+   # print( imagelist)
   #  print(ADM_VISUALIZE_CARDS[image_id %in% imagelist, Name])
     #imagelist_filtered <- imagelist[str_sub(imagelist,1, 3)  == "img"]
     #imagelist_filtered_no_prev <- imagelist_filtered[! imagelist_filtered %in%  values$lastAccepted]
@@ -124,33 +152,52 @@ server <- function(input, output, session) {
       })
     })
     #isolate(values$lastAccepted <-  values$lastUpdated)
-
+    print("IMAGLIST valmis")
   })
 
-  output$show_last <- renderPrint({
+
+  eV_show_last <- reactive({
     req(ReactDraftCards$image_ids)
     req( values$lastUpdated)
     print("rivimaara")
     print(nrow(ReactDraftCards$image_ids))
-
-    if (nrow(ReactDraftCards$image_ids) > 0){
-
-        updated_MID <- ReactDraftCards$image_ids[image_id ==  values$lastUpdated, .(MID)]
-        if (nrow(updated_MID) > 0) {
-           #STG_CARDS_DIM[MID == updated_MID[, MID]  , Name]
-            cardNames <- STG_CARDS_DIM[, .(MID = as.numeric(MID), Name)]
-           DeckNames <- STG_DECKS_DIM[, .(Pakka_ID, Nimi)]
-           if (nrow( deck_changes$draft) > 0) {
-           raw_data <- deck_changes$draft[, .(MID = as.numeric(MID), Pakka_ID = as.numeric(Pakka_ID))]
-           joinaa <- cardNames[raw_data, on = "MID"]
-           joinaa_pid <- DeckNames[joinaa, on = "Pakka_ID"]
-
-           print(joinaa_pid[order(Pakka_ID), .(Nimi, Name)])
-           }
-        }
+    clicked <- ""
+    #check where was clicked
+    if (nrow(ReactDraftCards$image_ids[image_id ==  values$lastUpdated]) > 0) {
+      clicked <- "Draft"
+    } else if  (nrow(main$cards[image_id ==  values$lastUpdated]) > 0) {
+      clicked <- "Main"
+    } else if  (nrow(side$cards[image_id ==  values$lastUpdated]) > 0) {
+      clicked <- "Side"
     }
 
-  #  str(input[[values$lastUpdated]])
+    if (clicked == "Draft") {
+
+      updated_MID <- ReactDraftCards$image_ids[image_id ==  values$lastUpdated, .(MID)]
+      if (nrow(updated_MID) > 0) {
+        #STG_CARDS_DIM[MID == updated_MID[, MID]  , Name]
+        required_data(c("STG_CARDS_DIM", "STG_DECKS_DIM"))
+        cardNames <- STG_CARDS_DIM[, .(MID = as.numeric(MID), Name)]
+        DeckNames <- STG_DECKS_DIM[, .(Pakka_ID, Nimi)]
+        if (nrow( deck_changes$draft) > 0) {
+          raw_data <- deck_changes$draft[, .(MID = as.numeric(MID), Pakka_ID = as.numeric(Pakka_ID))]
+          joinaa <- cardNames[raw_data, on = "MID"]
+          joinaa_pid <- DeckNames[joinaa, on = "Pakka_ID"]
+
+          print(joinaa_pid[order(Pakka_ID), .(Nimi, Name)])
+        }
+      }
+    } else if (clicked == "Main") {
+      print("Main clicked")
+
+    } else if (clicked == "Side") {
+      print("Side clicked")
+    }
+
+    #  str(input[[values$lastUpdated]])
+  })
+  output$show_last <- renderPrint({
+    eV_show_last()
 
   })
 

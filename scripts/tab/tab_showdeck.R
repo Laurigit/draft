@@ -14,7 +14,7 @@ output$deck_selector <- renderUI({
 
   # session <- NULL
   # session$user <- "Lauri"
-  my_decks <- STG_DECKS_DIM[Pakka_ID == 1 & Omistaja_NM == session$user & !(Retired == 1 & Side == 0) & Side != -1, .(Pakka_ID, Side, Nimi)]
+  my_decks <- STG_DECKS_DIM[Omistaja_NM == session$user & !(Retired == 1 & Side == 0) & Side != -1, .(Pakka_ID, Side, Nimi)]
   sorted <- my_decks[order(Side, Pakka_ID)]
   radioButtons(inputId = "myDecks",
                label = NULL,
@@ -26,15 +26,25 @@ output$deck_selector <- renderUI({
 
 #tee ekana korteista idt
 
+#reactive file to observe which cards are on side and main and recognize the clicks
+main <- reactiveValues(cards = NULL)
+ side <- reactiveValues(cards = NULL)
+
 observe({
+  #req(session$user)
 required_data("STG_DECKS_DIM")
   required_data("ADM_VISUALIZE_CARDS")
+  #main <- NULL
+  #side <- NULL
+  main$cards <- ADM_VISUALIZE_CARDS[Maindeck == 1 & NineSide == 0 & Pakka_ID == 1 , .(image_id, MID, Pakka_ID)]
+  side$cards <- ADM_VISUALIZE_CARDS[Maindeck == 0 & NineSide == 0  & Pakka_ID == 1, .(image_id, MID, Pakka_ID)]
 #  session <- NULL
  # session$user <- "Lauri"
   my_current_pakkaids <- STG_DECKS_DIM[Omistaja_NM == session$user  & !(Retired == 1 & Side == 0) & Side != -1, Pakka_ID]
   my_current_pfis <- ADM_VISUALIZE_CARDS[Pakka_ID %in% my_current_pakkaids, max(Pakka_form_ID), by = Pakka_ID]
-  kortit <-  ADM_VISUALIZE_CARDS[ Pakka_form_ID %in% my_current_pfis[, V1], .(image_file, Pakka_ID, Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
+  kortit <-  ADM_VISUALIZE_CARDS[Pakka_ID == 1 &  Pakka_form_ID %in% my_current_pfis[, V1], .(image_file, Pakka_ID, Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
 
+  #tähän vois laittaa, että ysisidejä ei vielä valmistauduta piirtään.
 
   #create land image files
   print("KORTIT")
