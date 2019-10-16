@@ -36,13 +36,13 @@ required_data("STG_DECKS_DIM")
   required_data("ADM_VISUALIZE_CARDS")
   #main <- NULL
   #side <- NULL
-  main$cards <- ADM_VISUALIZE_CARDS[Maindeck == 1 & NineSide == 0 & Pakka_ID == 1 , .(image_id, MID, Pakka_ID)]
-  side$cards <- ADM_VISUALIZE_CARDS[Maindeck == 0 & NineSide == 0  & Pakka_ID == 1, .(image_id, MID, Pakka_ID)]
+  main$cards <- ADM_VISUALIZE_CARDS[Maindeck == 1 & NineSide == 0  , .(image_id, MID, Pakka_ID)]
+  side$cards <- ADM_VISUALIZE_CARDS[Maindeck == 0 & NineSide == 0 , .(image_id, MID, Pakka_ID)]
 #  session <- NULL
  # session$user <- "Lauri"
   my_current_pakkaids <- STG_DECKS_DIM[Omistaja_NM == session$user  & !(Retired == 1 & Side == 0) & Side != -1, Pakka_ID]
   my_current_pfis <- ADM_VISUALIZE_CARDS[Pakka_ID %in% my_current_pakkaids, max(Pakka_form_ID), by = Pakka_ID]
-  kortit <-  ADM_VISUALIZE_CARDS[Pakka_ID == 1 &  Pakka_form_ID %in% my_current_pfis[, V1], .(image_file, Pakka_ID, Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
+  kortit <-  ADM_VISUALIZE_CARDS[  Pakka_form_ID %in% my_current_pfis[, V1], .(image_file, Pakka_ID, Converted_Cost, Name, colOrder, Rarity, Maindeck, image_id, MID)]
 
   #tähän vois laittaa, että ysisidejä ei vielä valmistauduta piirtään.
 

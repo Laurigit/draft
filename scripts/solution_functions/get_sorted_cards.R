@@ -23,7 +23,8 @@ get_sorted_cards <- function(ADM_VISUALIZE_CARDS, input_Pakka_form_ID = 439) {
 
 
   kaadettu_main_ids <- dcast.data.table(sorted, formula =   order_No ~ colOrder, value.var = "image_id" )
-
+  kaadettu_side_ids <- NULL
+  kaadettu_side_nimi <-  NULL
   #tarkista eka, etta sideissa on kortteja
   if(nrow(side) > 0){
     kaadettu_side_ids <-  dcast.data.table(side, formula =   order_No ~ colOrder, value.var = "image_id" )
