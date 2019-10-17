@@ -19,8 +19,18 @@ printChanges <- function(change_dt, input_ADM_VISUALIZE_CARDS, input_STG_CARDS_D
   for(loop_row in 1:nrow(change_dt)) {
     row_data <- change_dt[loop_row]
     card <- input_STG_CARDS_DIM[row_data[, MID] == MID, Name]
-    toDeck <- input_STG_DECKS_DIM[Pakka_ID == row_data[, Pakka_ID], Nimi]
-    text <- paste0(card,">",toDeck, "<br>")
+    toDeck <- word(input_STG_DECKS_DIM[Pakka_ID == row_data[, Pakka_ID], Nimi], 1, 1, sep = fixed("_"))
+print(row_data)
+sidetext <- ""
+prefix <- ""
+    if (row_data[, Maindeck] == 0) {
+      sidetext <- "_Side"
+      prefix = ""
+    } else if (row_data[, Maindeck] == -1) {
+
+      prefix <- " rem from "
+    }
+    text <- paste0(card,">", prefix, toDeck, sidetext, "<br>")
     text_tot <- c(text_tot, text)
   }
   return(text_tot)

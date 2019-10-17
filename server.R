@@ -128,7 +128,7 @@ server <- function(input, output, session) {
                                       MID = changed_MID,
                                       Pakka_ID = input$myDecks,
                                       DRAFT_CARDS_ID = draft_card_id,
-                                      Maindeck = NA,
+                                      Maindeck = -1,
                                       Removed_from_game = TRUE))
         deck$changes <- isolate(rbind(deck$changes, new_row))
 
@@ -230,7 +230,7 @@ server <- function(input, output, session) {
     #  str(input[[values$lastUpdated]])
   })
   output$show_last <- renderUI({
-    box(HTML(eV_show_last()))
+    HTML(eV_show_last())
 
   })
 
