@@ -68,6 +68,9 @@ server <- function(input, output, session) {
   }
 
 
+  #reactive file to observe which cards are on side and main and recognize the clicks
+  main <- reactiveValues(cards = NULL)
+  side <- reactiveValues(cards = NULL)
 
 
   values <- reactiveValues(
@@ -116,15 +119,15 @@ server <- function(input, output, session) {
                                       Removed_from_game = FALSE))
         deck$changes <- isolate(rbind(deck$changes, new_row))
 
-        #delete from draft
+        #delete from draftmain
 
         ReactDraftCards$cards_left <- isolate( ReactDraftCards$cards_left[image_id != removed_image_id])
       } else if (clicked == "Main") {
         print("Main clicked")
 
-        changed_MID <- ADM_VISUALIZE_CARDS[image_id == values$lastUpdated, MID]
-        draft_card_id <- ""
-        new_row <- isolate(data.table(source = paste0("Main", input$myDecks),
+        changed_MID <- ADM_VISUALIZE_CARDS[image_id == values$lastUpdated, max(MID)]
+        draft_card_id <- ADM_VISUALIZE_CARDS[image_id == values$lastUpdated, max(DRAFT_CARDS_ID)]
+        new_row <- isolate(data.table(source = paste0("Main"),
                                       MID = changed_MID,
                                       Pakka_ID = input$myDecks,
                                       DRAFT_CARDS_ID = draft_card_id,
@@ -136,9 +139,9 @@ server <- function(input, output, session) {
 
       } else if (clicked == "Side") {
         print("Side clicked")
-        changed_MID <- ADM_VISUALIZE_CARDS[image_id == values$lastUpdated, MID]
-        draft_card_id <- ""
-        new_row <- isolate(data.table(source = paste0("Side", input$myDecks),
+        changed_MID <- ADM_VISUALIZE_CARDS[image_id == values$lastUpdated, max(MID)]
+        draft_card_id <- ADM_VISUALIZE_CARDS[image_id == values$lastUpdated, max(DRAFT_CARDS_ID)]
+        new_row <- isolate(data.table(source = paste0("Side"),
                                       MID = changed_MID,
                                       Pakka_ID = input$myDecks,
                                       DRAFT_CARDS_ID = draft_card_id,
@@ -158,11 +161,12 @@ server <- function(input, output, session) {
 
 
   observe({
-    req(ReactDraftCards$image_ids)
+    req(ReactDraftCards$image_ids, main$cards, side$cards)
     #input <- NULL
    # input <- c("eka", "toka", "img1", "img3332")
     #imagelist <- names(input)
    # imagelist <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$pif, image_id]
+    print("BEFORE IMAGE LIST")
     mainCards <- main$cards[, image_id]
     sideCards <- side$cards[, image_id]
     draftCards <-   ReactDraftCards$image_ids[, image_id]
@@ -224,13 +228,15 @@ server <- function(input, output, session) {
     # } else if (clicked == "Side") {
     #   print("Side clicked")
     # }
-
+    required_data(c("ADM_VISUALIZE_CARDS", "STG_CARDS_DIM", "STG_DECKS_DIM"))
     printChanges(deck$changes, ADM_VISUALIZE_CARDS, STG_CARDS_DIM, STG_DECKS_DIM)
 
     #  str(input[[values$lastUpdated]])
   })
   output$show_last <- renderUI({
-    HTML(eV_show_last())
+   # HTML()
+
+    HTML('<font size="4" color="white">', eV_show_last(),  '</font>')
 
   })
 

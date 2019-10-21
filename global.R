@@ -8,7 +8,7 @@ library(shinyjs)
 library(readtext)
 library(qdapRegex)
 library(magick)
-
+options(shiny.trace=FALSE)
 
 
 sourcelist <- data.table(polku = c(dir("./scripts/", recursive = TRUE)))

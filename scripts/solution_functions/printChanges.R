@@ -1,4 +1,4 @@
-printChanges <- function(change_dt, input_ADM_VISUALIZE_CARDS, input_STG_CARDS_DIM, input_STG_PAKKA_DIM) {
+printChanges <- function(change_dt, input_ADM_VISUALIZE_CARDS, input_STG_CARDS_DIM, input_STG_DECKS_DIM) {
 
 
   # new_row <- isolate(data.table(source = paste0("Side", input$myDecks),
@@ -30,8 +30,8 @@ prefix <- ""
 
       prefix <- " rem from "
     }
-    text <- paste0(card,">", prefix, toDeck, sidetext, "<br>")
-    text_tot <- c(text_tot, text)
+    text <- paste0(card, prefix, toDeck, sidetext, "<br>")
+    text_tot <- paste0(text_tot, text)
   }
   return(text_tot)
 }

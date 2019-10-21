@@ -1,0 +1,3 @@
+#SRC_DRAFT_CARDS
+
+SRC_DRAFT_CARDS <- dbSelectAll("DRAFT_CARDS", con)

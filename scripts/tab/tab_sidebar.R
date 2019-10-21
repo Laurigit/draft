@@ -105,10 +105,12 @@ observeEvent(input$saveDraftedCards,{
   #create new decklist
   #save it with new pfi
   #old_decklist <- STG_CARDS[Pakka_form_ID == 250]
-  Pakka_IDt <- deck_changes$draft[, .N, by = Pakka_ID][, Pakka_ID]
+ # Pakka_IDt <- deck_changes$draft[, .N, by = Pakka_ID][, Pakka_ID]
+drafikortit <-  deck$changes[source ==  paste0("Draft", input$select_draft)]
+  Pakka_IDt <- drafikortit[, .N, by = Pakka_ID][, Pakka_ID]
   for (pakkaloop in Pakka_IDt) {
-    new_MIDs <- deck_changes$draft[Pakka_ID == pakkaloop, .(MID, DRAFT_CARDS_ID)]
-    new_dl_loop <- createNewDecklist_after_draft(new_MIDs, pakkaloop, STG_CARDS, STG_CARDS_DIM, con)
+    new_DCIDs <- drafikortit[Pakka_ID == pakkaloop, .( DRAFT_CARDS_ID)]
+    new_dl_loop <- createNewDecklist_after_draft(new_DCIDs, pakkaloop, STG_CARDS, STG_CARDS_DIM)
     #ammutaan kantaan
     dbWriteTable(con, "CARDS", new_dl_loop, row.names = FALSE, append = TRUE)
     required_data("ADM_DI_HIERARKIA")
@@ -116,7 +118,7 @@ observeEvent(input$saveDraftedCards,{
   }
 
   #merkkaa dräfätyt
-  draftit <- deck_changes$draft[, .(id = DRAFT_CARDS_ID, PICKED = 1)]
+  draftit <- drafikortit[, .(id = DRAFT_CARDS_ID, PICKED = 1)]
   dbIoU("DRAFT_CARDS", draftit, con)
   updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
 

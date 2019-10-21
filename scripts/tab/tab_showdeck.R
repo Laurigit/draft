@@ -4,6 +4,7 @@
 
 required_data(c("ADM_VISUALIZE_CARDS", "ADM_LAND_IMAGES"))
 output$sideboard_bar <- renderImage({
+  print("output$sideboard_bar ")
   list(src = paste0("./external_files/sideboard.JPG"),#image_nm,
        alt = "Image failed to render"
   )
@@ -11,7 +12,7 @@ output$sideboard_bar <- renderImage({
 
 output$deck_selector <- renderUI({
   required_data("STG_DECKS_DIM")
-
+print("output$deck_selector ")
   # session <- NULL
   # session$user <- "Lauri"
   my_decks <- STG_DECKS_DIM[Omistaja_NM == session$user & !(Retired == 1 & Side == 0) & Side != -1, .(Pakka_ID, Side, Nimi)]
@@ -26,16 +27,16 @@ output$deck_selector <- renderUI({
 
 #tee ekana korteista idt
 
-#reactive file to observe which cards are on side and main and recognize the clicks
-main <- reactiveValues(cards = NULL)
- side <- reactiveValues(cards = NULL)
 
 observe({
+
   #req(session$user)
+
 required_data("STG_DECKS_DIM")
   required_data("ADM_VISUALIZE_CARDS")
   #main <- NULL
   #side <- NULL
+
   main$cards <- ADM_VISUALIZE_CARDS[Maindeck == 1 & NineSide == 0  , .(image_id, MID, Pakka_ID)]
   side$cards <- ADM_VISUALIZE_CARDS[Maindeck == 0 & NineSide == 0 , .(image_id, MID, Pakka_ID)]
 #  session <- NULL
@@ -56,9 +57,7 @@ required_data("STG_DECKS_DIM")
       my_i <- i
       image_id <- kortit[i, image_id]
       image_filu <- kortit[i, image_file]
-     # print(image_id)
 
-     # print(image_nm)
       output[[image_id]] <-  renderImage({
 
         # output[[image_id]] <-  renderImage({
@@ -70,12 +69,41 @@ required_data("STG_DECKS_DIM")
   }
 })
 
+observeEvent(input$save_changes_button,{
+  #function(new_DCIDs, removed_DCIDs, Pakka_ID_input, STG_CARDS, STG_CARDS_DIM, STG_DRAFT_CARDS)
 
+  #  new_row <- isolate(data.table(source = paste0("Main_", input$session, "_", input$myDecks),
+  # MID = changed_MID,
+  # Pakka_ID = input$myDecks,
+  # DRAFT_CARDS_ID = draft_card_id,
+  # Maindeck = -1,
+  # Removed_from_game = TRUE))
+  required_data(c("STG_CARDS",
+                  "STG_CARDS_DIM",
+                  "STG_DRAFT_CARDS"
+                  ))
+  new_DCIDs <- deck$changes[Pakka_ID == input$myDecks & source == "Side", DRAFT_CARDS_ID]
+  removed_DCIDs <- deck$changes[Pakka_ID == input$myDecks & source == "Main", DRAFT_CARDS_ID]
+  Pakka_ID_input <- input$myDecks
+  new_dl <-  createNewDecklist_after_changes(new_DCIDs,
+                                  removed_DCIDs,
+                                  Pakka_ID_input,
+                                  STG_CARDS,
+                                  STG_CARDS_DIM,
+                                  STG_DRAFT_CARDS)
+  dbWriteTable(con, "CARDS", new_dl, row.names = FALSE, append = TRUE)
+  required_data("ADM_DI_HIERARKIA")
+  updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
+  deck$changes <- deck$changes[1 == 0]
+})
 
 
 
 output$boxes <- renderUI({
   req(input$myDecks)
+  #create dependency
+  print(input$save_changes_button)
+  print("output$boxes")
   # input <- NULL
   # input$pfi <- 72
   #input$myDecks <- 1
