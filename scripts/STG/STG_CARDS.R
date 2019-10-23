@@ -7,4 +7,3 @@ STG_CARDS <- SRC_CARDS[, .(MID = as.numeric(MID),
                            DRAFT_CARDS_ID = as.numeric(DRAFT_CARDS_ID),
                            Name,
                            Maindeck)]
-

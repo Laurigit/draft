@@ -133,8 +133,10 @@ server <- function(input, output, session) {
                                       DRAFT_CARDS_ID = draft_card_id,
                                       Maindeck = -1,
                                       Removed_from_game = TRUE))
-        deck$changes <- isolate(rbind(deck$changes, new_row))
 
+        deck$changes <- isolate(rbind(deck$changes, new_row))
+        print("Poistettu Mainista tulos")
+        print(deck$changes)
 
 
       } else if (clicked == "Side") {
@@ -148,7 +150,8 @@ server <- function(input, output, session) {
                                       Maindeck = 1,
                                       Removed_from_game = FALSE))
         deck$changes <- isolate(rbind(deck$changes, new_row))
-
+        print("Laitettu sidestä tulos")
+        print(deck$changes)
       }
 
 
@@ -229,6 +232,7 @@ server <- function(input, output, session) {
     #   print("Side clicked")
     # }
     required_data(c("ADM_VISUALIZE_CARDS", "STG_CARDS_DIM", "STG_DECKS_DIM"))
+
     printChanges(deck$changes, ADM_VISUALIZE_CARDS, STG_CARDS_DIM, STG_DECKS_DIM)
 
     #  str(input[[values$lastUpdated]])

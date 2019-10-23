@@ -4,7 +4,7 @@
 
 required_data(c("ADM_VISUALIZE_CARDS", "ADM_LAND_IMAGES"))
 output$sideboard_bar <- renderImage({
-  print("output$sideboard_bar ")
+
   list(src = paste0("./external_files/sideboard.JPG"),#image_nm,
        alt = "Image failed to render"
   )
@@ -55,6 +55,7 @@ required_data("STG_DECKS_DIM")
 
     local({
       my_i <- i
+     # print(paste0(kortit[i, image_id], " ", kortit[i, image_file], " ", kortit[i, Name]))
       image_id <- kortit[i, image_id]
       image_filu <- kortit[i, image_file]
 
@@ -82,7 +83,7 @@ observeEvent(input$save_changes_button,{
                   "STG_CARDS_DIM",
                   "STG_DRAFT_CARDS"
                   ))
-  new_DCIDs <- deck$changes[Pakka_ID == input$myDecks & source == "Side", DRAFT_CARDS_ID]
+  new_DCIDs <- deck$changes[Pakka_ID == input$myDecks & source == "Side", .(DRAFT_CARDS_ID, MID)]
   removed_DCIDs <- deck$changes[Pakka_ID == input$myDecks & source == "Main", DRAFT_CARDS_ID]
   Pakka_ID_input <- input$myDecks
   new_dl <-  createNewDecklist_after_changes(new_DCIDs,
@@ -91,6 +92,7 @@ observeEvent(input$save_changes_button,{
                                   STG_CARDS,
                                   STG_CARDS_DIM,
                                   STG_DRAFT_CARDS)
+
   dbWriteTable(con, "CARDS", new_dl, row.names = FALSE, append = TRUE)
   required_data("ADM_DI_HIERARKIA")
   updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
@@ -100,7 +102,9 @@ observeEvent(input$save_changes_button,{
 
 
 output$boxes <- renderUI({
+
   req(input$myDecks)
+
   #create dependency
   print(input$save_changes_button)
   print("output$boxes")
@@ -117,9 +121,9 @@ output$boxes <- renderUI({
   columnWidth <- 1
 
   max_cc <- kaadettu_all$maxcc
-  print(max_cc)
+
   max_kortit <- kaadettu[, max(order_No)]
-  print(max_kortit)
+
   boxno <- 0
   offset_laskenta <- kaadettu
 
@@ -269,4 +273,39 @@ output$boxes <- renderUI({
 })
 
 
+
 })
+
+
+# # #basic land handling
+#
+observeEvent(input$add_basic_land,{
+
+  print("HEII")
+    req(input$basic_land)
+    req(deck$changes)
+
+    changed_MID <- input$basic_land
+    #get free DCID
+    #check first if lands are already added
+    min_id <- deck$changes[, min(DRAFT_CARDS_ID)]
+    #if min id is positive then this is first new land
+    first_land <- ifelse(min_id < 0, FALSE, TRUE)
+    #get free DCID based on the result
+    if (first_land == TRUE) {
+      input_draft_cards_id  <- (STG_CARDS[, min(DRAFT_CARDS_ID)]) - 1
+    } else {
+      input_draft_cards_id  <- (deck$changes[, min(DRAFT_CARDS_ID)]) - 1
+    }
+    new_row <- isolate(data.table(source = paste0("Side"),
+                                  MID = changed_MID,
+                                  Pakka_ID = input$myDecks,
+                                  DRAFT_CARDS_ID = input_draft_cards_id,
+                                  Maindeck = 1,
+                                  Removed_from_game = FALSE))
+    print("Ennen ländiä")
+    print(deck$changes )
+    deck$changes <- isolate(rbind(deck$changes, new_row))
+    print("Jälkeen")
+},
+ignoreInit = TRUE, ignoreNULL = TRUE)
