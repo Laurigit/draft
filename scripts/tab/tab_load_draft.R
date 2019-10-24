@@ -1,11 +1,15 @@
 draftMID <- reactiveValues(MID = NULL)
 observeEvent(input$reload, {
 
-  leike <- read_clip()
+  leike <- gsub("[^0-9.-]", "", input$clip)
+
+  leike_all <- as.numeric(str_split(gsub("[\r\n]", "/", input$clip), pattern = "/")[[1]])
+  leike <- leike_all[!is.na(leike_all)]
   MIDs <- dbQ(paste0("SELECT MID from CARDS_DIM"),  con)
   new_cards <- setdiff(leike, MIDs[, MID])
   for (x in new_cards) {
     addCardToDB(x, con)
+
   }
   draftiTaulu <- data.table(MID = leike)
   draftiTaulu[, PICK_ORDER := seq_len(.N)]
@@ -62,7 +66,7 @@ output$uudet_kortit <- renderUI({
 output$draftit <- renderUI({
 
   req(draftMID$MID)
-con <- connDB(con)
+  con <- connDB(con)
   input$reload
 
   leike <- draftMID$MID[, MID]
@@ -94,10 +98,10 @@ con <- connDB(con)
   fluidRow(
     lapply( 1:nrow(uudet_kortit), function(x) {
       column(width = 4,
-      imageOutput(uudet_kortit[x, image_id],
-                  height = "150px"
-                  #  hover = hoverOpts(id = nimi)
-      )
+             imageOutput(uudet_kortit[x, image_id],
+                         height = "150px"
+                         #  hover = hoverOpts(id = nimi)
+             )
       )
 
     })

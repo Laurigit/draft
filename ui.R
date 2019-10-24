@@ -7,7 +7,7 @@
 uusi_peli <- dashboardBody(
 
 
- # height: 114px;
+  # height: 114px;
   tags$head(
     tags$style(
       HTML("
@@ -26,12 +26,12 @@ uusi_peli <- dashboardBody(
 
 
 
-#
-#   useShinyjs(),
-#   extendShinyjs(text = jscode),
-#   extendShinyjs(text = "shinyjs.hidehead = function(parm){
-#                 $('header').css('display', parm);
-#                 }"),
+  #
+  #   useShinyjs(),
+  #   extendShinyjs(text = jscode),
+  #   extendShinyjs(text = "shinyjs.hidehead = function(parm){
+  #                 $('header').css('display', parm);
+  #                 }"),
 
   tags$head(
     tags$style(
@@ -42,7 +42,7 @@ uusi_peli <- dashboardBody(
            height:740px;
            }
            ")
-      )
+    )
     ,
 
     tags$style(type = "text/css", "
@@ -50,9 +50,10 @@ uusi_peli <- dashboardBody(
                ")
 
 
-    ),
+  ),
   tabItems(
     source("./scripts/ui/ui_load_draft.R",local = TRUE)$value,
+    source("./scripts/ui/ui_new_deck.R",local = TRUE)$value,
     source("./scripts/ui/ui_showdeck.R",local = TRUE)$value
 
 
@@ -64,7 +65,8 @@ uusi_peli <- dashboardBody(
 sidebar <- dashboardSidebar(
   sidebarMenu(id = "sidebarmenu",
               menuItem("Load draft", tabName = "tab_load_draft", icon = icon("gamepad")),
-              menuItem("Uusi peli", tabName = "tab_showdeck", icon = icon("gamepad")),
+              menuItem("Edit decks", tabName = "tab_showdeck", icon = icon("gamepad")),
+              menuItem("New deck", tabName = "tab_showdeck", icon = icon("gamepad")),
               actionButton("saveDraftedCards", "Save drafted cards"),
               uiOutput("show_last"),
               uiOutput("select_draft"),

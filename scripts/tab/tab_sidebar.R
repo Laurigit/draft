@@ -111,7 +111,7 @@ drafikortit <-  deck$changes[source ==  paste0("Draft", input$select_draft)]
   for (pakkaloop in Pakka_IDt) {
     new_DCIDs <- drafikortit[Pakka_ID == pakkaloop, .( DRAFT_CARDS_ID)]
     new_dl_loop <- createNewDecklist_after_draft(new_DCIDs, pakkaloop, STG_CARDS, STG_CARDS_DIM, STG_DRAFT_CARDS)
-    browser()
+
     #ammutaan kantaan
     dbWriteTable(con, "CARDS", new_dl_loop, row.names = FALSE, append = TRUE)
     required_data("ADM_DI_HIERARKIA")

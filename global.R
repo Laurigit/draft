@@ -1,3 +1,4 @@
+library(shiny)
 library(data.table)
 library(stringr)
 library(shinydashboard)
@@ -6,7 +7,9 @@ library(jsonlite)
 library(RMySQL)
 library(shinyjs)
 library(readtext)
-library(qdapRegex)
+
+library(clipr)
+#library(qdapRegex)
 library(magick)
 options(shiny.trace=FALSE)
 

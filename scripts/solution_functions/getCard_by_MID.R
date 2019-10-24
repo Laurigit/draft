@@ -8,7 +8,7 @@ getCard_by_MID <- function(cardMID) {
 
   result_row <- data.table( MID = cardMID,
                             Name = result_json$name,
-                            Text = ifelse(is.null(result_json$oracle_text), NA,  result_json$oracle_text),
+                            Text = gsub("[[:punct:]]", "", ifelse(is.null(result_json$oracle_text), NA,  result_json$oracle_text)),
                             Cost = ifelse(is.null(result_json$mana_cost), NA, result_json$mana_cost),
                             Converted_Cost = ifelse(is.null(result_json$cmc), NA, result_json$cmc),
                             Rarity = result_json$rarity,

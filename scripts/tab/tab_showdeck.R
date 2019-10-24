@@ -50,6 +50,7 @@ required_data("STG_DECKS_DIM")
 
   #create land image files
   print("KORTIT")
+
   for (i in 1:nrow(kortit))
    # for (i in 1:1)
   {

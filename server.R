@@ -7,9 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 
-library(shiny)
-library(clipr)
-library(shinydashboard)
+
 
 
 

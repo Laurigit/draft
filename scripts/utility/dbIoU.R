@@ -14,18 +14,17 @@ dbIoU <- function(table, data_rows, con) {
     row_string <- data_to_string[loop]
 
     duplicate_table <- data.table(colname = non_key_cols, value =  as.matrix(data_rows[loop, non_key_cols, with = FALSE])[1,])
-    duplicate_table[, string_sql := paste0(colname, " = \"", value, "\"")]
+    duplicate_table[, string_sql := paste0(colname, ' = \'', value, '\'')]
     duplicate_string <- paste0(duplicate_table[, string_sql],  collapse = ", ")
-
-    dbFetch(dbSendQuery(con, paste0("insert into ",
+    dbFetch(dbSendQuery(con, paste0('insert into ',
                                     table,
-                                    " (",
+                                    ' (',
                                     colnames,
-                                    ")",
-                                    " VALUES (\"",
+                                    ')',
+                                    ' VALUES (\"',
                                     row_string,
-                                    "\")",
-                                    "ON DUPLICATE KEY UPDATE ",
+                                    '\")',
+                                    'ON DUPLICATE KEY UPDATE ',
                                     duplicate_string)))
 
   }
