@@ -9,7 +9,7 @@ library(shinyjs)
 library(readtext)
 
 library(clipr)
-#library(qdapRegex)
+library(qdapRegex)
 library(magick)
 options(shiny.trace=FALSE)
 
