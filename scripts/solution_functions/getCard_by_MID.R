@@ -1,5 +1,5 @@
 
-getCard_by_MID <- function(MID) {
+getCard_by_MID <- function(cardMID) {
   #cardMID <- "456612"
   url <- paste0("https://api.scryfall.com/cards/multiverse/", cardMID)
 

@@ -119,4 +119,5 @@ observeEvent(input$draft_cards, {
 kortit <-   draftMID$MID
   dbWriteTable(con, "DRAFT_CARDS", kortit, append = TRUE, row.names = FALSE)
   draftMID$MID <- NULL
+  updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
 })

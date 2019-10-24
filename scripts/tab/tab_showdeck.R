@@ -34,6 +34,7 @@ observe({
 
 required_data("STG_DECKS_DIM")
   required_data("ADM_VISUALIZE_CARDS")
+  #create dep ÄLÄ TUHOA
   #main <- NULL
   #side <- NULL
 
@@ -106,7 +107,10 @@ output$boxes <- renderUI({
   req(input$myDecks)
 
   #create dependency
-  print(input$save_changes_button)
+  #create dep ÄLÄ TUHOA
+  input$save_changes_button
+  input$saveDraftedCards
+  #DEP VALMIS
   print("output$boxes")
   # input <- NULL
   # input$pfi <- 72
@@ -309,3 +313,58 @@ observeEvent(input$add_basic_land,{
     print("Jälkeen")
 },
 ignoreInit = TRUE, ignoreNULL = TRUE)
+
+
+
+observeEvent(input$remove_basic_land,{
+
+  print("remove")
+  req(input$remove_basic_land)
+  req(deck$changes)
+
+  changed_MID <- input$basic_land
+  #get free DCID
+  #check first if lands are already added. This works because only basic lands get new negative DCIDs
+  min_id <- deck$changes[MID == changed_MID & source == "Side", min(DRAFT_CARDS_ID)]
+  #if min id is positive then this is first new land
+  first_land <- ifelse(min_id < 0, FALSE, TRUE)
+
+  if (first_land == TRUE) {
+   #remove from old list
+    #get a correct DCID from old list
+    old_PFI <- STG_CARDS[Pakka_ID == input$myDecks, max(Pakka_form_ID)]
+    old_dl <- STG_CARDS[Pakka_form_ID == old_PFI, .(MID, Pakka_ID, Name, Maindeck, DRAFT_CARDS_ID)]
+
+    lands_removed_already_from_main <- deck$changes[MID == changed_MID &
+                                                      Removed_from_game == TRUE &
+                                                      source == "Main",
+                                                    DRAFT_CARDS_ID]
+    #remove  one of the not already removed lands :)
+
+    removed_DCID <- min(setdiff(old_dl[MID == changed_MID, DRAFT_CARDS_ID],
+                            lands_removed_already_from_main))
+
+    new_row <- isolate(data.table(source = paste0("Main"),
+                                  MID = changed_MID,
+                                  Pakka_ID = input$myDecks,
+                                  DRAFT_CARDS_ID = removed_DCID,
+                                  Maindeck = -1,
+                                  Removed_from_game = TRUE))
+    deck$changes <- isolate(rbind(deck$changes, new_row))
+  } else {
+    #remove from temporaryli added cards
+    deck$changes <- deck$changes[DRAFT_CARDS_ID != min_id]
+  }
+
+  print(deck$changes )
+
+  print("Jälkeen ländiä")
+},
+ignoreInit = TRUE, ignoreNULL = TRUE)
+
+observeEvent(input$reset_changes,{
+  deck$changes <- deck$changes[1 == 0]
+})
+
+#reset
+#land pct

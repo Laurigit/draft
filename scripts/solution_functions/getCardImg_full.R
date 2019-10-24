@@ -1,6 +1,7 @@
 #cardNameInput <- "Kitchen Finks"
 #getCardImg_full(cardNameInput)
 getCardImg_full <- function(cardMID) {
+
   #check if exists
   #fixedName <- stringi::stri_trans_general(cardNameInput, "Latin-ASCII")
   if (!file.exists(paste0("../common_data/", cardMID, "_card.jpg"))) {
