@@ -65,7 +65,7 @@ server <- function(input, output, session) {
     }
   }
 
-
+required_data("ADM_DI_HIERARKIA")
   #reactive file to observe which cards are on side and main and recognize the clicks
   main <- reactiveValues(cards = NULL)
   side <- reactiveValues(cards = NULL)
