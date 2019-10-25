@@ -64,6 +64,7 @@ uusi_peli <- dashboardBody(
 #SIDEBAR
 sidebar <- dashboardSidebar(
   sidebarMenu(id = "sidebarmenu",
+              radioButtons("select_user", "User", choices = c("Lauri", "Martti")),
               menuItem("Load draft", tabName = "tab_load_draft", icon = icon("gamepad")),
               menuItem("Edit decks", tabName = "tab_showdeck", icon = icon("gamepad")),
               menuItem("New deck", tabName = "tab_showdeck", icon = icon("gamepad")),

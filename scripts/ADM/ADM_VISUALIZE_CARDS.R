@@ -6,11 +6,7 @@ sscols <- STG_CARDS[, .(Pakka_form_ID, MID, DRAFT_CARDS_ID, Maindeck, Pakka_ID)]
 
 joini_all <- sscols_DIM[sscols, on = "MID"]
 
-#join nineside info
-if(!exists("session")) {
-  session <- NULL
-  session$user <- "Lauri"
-}
+
 sscolsDecks <- STG_DECKS_DIM[Omistaja_NM == session$user, .(NineSide, Pakka_ID)]
 joini <- joini_all[sscolsDecks, on = .(Pakka_ID)]
 

@@ -99,6 +99,10 @@ observe({
   # }
 })
 
+observeEvent(input$select_user, {
+  session$user <- input$select_user
+})
+
 observeEvent(input$saveDraftedCards,{
   required_data(c("STG_CARDS", "STG_CARDS_DIM"))
   #need old list
