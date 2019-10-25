@@ -100,7 +100,7 @@ observe({
 })
 
 observeEvent(input$select_user, {
-  session$user <- input$select_user
+  #session$user <- input$select_user
 })
 
 observeEvent(input$saveDraftedCards,{

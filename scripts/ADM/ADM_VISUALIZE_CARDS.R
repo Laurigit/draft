@@ -6,8 +6,10 @@ sscols <- STG_CARDS[, .(Pakka_form_ID, MID, DRAFT_CARDS_ID, Maindeck, Pakka_ID)]
 
 joini_all <- sscols_DIM[sscols, on = "MID"]
 
-
-sscolsDecks <- STG_DECKS_DIM[Omistaja_NM == session$user, .(NineSide, Pakka_ID)]
+print("TOIMI")
+#sscolsDecks <- STG_DECKS_DIM[Omistaja_NM == session$user, .(NineSide, Pakka_ID)]
+sscolsDecks <- STG_DECKS_DIM[, .(NineSide, Pakka_ID)]
+print("EITOIMIs")
 joini <- joini_all[sscolsDecks, on = .(Pakka_ID)]
 
 
