@@ -9,10 +9,10 @@ tabItem(tabName = "tab_load_draft",
                      actionButton("draft_cards",
                                   width = '100%',
                                   label = HTML('<h1>Draft cards</h1>')))),
-       uiOutput("draftit"),
-       textAreaInput("clip", "Paste MIDs")
-       # ,
-       # uiOutput("draftitSideBar")
-      )
+          uiOutput("draftit"),
+          textAreaInput("clip", "Paste MIDs")
+          # ,
+          # uiOutput("draftitSideBar")
+        )
 
 )

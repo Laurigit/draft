@@ -8,8 +8,6 @@ dbIoU <- function(table, data_rows, con) {
   non_key_cols <- setdiff(colnames_vect, keyCols)
   data_to_string <- apply(data_rows, 1, paste, collapse="\",\"")
 
-
-
   for (loop in 1:nrow(data_rows)) {
     row_string <- data_to_string[loop]
 
