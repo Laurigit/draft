@@ -18,7 +18,7 @@ observeEvent(input$reload, {
 
   #find next draft no
   draft_data <- dbQ("SELECT max(DRAFT_ID) as max_draft, OMISTAJA_ID from DRAFT_CARDS GROUP BY OMISTAJA_ID",  con)
-  if (nrow(draft_data) == 0) {
+  if (nrow(draft_data[OMISTAJA_ID == omistaja_ID_calc$value]) == 0) {
     drafti_no <- 1
   } else {
     drafti_no <- as.numeric(draft_data[OMISTAJA_ID == omistaja_ID_calc$value, max_draft]) + 1

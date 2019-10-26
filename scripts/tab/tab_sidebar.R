@@ -26,6 +26,8 @@ ReactDraftCards <- reactiveValues(image_ids = NULL,
 
 observeEvent(input$todo_Drafts,{
 req(input$todo_Drafts)
+  req( omistaja_ID_calc$value)
+
   uudet_kortit <- dbQ(paste0("SELECT MID, id as DRAFT_CARDS_ID
                               FROM DRAFT_CARDS
                              WHERE DRAFT_ID = ", input$todo_Drafts, " AND
