@@ -1,4 +1,5 @@
 draftMID <- reactiveValues(MID = NULL)
+
 observeEvent(input$reload, {
 
   #leike <- gsub("[^0-9.-]", "", input$clip)
@@ -34,30 +35,6 @@ observeEvent(input$reload, {
 output$uudet_kortit <- renderUI({
 
 })
-#tee imaget
-# observe({
-#  # input$reload
-#  # leike <-  draftMID$MID
-#     for (i in leike) {
-#
-#       local({
-#         my_i <- i
-#         image_id <- paste0("Draft",i)
-#         # print(image_id)
-#         image_nm <- paste0(i, "_card.jpg")
-#         # print(image_nm)
-#         output[[image_id]] <-  renderImage({
-#
-#           # output[[image_id]] <-  renderImage({
-#           list(src = paste0("./www/",image_nm),#image_nm,
-#                alt = "Image failed to render"
-#           )
-#         }, deleteFile = FALSE)
-#       })
-#     }
-# })
-
-
 
 
 

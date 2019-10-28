@@ -19,8 +19,8 @@ server <- function(input, output, session) {
 
 
   #CHECK THAT IS HAVE ALL THE IMAGES LOADED THAT ARE IN CARDS_DIM. ADM_CARD_IMAGES does it
-required_data("ADM_CARD_IMAGES")
-
+required_data("ADM_DI_HIERARKIA")
+updateData("SRC_CARDS_DIM", ADM_DI_HIERARKIA, globalenv(), FALSE)
 
 
 

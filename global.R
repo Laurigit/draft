@@ -7,7 +7,7 @@ library(jsonlite)
 library(RMySQL)
 library(shinyjs)
 library(readtext)
-
+library(shinyDND)
 library(clipr)
 library(qdapRegex)
 library(magick)

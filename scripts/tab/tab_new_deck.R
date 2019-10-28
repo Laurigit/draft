@@ -20,3 +20,15 @@ new_row <- data.table(Nimi = input$pakka_nimi,
 )
 dbWriteTable(con, "DECKS_DIM", new_row, row.names = FALSE, append = TRUE)
 })
+
+
+#create images
+output$dd_images <- renderUI({
+  files <- ADM_CARD_IMAGES[1:10, file_name]
+      lapply(files, function(x) {
+        fluidRow(
+        dragUI(id = paste0("kuva_Id", x), tags$img(src = x, height = "200px"))
+        )
+      })
+
+})
