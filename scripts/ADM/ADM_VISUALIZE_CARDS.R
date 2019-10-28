@@ -4,7 +4,7 @@ required_data(c("STG_CARDS_DIM", "STG_CARDS", "ADM_LAND_IMAGES", "STG_DECKS_DIM"
 sscols_DIM <- STG_CARDS_DIM
 sscols <- STG_CARDS[, .(Pakka_form_ID, MID, DRAFT_CARDS_ID, Maindeck, Pakka_ID)]
 
-joini_all <- sscols_DIM[sscols, on = "MID"]
+joini_all <- sscols_DIM[sscols, on = "MID", allow.cartesian = TRUE]
 
 print("TOIMI")
 #sscolsDecks <- STG_DECKS_DIM[Omistaja_NM == session$user, .(NineSide, Pakka_ID)]
