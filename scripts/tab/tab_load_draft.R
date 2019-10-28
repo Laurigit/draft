@@ -1,7 +1,7 @@
 draftMID <- reactiveValues(MID = NULL)
 observeEvent(input$reload, {
 
-  leike <- gsub("[^0-9.-]", "", input$clip)
+  #leike <- gsub("[^0-9.-]", "", input$clip)
 
   leike_all <- as.numeric(str_split(gsub("[\r\n]", "/", input$clip), pattern = "/")[[1]])
   leike <- leike_all[!is.na(leike_all)]

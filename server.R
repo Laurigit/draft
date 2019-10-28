@@ -14,8 +14,17 @@
 user_logged <- reactiveValues(count = 0)
 omistaja_ID_calc <- reactiveValues(value = NULL)
 
-# Define server logic required to draw a histogram
+
 server <- function(input, output, session) {
+
+
+  #CHECK THAT IS HAVE ALL THE IMAGES LOADED THAT ARE IN CARDS_DIM. ADM_CARD_IMAGES does it
+required_data("ADM_CARD_IMAGES")
+
+
+
+
+
   func_login <- function(input_user_count, clientDataInput) {
     cdata <- clientDataInput
     login <- cdata[["url_search"]]
