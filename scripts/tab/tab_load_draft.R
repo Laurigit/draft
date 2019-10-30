@@ -5,7 +5,7 @@ observeEvent(input$reload, {
   #leike <- gsub("[^0-9.-]", "", input$clip)
 
 
-  leike <- readCardsFromTextArea(input$clip)
+  leike <- readCardsFromTextArea(input$clip, con)
   draftiTaulu <- data.table(MID = leike)
   draftiTaulu[, PICK_ORDER := seq_len(.N)]
   draftiTaulu[, PICK_DT := as.IDate(Sys.Date(), tz = "EET")]

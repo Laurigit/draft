@@ -1,4 +1,4 @@
-readCardsFromTextArea <- function(textAreaInput_text) {
+readCardsFromTextArea <- function(textAreaInput_text, con) {
 
 
   leike_all <- as.numeric(str_split(gsub("[\r\n]", "/", textAreaInput_text), pattern = "/")[[1]])

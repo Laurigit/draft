@@ -4,7 +4,7 @@ setupDraft <- reactiveValues(cards = NULL)
 
 observeEvent(input$load_setup_draft, {
 print("Painettu")
-setupDraft$cards <- readCardsFromTextArea(input$loadSetupDraft_area)
+setupDraft$cards <- readCardsFromTextArea(input$loadSetupDraft_area, con)
 print(setupDraft$cards)
 
 })
