@@ -4,14 +4,8 @@ observeEvent(input$reload, {
 
   #leike <- gsub("[^0-9.-]", "", input$clip)
 
-  leike_all <- as.numeric(str_split(gsub("[\r\n]", "/", input$clip), pattern = "/")[[1]])
-  leike <- leike_all[!is.na(leike_all)]
-  MIDs <- dbQ(paste0("SELECT MID from CARDS_DIM"),  con)
-  new_cards <- setdiff(leike, MIDs[, MID])
-  for (x in new_cards) {
-    addCardToDB(x, con)
 
-  }
+  leike <- readCardsFromTextArea(input$clip)
   draftiTaulu <- data.table(MID = leike)
   draftiTaulu[, PICK_ORDER := seq_len(.N)]
   draftiTaulu[, PICK_DT := as.IDate(Sys.Date(), tz = "EET")]
@@ -28,11 +22,6 @@ observeEvent(input$reload, {
   draftiTaulu[, PICKED := 0]
 
   draftMID$MID <- draftiTaulu
-
-})
-
-
-output$uudet_kortit <- renderUI({
 
 })
 

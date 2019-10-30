@@ -11,6 +11,7 @@ library(shinyDND)
 library(clipr)
 library(qdapRegex)
 library(magick)
+library(dragulaR)
 options(shiny.trace=FALSE)
 
 
