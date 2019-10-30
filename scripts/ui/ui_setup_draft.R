@@ -18,18 +18,17 @@ tabItem(tabName = "tab_setup_draft",
           #
         ),
         fluidRow(
-          column(3,
-                 h3("Drag from here:"),
-                 div(id = "Available", style = "min-height: 600px;",
+
+                 div(id = "Available", style = "min-height: 100px;min-width: 600px; max-height: 200px;",
                     # lapply(colnames(mtcars), makeElement, data = mtcars))
                   #  tags$img(src = "262838_card.jpg", height = "200px", drag = "262838_card.jpg")
                   uiOutput("dnd_draft")
                     )
           ),
-          column(3,
-                 h3("Drop here:"),
+        fluidRow(
+
                  div(id = "Model", style = "min-height: 600px;")
-          )
+
         ),
        # dragulaOutput("dragula")
         dragula(c("dnd_draft", "dnd_picks"), id = "dragula")
