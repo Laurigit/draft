@@ -3,6 +3,7 @@
 output$show_resolvable_drafts <- renderUI({
 
   required_data("ADM_DI_HIERARKIA")
+  required_data("STG_DRAFT_PICKORDER")
   updateData("SRC_DRAFT_PICKORDER", ADM_DI_HIERARKIA, globalenv())
   if (nrow(STG_DRAFT_PICKORDER) > 0) {
     aggr <- STG_DRAFT_PICKORDER[, .N, by = .(OMISTAJA_ID, Booster_ID)]
@@ -23,7 +24,7 @@ observeEvent(input$random_first_pick, {
 
 })
 
-
+resolved_draft <- reactiveValues(cards = NULL)
 output$pickorders <- renderUI({
   # input <- NULL
   # input$select_draft_to_resolve <- 1
@@ -33,8 +34,9 @@ output$pickorders <- renderUI({
   # mda[, PICK_ORDER := sample(1:16)]
   # cardData <- rbind(cardData, mda)
   # cardData[, MID := ifelse(MID == 10, 3, MID)]
+  required_data("STG_DRAFT_PICKORDER")
   cardData <- STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve]
- # cardData[, PICK_ORDER := ifelse(OMISTAJA_ID == str_sub(input$radio_first_pick, 1, 1), PICK_ORDER - 0.5, PICK_ORDER)]
+  cardData[, PICK_ORDER := ifelse(OMISTAJA_ID == str_sub(input$radio_first_pick, 1, 1), PICK_ORDER - 0.5, PICK_ORDER)]
   cardData_sorted <- cardData[order(PICK_ORDER)]
   cardsLeft <- cardData_sorted[, .(card_count = .N / 2) , by = MID]
   all_picks <- NULL
@@ -43,9 +45,9 @@ output$pickorders <- renderUI({
   for (picki_for in 1:(nrow(cardData_sorted) / 2)) {
       #kuka pickaa?
     pick_vuoro_omistaja <- picki_vuorot[picki_for, OMISTAJA_ID]
-    print(picki_for)
+
     repeat{
-      print("repeat")
+
       #mitä pickaa
       minPick <- cardData_sorted[OMISTAJA_ID == pick_vuoro_omistaja, min(PICK_ORDER)]
       try_pick_MID <- cardData_sorted[OMISTAJA_ID == pick_vuoro_omistaja & PICK_ORDER == minPick, MID]
@@ -63,28 +65,44 @@ output$pickorders <- renderUI({
     cardsLeft <- cardsLeft[card_count > 0]
     all_picks <- rbind(all_picks, pickedMID)
   }
+  resolved_draft$cards <- all_picks
   all_picks[, rivi := seq_len(.N)]
-  omistajat <- all_picks[, .N, by = OMISTAJA_ID][, OMISTAJA_ID]
-  fluidRow(
-  #lapply(OMISTAJA_ID, function(x)){
-   # column(1,
-           lapply(all_picks[OMISTAJA_ID == "L", rivi], function(x) {
+
+  omistajat <- c("L", "M")
+
+  lapply(omistajat, function(y) {
+column(3,
+
+           lapply(all_picks[OMISTAJA_ID == y, rivi], function(x) {
+          #   tags$div(style= paste0('width: 100px; height: 100px; background-image: ', all_picks[x, MID], '_card.jpg; background-repeat: no-repeat;'))
+           # imageOutput("")
+           #  HTML('div(class="topimg",img(src=464104_card.jpg,height="100%", width="100%"))))')
+
+
               tags$img(src = paste0(all_picks[x, MID], "_card.jpg"))
+                      # style = "object-fit: cover;")#, style = 'object-fit = "cover";height = 100px;'))
            })
 
-      #     )
-
-  #         )
-
-
-  )
+    )
+           })
 
 
-  # con <- connDB(con)
-  # maxDraft <- as.numeric(dbQ("SELECT MAX(DRAFT_ID) FROM DRAFT_CARDS", con)) + 1
-  # add_info <- cbind(all_picks, PICK_DT = as.IDate(Sys.Date(), tz = "EET"), PICKED = 0, DRAFT_ID = maxDraft)
-  # dbWriteTable(con, "DRAFT_CARDS", add_info, append = TRUE, row.names = FALSE)
-  # updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
 
+
+
+})
+
+observeEvent(input$accept_and_save,{
+  to_save <- resolved_draft$cards
+  to_save[, rivi := NULL]
+  con <- connDB(con)
+  maxDraft <- as.numeric(dbQ("SELECT MAX(DRAFT_ID) FROM DRAFT_CARDS", con)) + 1
+  add_info <- cbind(to_save , PICK_DT = as.IDate(Sys.Date(), tz = "EET"), PICKED = 0, DRAFT_ID = maxDraft)
+  dbWriteTable(con, "DRAFT_CARDS", add_info, append = TRUE, row.names = FALSE)
+  updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
+  browser()
+  del_Query <- paste0("DELETE FROM DRAFT_PICKORDER WHERE Booster_ID = ", input$select_draft_to_resolve)
+  dbQ(del_Query, con)
+  updateData("SRC_DRAFT_PICKORDER", ADM_DI_HIERARKIA, input_env = globalenv())
 
 })
