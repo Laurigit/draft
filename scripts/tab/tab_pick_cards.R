@@ -47,8 +47,34 @@ observeEvent(input$save_picks, {
 })
 
 
-observeEvent(input$select_booster, {
+# observeEvent(input$select_booster, {
+#
+#
+#
+# }, ignoreNULL = TRUE, ignoreInit = TRUE)
 
 
+output$card_order_text <- renderUI({
 
-}, ignoreNULL = TRUE, ignoreInit = TRUE)
+  dtpicked <- data.table(unlist(input$dragula))[, MID := as.numeric(word(V1, 4, sep = fixed("_")))]
+  dtpicked[, order := seq_len(.N)]
+
+  required_data("STG_CARDS_DIM")
+  sscol <- STG_CARDS_DIM[, .(Name, MID)]
+  joinNimi <- sscol[dtpicked, on = "MID"]
+
+  rivivaihto <- HTML(paste0(joinNimi[, Name], collapse = "<br>"))
+  #browser()
+  rivivaihto
+})
+
+
+observeEvent(input$dragula, {
+  if (is.null(input$dragula)) {
+    shinyjs::disable("save_picks")
+  } else {
+    shinyjs::enable("save_picks")
+  }
+
+
+})

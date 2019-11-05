@@ -56,9 +56,9 @@ output$draftitSideBar <- renderUI({
 
 
   for (i in 1:nrow(uudet_kortit)) {
-print("sidekortit piirtyy")
+#print("sidekortit piirtyy")
     local({
-      print(i)
+      #print(i)
       my_i <- i
       image_id <- uudet_kortit[i, image_id]
       # print(image_id)

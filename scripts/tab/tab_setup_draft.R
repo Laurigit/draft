@@ -36,10 +36,11 @@ if (is.na(BOOSTER_ID[, BOOSTER_ID])) {
 setupDraft$result <- cbind(setupDraft$result, BOOSTER_ID)
 dbWriteTable(con, "DRAFT_BOOSTER", setupDraft$result, append = TRUE, row.names = FALSE)
 updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, input_env = globalenv(), FALSE)
-})
+}, ignoreNULL = TRUE, ignoreInit = TRUE)
 
 output$dnd_draft <- renderUI({
-  #req(setupDraft$cards)
+print(setupDraft$cards)
+  req(setupDraft$cards)
   kuvadata <- setupDraft$cards
 
 

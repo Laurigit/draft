@@ -2,9 +2,14 @@
 
 output$show_resolvable_drafts <- renderUI({
 
+  #DEPENDENCY DONT DEL
+  print(input$save_picks)
+  ###########
+
   required_data("ADM_DI_HIERARKIA")
   required_data("STG_DRAFT_PICKORDER")
-  updateData("SRC_DRAFT_PICKORDER", ADM_DI_HIERARKIA, globalenv())
+  required_data("SRC_DRAFT_PICKORDER")
+
   if (nrow(STG_DRAFT_PICKORDER) > 0) {
     aggr <- STG_DRAFT_PICKORDER[, .N, by = .(OMISTAJA_ID, Booster_ID)]
     result <- aggr[, .N, by = Booster_ID][N == 2, Booster_ID]
@@ -65,6 +70,7 @@ output$pickorders <- renderUI({
     cardsLeft <- cardsLeft[card_count > 0]
     all_picks <- rbind(all_picks, pickedMID)
   }
+  all_picks[, Booster_ID := input$select_draft_to_resolve]
   resolved_draft$cards <- all_picks
   all_picks[, rivi := seq_len(.N)]
 
@@ -93,16 +99,28 @@ column(3,
 })
 
 observeEvent(input$accept_and_save,{
+  required_data("SRC_DRAFT_PICKORDER")
   to_save <- resolved_draft$cards
   to_save[, rivi := NULL]
+  delete_booster_id <- to_save[, max(Booster_ID)]
+  to_save[, Booster_ID := NULL]
   con <- connDB(con)
+
   maxDraft <- as.numeric(dbQ("SELECT MAX(DRAFT_ID) FROM DRAFT_CARDS", con)) + 1
+  if (is.na(maxDraft)) {
+    maxDraft <- 1
+  }
   add_info <- cbind(to_save , PICK_DT = as.IDate(Sys.Date(), tz = "EET"), PICKED = 0, DRAFT_ID = maxDraft)
   dbWriteTable(con, "DRAFT_CARDS", add_info, append = TRUE, row.names = FALSE)
   updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
-  browser()
+
   del_Query <- paste0("DELETE FROM DRAFT_PICKORDER WHERE Booster_ID = ", input$select_draft_to_resolve)
   dbQ(del_Query, con)
   updateData("SRC_DRAFT_PICKORDER", ADM_DI_HIERARKIA, input_env = globalenv())
 
+
+  #delete cards from DRAFT_BOOSTER
+  #delete_booster_id <- 1
+  dbQ(paste0("DELETE FROM DRAFT_BOOSTER WHERE Booster_ID = ", delete_booster_id), con)
+  updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, globalenv())
 })

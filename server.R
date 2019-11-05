@@ -18,6 +18,10 @@ omistaja_ID_calc <- reactiveValues(value = NULL)
 server <- function(input, output, session) {
 
 
+  #UI SETTINGS
+  shinyjs::disable(id = "save_picks")
+
+
   #CHECK THAT IS HAVE ALL THE IMAGES LOADED THAT ARE IN CARDS_DIM. ADM_CARD_IMAGES does it
 required_data("ADM_DI_HIERARKIA")
 updateData("SRC_CARDS_DIM", ADM_DI_HIERARKIA, globalenv(), FALSE)
