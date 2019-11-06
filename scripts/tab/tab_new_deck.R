@@ -3,8 +3,11 @@ observeEvent(input$add_deck,{
 con <- connDB(con)
   #first create new deck
 required_data("ADM_DI_HIERARKIA")
-  rivi_id <- SRC_DECKS_DIM[, max(rivi_id)] + 1
-  free_pakka_no <- SRC_DECKS_DIM[Omistaja_nimi == session$user, max(Pakka)] + 1
+required_data("SRC_DECKS_DIM")
+rivi_id <- SRC_DECKS_DIM[, max(rivi_id)] + 1
+#session <- NULL
+#session$user <- "Lauri"
+free_pakka_no <- as.numeric(SRC_DECKS_DIM[Omistaja_nimi == session$user, max(Pakka)]) + 1
   omistaja_kirain <-  str_sub(session$user, 1, 1)
   new_row <- data.table(Nimi = input$pakka_nimi,
                         Divari = 1,
@@ -23,7 +26,7 @@ required_data("ADM_DI_HIERARKIA")
 
   new_deck_list <- rbind(rv_new_deck$main, rv_new_deck$side)#[1:4]
   #new_deck_list <- new_deck_list[1:4]
-  #new_deck_list <- data.table(MID = c(425866, 397755,397796,442047,442207,442207), monesko_kortti = c(1, 1, 1, 1, 1, 2), Maindeck = c(1,1,1,1,0,0))
+  #new_deck_list <- data.table(Name = c("Grasp of Phantoms", "Tumble Magnet","Alloy Myr","Freed from the Real","Stangg","Stangg"), monesko_kortti = c(1, 1, 1, 1, 1, 2), Maindeck = c(1,1,1,1,0,0))
   required_data(c("STG_CARDS", "STG_DECKS_DIM"))
   #session <- NULL
   #session$user <- "Lauri"
@@ -34,30 +37,28 @@ required_data("ADM_DI_HIERARKIA")
   #my_latest_side_decklists[MID == 397879]
 
   #get kortit from sides
-  joini <- my_latest_side_decklists[new_deck_list, on = .(MID, monesko_kortti)]
-
-
-
-
+  joini <- my_latest_side_decklists[new_deck_list, on = .(Name, monesko_kortti)]
+  con <- connDB(con)
+  Pakka_ID <-  rivi_id
+  #Free_PFI <- 500
+  Free_PFI <- as.numeric(dbQ("SELECT MAX(Pakka_form_ID) FROM CARDS", con) + 1)
+  new_deck_with_info <- cbind(joini, Pakka_form_ID = Free_PFI, Pakka_ID, CARD_ID = NULL)
+  new_deck_with_info[, monesko_kortti := NULL]
+  dbWriteTable(con, "CARDS", new_deck_with_info, append = TRUE, row.names = FALSE)
+  updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
   #create new sides
   changed_sides <- new_deck_with_info[, .N, by = Pakka_ID][, Pakka_ID]
-  con <- connDB(con)
+
   for(update_sides in changed_sides) {
     remove <- new_deck_with_info[Pakka_ID == update_sides, DRAFT_CARDS_ID]
-    new_side <- remove_DIDs_from_deck(update_sides, remove, STG_CARDS, STG_DECKS_DIM, con)
-    dbWriteTable(con, "CARDS", new_side)
+    new_side <- remove_DIDs_from_deck(update_sides, remove, STG_CARDS, con)
+    dbWriteTable(con, "CARDS", new_side, append = TRUE, row.names = FALSE)
     updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
   }
 
 
 
-  #Free_PFI <- 500
-  Free_PFI <- dbQ("SELECT MAX(Pakka_form_ID) FROM CARDS") + 1
-  Pakka_ID <-  rivi_id
-  new_deck_with_info <- cbind(joini, Pakka_form_ID = Free_PFI, Pakka_ID, CARD_ID = NULL)
-  new_deck_with_info[, monesko_kortti := NULL]
-  dbWriteTable(con, "CARDS", new_deck_with_info)
-  updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
+
 
 
 #)
@@ -79,7 +80,11 @@ observeEvent(input$load_new_deck_MIDS, {
   kortit <- readCardsFromTextArea(input$new_deck_text_area, con)
   #kortit <- c(40001, 40002, 40002, 40003)
   kortti_dt <- data.table(MID = kortit)
-  kortti_dt[, monesko_kortti := seq_len(.N), by = MID]
+  required_data("STG_CARDS_DIM")
+  #joinaa name
+  ssnimi <- STG_CARDS_DIM[, .(MID, Name)]
+  joinNimi <- ssnimi[kortti_dt, on = "MID"]
+  joinNimi[, monesko_kortti := seq_len(.N), by = Name]
   if (input$load_to_main_or_side == "Main") {
 
         rv_new_deck$main <- kortti_dt
