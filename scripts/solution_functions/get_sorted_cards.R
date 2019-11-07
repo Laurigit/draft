@@ -1,6 +1,6 @@
-get_sorted_cards <- function(ADM_VISUALIZE_CARDS, input_Pakka_form_ID = 439) {
+get_sorted_cards <- function(input_dl) {
 
-  sata <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input_Pakka_form_ID, .(Converted_Cost, Name, colOrder, is_basic_land, Maindeck, image_id, MID)]
+  sata <- input_dl[, .(Converted_Cost, Name, colOrder, is_basic_land, Maindeck, image_id, MID)]
 
   lapply(sata[, MID], function(x) {
 
@@ -23,12 +23,15 @@ get_sorted_cards <- function(ADM_VISUALIZE_CARDS, input_Pakka_form_ID = 439) {
 
 
   kaadettu_main_ids <- dcast.data.table(sorted, formula =   order_No ~ colOrder, value.var = "image_id" )
+  kaadettu_main_MID <- dcast.data.table(sorted, formula =   order_No ~ colOrder, value.var = "MID" )
   kaadettu_side_ids <- NULL
   kaadettu_side_nimi <-  NULL
+  kaadettu_side_MID <-  NULL
   #tarkista eka, etta sideissa on kortteja
   if(nrow(side) > 0){
     kaadettu_side_ids <-  dcast.data.table(side, formula =   order_No ~ colOrder, value.var = "image_id" )
     kaadettu_side_nimi <-  dcast.data.table(side, formula =   order_No ~ colOrder, value.var = "Name" )
+    kaadettu_side_MID <-  dcast.data.table(side, formula =   order_No ~ colOrder, value.var = "MID" )
   }
   #append side ja maini ja sidevälirivi
   siderivi <- data.table("-1" = "Side")
@@ -39,12 +42,17 @@ get_sorted_cards <- function(ADM_VISUALIZE_CARDS, input_Pakka_form_ID = 439) {
 
   kaadettu_main_nimi <- dcast.data.table(sorted, formula =   order_No ~ colOrder, value.var = "Name" )
 
+
   #append side ja maini
-  kaadettu_nimi <- rbind(kaadettu_main_nimi, kaadettu_side_nimi, fill = TRUE)[, order_No := NULL]
+  kaadettu_nimi <- rbind(kaadettu_main_nimi,siderivi, kaadettu_side_nimi, fill = TRUE)[, order_No := NULL]
   kaadettu_nimi[, order_No := seq_len(.N)]
+
+  kaadettu_MID <- rbind(kaadettu_main_MID,siderivi, kaadettu_side_MID, fill = TRUE)[, order_No := NULL]
+  kaadettu_MID[, order_No := seq_len(.N)]
   reslist <- NULL
   reslist$nimi <- kaadettu_nimi
   reslist$id <- kaadettu_ids
+  reslist$MID <- kaadettu_MID
   reslist$maxcc <- sata[!is.na(Converted_Cost), max(Converted_Cost)]
 
 

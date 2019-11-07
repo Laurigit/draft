@@ -1,9 +1,14 @@
 
-dbIoU <- function(table, data_rows) {
+dbIoU <- function(table, data_rows, con) {
 
 
-  keyCols <- suppressWarnings( dbQ(paste0("SHOW KEYS FROM ",table, " WHERE Key_name = 'PRIMARY'"))[, Column_name])
+  keyCols <- suppressWarnings( dbQ(paste0("SHOW KEYS FROM ",table, " WHERE Key_name = 'PRIMARY'"), con)[, Column_name])
   #data_rows <- data.table(PELI_ID = 1:6, BETTER_ID = 1:4, ODDS = as.integer(runif(n = 24, min = 0, max = 100)), BET_DT = now() )
+
+  #fix quotes to match sql
+  cols <- colnames(data_rows)
+  data_rows[ , (cols) := lapply(.SD, function(x_input){gsub('\'', '\'\'', x_input)}), .SDcols = cols]
+
   colnames_vect <- colnames(data_rows)
   colnames <- paste0(colnames_vect, collapse = ", ")
   non_key_cols <- setdiff(colnames_vect, keyCols)

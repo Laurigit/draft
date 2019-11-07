@@ -118,7 +118,10 @@ output$boxes <- renderUI({
   #input$myDecks <- 1
  # kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, 129)
   show_pfi <- STG_CARDS[Pakka_ID == input$myDecks, max(Pakka_form_ID)]
- kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, show_pfi)
+
+  draw_deck_pfi <- ADM_VISUALIZE_CARDS[Pakka_form_ID == show_pfi]
+
+ kaadettu_all <-  get_sorted_cards(draw_deck_pfi)
  kaadettu <- kaadettu_all$id
 #print( get_sorted_cards(ADM_VISUALIZE_CARDS, show_pfi)$nimi)
 
