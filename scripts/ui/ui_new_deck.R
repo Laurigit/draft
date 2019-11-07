@@ -3,6 +3,7 @@
 tabItem(tabName = "tab_new_deck",
 fluidPage(
   fluidRow(
+    uiOutput("sideWarning"),
 textInput("pakka_nimi", "Deck name"),
 actionButton("add_deck", "Add deck"),
 actionButton("load_new_deck_MIDS", label = "Load cards"),

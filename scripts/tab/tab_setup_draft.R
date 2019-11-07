@@ -7,7 +7,7 @@ observeEvent(input$load_setup_draft, {
   print("Painettu")
   req(input$loadSetupDraft_area)
 
-  setupDraft$cards <- data.table(MID = readCardsFromTextArea(input$loadSetupDraft_area, con))
+  setupDraft$cards <- readCardsFromTextArea(input$loadSetupDraft_area, con)
   setupDraft$cards[, rivi := seq_len(.N)]
   setupDraft$cards[, kuva_id := paste0("id_", rivi)]
   setupDraft$cards[, filu := paste0(MID, "_card.jpg")]
@@ -19,14 +19,7 @@ observeEvent(input$load_setup_draft, {
 
 observeEvent(input$save_to_be_drafted, {
 
- #  cards <-  setupDraft$cards
-# picke_order <- data.table(kuva_id = unlist(cards$dnd_draft))
-# picke_order[, PICK_ORDER := seq_len(.N)]
-# join_mids <- picke_order[  setupDraft$cards, on = "kuva_id"]
-# join_mids[, Omistaja_ID := session$user]
-# join_mids[, kuva_id := NULL]
-# join_mids[, rivi := NULL]
-# join_mids[, filu := NULL]
+
 
 setupDraft$result <- setupDraft$cards[, .(MID)]
 BOOSTER_ID <- dbQ("SELECT MAX(BOOSTER_ID) as BOOSTER_ID FROM DRAFT_BOOSTER", con) + 1
@@ -60,31 +53,12 @@ print(setupDraft$cards)
 
 
 
-# output$dragula <- renderDragula({
-#   dragula(c("draft", "picks"))
-# })
-
-
 
 
 output$order <- renderPrint({
   req(setupDraft$cards)
   dragulaValue(input$dragula)
 })
-
-
-# output$dnd_picks <- renderUI({
-#   # pick_order <- 1:15
-#   # fluidRow(
-#   #     lapply(pick_order, function(x) {
-#   #       column(1, tags$h3(id = paste0("pick_", x)))
-#   #
-#   #     }
-#   #   )
-#   # )
-#   div()
-# })
-
 
 
 

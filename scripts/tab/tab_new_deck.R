@@ -255,3 +255,7 @@ output$show_new_deck <- renderUI({
 
 })
 
+
+output$sideWarning <- renderText({
+  cards_not_found_from_sides$cards
+})

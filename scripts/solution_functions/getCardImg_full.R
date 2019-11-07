@@ -13,7 +13,7 @@ getCardImg_full <- function(cardMID) {
     raw.result <- GET(url = url)
     result_json <- fromJSON(rawToChar(raw.result$content))
 
-      image_url <- result_json$image_uris$small
+      image_url <- result_json$image_uris$normal
 
 
 
