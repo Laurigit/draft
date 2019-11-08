@@ -5,8 +5,8 @@ observeEvent(input$reload, {
   #leike <- gsub("[^0-9.-]", "", input$clip)
 
 
-  leike <- readCardsFromTextArea(input$clip, con)
-  draftiTaulu <- data.table(MID = leike)
+  draftiTaulu <- readCardsFromTextArea(input$clip, con)
+
   draftiTaulu[, PICK_ORDER := seq_len(.N)]
   draftiTaulu[, PICK_DT := as.IDate(Sys.Date(), tz = "EET")]
   draftiTaulu[, OMISTAJA_ID := omistaja_ID_calc$value]
@@ -76,17 +76,10 @@ output$draftit <- renderUI({
 })
 
 
-
-
-
-
-
-
-
-
 observeEvent(input$draft_cards, {
 
 kortit <-   draftMID$MID
+kortit[, Name := NULL]
   dbWriteTable(con, "DRAFT_CARDS", kortit, append = TRUE, row.names = FALSE)
   draftMID$MID <- NULL
   updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())

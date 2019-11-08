@@ -5,7 +5,7 @@ observeEvent(input$add_deck,{
 con <- connDB(con)
 
 #very first check if the cards are in the sideboard
-new_deck_list <- rbind(rv_new_deck$main, rv_new_deck$side)#[1:4]]
+new_deck_list <- rbind(rv_new_deck$main, rv_new_deck$side, rv_new_deck$basic_lands)#[1:4]]
 new_deck_list[, MID := NULL]
 new_deck_list[, Converted_Cost := NULL]
 new_deck_list[, Colors := NULL]
@@ -88,7 +88,8 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
 
 
 rv_new_deck <- reactiveValues(main = NULL,
-                              side = NULL)
+                              side = NULL,
+                              basic_lands = NULL)
 
 observeEvent(input$load_new_deck_MIDS, {
   #con <- connDB(con)
@@ -107,9 +108,11 @@ observeEvent(input$load_new_deck_MIDS, {
 
         rv_new_deck$main <- kortti_dt
         rv_new_deck$main[, Maindeck := 1]
+        rv_new_deck$main[, basic_land := 0]
 
   } else {
         rv_new_deck$side <- kortti_dt
+        rv_new_deck$side[, basic_land := 0]
         rv_new_deck$side[, Maindeck := 0]
 
   }
@@ -259,3 +262,31 @@ output$show_new_deck <- renderUI({
 output$sideWarning <- renderText({
   cards_not_found_from_sides$cards
 })
+
+
+
+observeEvent(input$add_basic_land_new_deck,{
+
+  print("HEII")
+  req(input$basic_land_new_deck)
+#input$basic_land_new_deck <- 289327
+  #input$count_of_lands <-  8
+  changed_MID <- input$basic_land_new_deck
+  required_data("ADM_LAND_IMAGES")
+  land_name_MID <- ADM_LAND_IMAGES[, .N, by = .(Name, MID)][, N := NULL]
+
+
+
+  join_name <- land_name_MID[changed_MID == MID]
+  #remove old count
+  rv_new_deck$basic_lands <- rv_new_deck$basic_lands[Name != land_name_MID[, Name]]
+
+
+  #replicate rows
+  replicate_rows <- join_name[rep(1:.N,input$count_of_lands)]
+  replicate_rows[, Maindeck := 1]
+  replicate_rows[, basic_land := 1]
+
+  rv_new_deck$basic_lands <- rbind(rv_new_deck$basic_lands, replicate_rows)
+},
+ignoreInit = TRUE, ignoreNULL = TRUE)
