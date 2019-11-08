@@ -12,7 +12,7 @@ radioButtons(inputId = "load_to_main_or_side", label = "Side or Main", choices =
 radioButtons("basic_land_new_deck", "Basic land", choiceNames = ADM_LAND_IMAGES[, .N, by = .(MID, Name)][, Name],
              choiceValues  = ADM_LAND_IMAGES[, .N, by = .(MID, Name)][, MID],
              inline = TRUE),
-numericInput(inputId = "count_of_lands", label = "How many lands"),
+numericInput(inputId = "count_of_lands", value = 1, label = "How many lands"),
 actionButton(inputId = "add_basic_land_new_deck", label =  "Set land count")
 
 

@@ -53,7 +53,7 @@ get_sorted_cards <- function(input_dl) {
   reslist$nimi <- kaadettu_nimi
   reslist$id <- kaadettu_ids
   reslist$MID <- kaadettu_MID
-  reslist$maxcc <- sata[!is.na(Converted_Cost), max(Converted_Cost)]
+  reslist$maxcc <- nrow(sata[!is.na(Converted_Cost), .N, by = Converted_Cost])
 
 
   reslist$last_main_row <- max_order_no

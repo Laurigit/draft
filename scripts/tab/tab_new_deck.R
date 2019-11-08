@@ -124,7 +124,7 @@ observeEvent(input$load_new_deck_MIDS, {
 output$show_new_deck <- renderUI({
   req(rv_new_deck$main)
 
-  decki <- rbind(rv_new_deck$main, rv_new_deck$side)
+  decki <- rbind(rv_new_deck$main, rv_new_deck$side, rv_new_deck$basic_lands)
 
   decki[, image_id := paste0("img_", Name, monesko_kortti, Maindeck)]
   decki[, colOrder := Converted_Cost]
@@ -138,6 +138,7 @@ output$show_new_deck <- renderUI({
   columnWidth <- 1
 
   max_cc <- kaadettu_all$maxcc
+
 
   max_kortit <- kaadettu[, max(order_No)]
 
@@ -156,7 +157,6 @@ output$show_new_deck <- renderUI({
 
   offset_counter_new_deck<- 0
   reset_next_round_new_deck <- FALSE
-
   lapply(1:max_kortit, function(i) {
     offset_counter_new_deck <<- 0
     reset_next_round_new_deck <<- FALSE
@@ -279,14 +279,16 @@ observeEvent(input$add_basic_land_new_deck,{
 
   join_name <- land_name_MID[changed_MID == MID]
   #remove old count
-  rv_new_deck$basic_lands <- rv_new_deck$basic_lands[Name != land_name_MID[, Name]]
 
+  if (!is.null(rv_new_deck$basic_lands)) {
+    rv_new_deck$basic_lands <- rv_new_deck$basic_lands[Name != join_name[, Name]]
+  }
 
   #replicate rows
   replicate_rows <- join_name[rep(1:.N,input$count_of_lands)]
   replicate_rows[, Maindeck := 1]
   replicate_rows[, basic_land := 1]
-
+  replicate_rows[, ':=' (Converted_Cost = 0, Colors = "NULL", monesko_kortti = seq_len(.N))]
   rv_new_deck$basic_lands <- rbind(rv_new_deck$basic_lands, replicate_rows)
 },
 ignoreInit = TRUE, ignoreNULL = TRUE)
