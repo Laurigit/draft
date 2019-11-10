@@ -9,7 +9,7 @@
 
 
 
-
+global_update_data <- reactiveValues(update = 1)
 
 user_logged <- reactiveValues(count = 0)
 omistaja_ID_calc <- reactiveValues(value = NULL)

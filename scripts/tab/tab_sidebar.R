@@ -1,8 +1,9 @@
 #tab_sidebar
 
 output$select_draft <- renderUI({
-  input$draft_cards
 
+  #dont del next print
+  print(global_update_data$update)
 # omistaja_ID_calc <-  NULL
 # omistaja_ID_calc$value <- "L"
 

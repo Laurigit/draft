@@ -3,7 +3,7 @@ cards_not_found_from_sides <- reactiveValues(cards = NULL)
 
 observeEvent(input$add_deck,{
 con <- connDB(con)
-
+required_data("ADM_LAND_IMAGES")
 #very first check if the cards are in the sideboard
 new_deck_list <- rbind(rv_new_deck$main, rv_new_deck$side, rv_new_deck$basic_lands)#[1:4]]
 new_deck_list[, MID := NULL]
@@ -16,7 +16,11 @@ required_data(c("STG_CARDS", "STG_DECKS_DIM"))
 #session$user <- "Lauri"
 mysidet <- STG_DECKS_DIM[Omistaja_ID == str_sub(session$user, 1, 1) & Side == 1, Pakka_ID]
 my_latest_side_PFI <- STG_CARDS[Pakka_ID %in% mysidet, .(Pakka_form_ID = max(Pakka_form_ID)), by = Pakka_ID]
-my_latest_side_decklists <- STG_CARDS[Pakka_form_ID %in% my_latest_side_PFI[, Pakka_form_ID], .(MID, Pakka_ID, DRAFT_CARDS_ID, Name, monesko_kortti)]
+my_latest_side_decklists_no_basics <- STG_CARDS[Pakka_form_ID %in% my_latest_side_PFI[, Pakka_form_ID], .(MID, Pakka_ID, DRAFT_CARDS_ID, Name, monesko_kortti)]
+#add basic lands to side
+ssLands <- ADM_LAND_IMAGES[, .(Name, MID, monesko_kortti = Count, DRAFT_CARDS_ID = "", Pakka_ID = "")]
+my_latest_side_decklists <- rbind(my_latest_side_decklists_no_basics, ssLands)
+
 #my_latest_side_decklists[monesko_kortti== 2]
 #my_latest_side_decklists[MID == 397879]
 
@@ -68,8 +72,19 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
     Pakka_ID <-  rivi_id
     #Free_PFI <- 500
     Free_PFI <- as.numeric(dbQ("SELECT MAX(Pakka_form_ID) FROM CARDS", con) + 1)
+
+    #remove the old Pakka_ID column which contains the info where the card was
+    joini[, Pakka_ID := NULL]
+
     new_deck_with_info <- cbind(joini, Pakka_form_ID = Free_PFI, Pakka_ID, CARD_ID = NULL)
     new_deck_with_info[, monesko_kortti := NULL]
+    new_deck_with_info[, basic_land := NULL]
+
+    #get DRAFT_CARDS_ID for lands
+    max_DCID <- dbQ("SELECT MAX(DRAFT_CARDS_ID) AS MAXDID FROM CARDS", con)[, MAXDID]
+
+    new_deck_with_info[DRAFT_CARDS_ID == "", DRAFT_CARDS_ID := seq_len(.N) + max_DCID]
+
     dbWriteTable(con, "CARDS", new_deck_with_info, append = TRUE, row.names = FALSE)
     updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
     #create new sides
@@ -260,7 +275,7 @@ output$show_new_deck <- renderUI({
 
 
 output$sideWarning <- renderText({
-  cards_not_found_from_sides$cards
+  cards_not_found_from_sides$cards[, Name]
 })
 
 

@@ -15,6 +15,7 @@ observeEvent(input$load_setup_draft, {
 
   print(setupDraft$cards)
 
+
 })
 
 observeEvent(input$save_to_be_drafted, {
@@ -29,7 +30,12 @@ if (is.na(BOOSTER_ID[, BOOSTER_ID])) {
 setupDraft$result <- cbind(setupDraft$result, BOOSTER_ID)
 dbWriteTable(con, "DRAFT_BOOSTER", setupDraft$result, append = TRUE, row.names = FALSE)
 updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, input_env = globalenv(), FALSE)
+global_update_data$update <- isolate(global_update_data$update + 1)
 }, ignoreNULL = TRUE, ignoreInit = TRUE)
+
+
+
+
 
 output$dnd_draft <- renderUI({
 print(setupDraft$cards)
@@ -40,6 +46,7 @@ print(setupDraft$cards)
         #dont del me
         print(input$load_setup_draft)
       #the up one
+
 
 
   lapply(1:nrow(kuvadata), function(x) {

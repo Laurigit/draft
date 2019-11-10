@@ -4,6 +4,7 @@ output$show_resolvable_drafts <- renderUI({
 
   #DEPENDENCY DONT DEL
   print(input$save_picks)
+  print(global_update_data$update)
   ###########
 
   required_data("ADM_DI_HIERARKIA")
@@ -121,6 +122,8 @@ observeEvent(input$accept_and_save,{
 
   #delete cards from DRAFT_BOOSTER
   #delete_booster_id <- 1
+
   dbQ(paste0("DELETE FROM DRAFT_BOOSTER WHERE Booster_ID = ", delete_booster_id), con)
   updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, globalenv())
+  global_update_data$update <- isolate(global_update_data$update + 1)
 })

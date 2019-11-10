@@ -1,8 +1,14 @@
 output$select_booster <- renderUI({
 
+  ##############DEPP
+  print(input$load_setup_draft)
+  #dont del next print
+  print(global_update_data$update)
+  #############dont del
+
   required_data("STG_DRAFT_BOOSTER")
 
-  if(nrow(STG_DRAFT_BOOSTER) == 0) {
+  if (nrow(STG_DRAFT_BOOSTER) == 0) {
     boosterlist <- "No boosters to draft"
 
   } else {
@@ -43,7 +49,7 @@ observeEvent(input$save_picks, {
   picke_order[, kuva_id := NULL]
   dbWriteTable(con, "DRAFT_PICKORDER", picke_order, row.names = FALSE, append = TRUE)
   updateData("SRC_DRAFT_PICKORDER", ADM_DI_HIERARKIA, globalenv())
-
+  global_update_data$update <- isolate(global_update_data$update + 1)
 })
 
 

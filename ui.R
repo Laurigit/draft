@@ -72,7 +72,7 @@ sidebar <- dashboardSidebar(
               menuItem("Load draft", tabName = "tab_load_draft", icon = icon("gamepad")),
               menuItem("Edit decks", tabName = "tab_showdeck", icon = icon("gamepad")),
               menuItem("New deck", tabName = "tab_new_deck", icon = icon("gamepad")),
-              menuItem("New deck", tabName = "tab_delete_deck", icon = icon("gamepad")),
+              menuItem("Retire deck", tabName = "tab_delete_deck", icon = icon("gamepad")),
               actionButton("saveDraftedCards", "Save drafted cards"),
               uiOutput("show_last"),
               uiOutput("select_draft"),

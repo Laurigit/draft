@@ -1,4 +1,4 @@
-
+required_data("ADM_LAND_IMAGES")
 #ui_new_deck
 tabItem(tabName = "tab_new_deck",
 fluidPage(
