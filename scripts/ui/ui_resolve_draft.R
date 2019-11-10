@@ -15,7 +15,9 @@ tabItem(tabName = "tab_resolve_draft",
             fluidRow(
               uiOutput("show_resolvable_drafts")
             ),
+            fluidRow(
             uiOutput("pickorders")
+            )
 
 
 

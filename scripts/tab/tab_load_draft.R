@@ -79,8 +79,12 @@ output$draftit <- renderUI({
 observeEvent(input$draft_cards, {
 
 kortit <-   draftMID$MID
-kortit[, Name := NULL]
+
+kortit[,':=' (Name = NULL,
+               Converted_Cost = NULL,
+               Colors = NULL)]
   dbWriteTable(con, "DRAFT_CARDS", kortit, append = TRUE, row.names = FALSE)
   draftMID$MID <- NULL
   updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
+  global_update_data$update <- isolate(global_update_data$update + 1)
 })

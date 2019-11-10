@@ -30,6 +30,7 @@ if (is.na(BOOSTER_ID[, BOOSTER_ID])) {
 setupDraft$result <- cbind(setupDraft$result, BOOSTER_ID)
 dbWriteTable(con, "DRAFT_BOOSTER", setupDraft$result, append = TRUE, row.names = FALSE)
 updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, input_env = globalenv(), FALSE)
+setupDraft$cards <-  NULL
 global_update_data$update <- isolate(global_update_data$update + 1)
 }, ignoreNULL = TRUE, ignoreInit = TRUE)
 

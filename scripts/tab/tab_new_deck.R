@@ -106,7 +106,15 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
       updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
     }
 
+
+    #cleanup
+    rv_new_deck$main <- NULL
+    rv_new_deck$side <-  NULL
+    rv_new_deck$basic_lands <- NULL
+
   }
+
+
 
 }, ignoreInit = TRUE, ignoreNULL = TRUE)
 

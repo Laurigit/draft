@@ -6,13 +6,14 @@ output$select_booster <- renderUI({
   print(global_update_data$update)
   #############dont del
 
-  required_data("STG_DRAFT_BOOSTER")
+  required_data(c("ADM_UNPICKED_DRAFT"))
+my_to_do <- ADM_UNPICKED_DRAFT[OMISTAJA_ID == omistaja_ID_calc$value, .N, by = Booster_ID][, .(Booster_ID)]
 
-  if (nrow(STG_DRAFT_BOOSTER) == 0) {
+  if (nrow(my_to_do) == 0) {
     boosterlist <- "No boosters to draft"
 
   } else {
-    boosterlist <- STG_DRAFT_BOOSTER[, .N, by = Booster_ID][, Booster_ID]
+    boosterlist <- my_to_do[, Booster_ID]
   }
   selectInput(inputId = "booster_selector",
               label = "Select booster No",

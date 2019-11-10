@@ -128,5 +128,5 @@ drafikortit <-  deck$changes[source ==  paste0("Draft", input$select_draft)]
   dbIoU("DRAFT_CARDS", draftit, con)
   updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
   deck$changes <-  deck$changes[1 == 0]
-
+  global_update_data$update <- isolate(global_update_data$update + 1)
 }, ignoreInit = TRUE, ignoreNULL = TRUE)

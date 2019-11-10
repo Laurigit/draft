@@ -216,40 +216,7 @@ required_data("ADM_DI_HIERARKIA")
     req( values$lastUpdated)
     print("rivimaara")
     print(nrow(ReactDraftCards$image_ids))
-    # clicked <- ""
-    # #check where was clicked
-    # if (nrow(ReactDraftCards$image_ids[image_id ==  values$lastUpdated]) > 0) {
-    #   clicked <- "Draft"
-    # } else if  (nrow(main$cards[image_id ==  values$lastUpdated]) > 0) {
-    #   clicked <- "Main"
-    # } else if  (nrow(side$cards[image_id ==  values$lastUpdated]) > 0) {
-    #   clicked <- "Side"
-    # }
-    #
-    # if (clicked == "Draft") {
-    #
-    #   updated_MID <- ReactDraftCards$image_ids[image_id ==  values$lastUpdated, .(MID)]
-    #   if (nrow(updated_MID) > 0) {
-    #     #STG_CARDS_DIM[MID == updated_MID[, MID]  , Name]
-    #     required_data(c("STG_CARDS_DIM", "STG_DECKS_DIM"))
-    #     cardNames <- STG_CARDS_DIM[, .(MID = as.numeric(MID), Name)]
-    #     DeckNames <- STG_DECKS_DIM[, .(Pakka_ID, Nimi)]
-    #     if (nrow( deck$changes) > 0) {
-    #       raw_data <- deck$changes[, .(MID = as.numeric(MID), Pakka_ID = as.numeric(Pakka_ID))]
-    #       joinaa <- cardNames[raw_data, on = "MID"]
-    #       joinaa_pid <- DeckNames[joinaa, on = "Pakka_ID"]
-    #
-    #       print(joinaa_pid[order(Pakka_ID), .(Nimi, Name)])
-    #      # char_vect <- lapply(list, function)
-    #
-    #     }
-    #   }
-    # } else if (clicked == "Main") {
-    #   print("Main clicked")
-    #
-    # } else if (clicked == "Side") {
-    #   print("Side clicked")
-    # }
+
     required_data(c("ADM_VISUALIZE_CARDS", "STG_CARDS_DIM", "STG_DECKS_DIM"))
 
     printChanges(deck$changes, ADM_VISUALIZE_CARDS, STG_CARDS_DIM, STG_DECKS_DIM)
