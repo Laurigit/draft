@@ -103,12 +103,9 @@ observe({
   # }
 })
 
-observeEvent(input$select_user, {
-  #session$user <- input$select_user
-})
 
 observeEvent(input$saveDraftedCards,{
-  required_data(c("STG_CARDS", "STG_CARDS_DIM"))
+  required_data(c("STG_CARDS", "STG_CARDS_DIM", "STG_DECKS_DIM"))
   #need old list
   #create new decklist
   #save it with new pfi
@@ -118,7 +115,7 @@ drafikortit <-  deck$changes[source ==  paste0("Draft", input$select_draft)]
   Pakka_IDt <- drafikortit[, .N, by = Pakka_ID][, Pakka_ID]
   for (pakkaloop in Pakka_IDt) {
     new_DCIDs <- drafikortit[Pakka_ID == pakkaloop, .( DRAFT_CARDS_ID)]
-    new_dl_loop <- createNewDecklist_after_draft(new_DCIDs, pakkaloop, STG_CARDS, STG_CARDS_DIM, STG_DRAFT_CARDS)
+    new_dl_loop <- createNewDecklist_after_draft(new_DCIDs, pakkaloop, STG_CARDS, STG_CARDS_DIM, STG_DRAFT_CARDS, STG_DECKS_DIM)
 
     #ammutaan kantaan
     dbWriteTable(con, "CARDS", new_dl_loop, row.names = FALSE, append = TRUE)

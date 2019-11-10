@@ -111,6 +111,7 @@ observeEvent(input$accept_and_save,{
   if (is.na(maxDraft)) {
     maxDraft <- 1
   }
+
   add_info <- cbind(to_save , PICK_DT = as.IDate(Sys.Date(), tz = "EET"), PICKED = 0, DRAFT_ID = maxDraft)
   dbWriteTable(con, "DRAFT_CARDS", add_info, append = TRUE, row.names = FALSE)
   updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())

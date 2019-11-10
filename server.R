@@ -12,11 +12,11 @@
 global_update_data <- reactiveValues(update = 1)
 
 user_logged <- reactiveValues(count = 0)
-omistaja_ID_calc <- reactiveValues(value = NULL)
+
 
 
 server <- function(input, output, session) {
-
+  omistaja_ID_calc <- reactiveValues(value = NULL)
 
   #UI SETTINGS
   shinyjs::disable(id = "save_picks")
@@ -124,10 +124,17 @@ required_data("ADM_DI_HIERARKIA")
         removed_image_id <- values$lastUpdated
         changed_MID <- ReactDraftCards$image_ids[image_id == values$lastUpdated, MID]
         draft_card_id <- ReactDraftCards$image_ids[image_id == values$lastUpdated, DRAFT_CARDS_ID]
+        #check if drafted card is going to sideboard or mainboard. It oges to sideboard if picked to deck. Goes to main if picked to 9side
+
+        if (STG_DECKS_DIM[Pakka_ID == input$myDecks, NineSide] == 1) {
+          toMainorSide <- 1
+        } else {
+          toMainorSide <- 0
+        }
         new_row <- isolate(data.table(source = paste0("Draft", input$select_draft),
                                       MID = changed_MID, Pakka_ID = input$myDecks,
                                       DRAFT_CARDS_ID = draft_card_id,
-                                      Maindeck = 0,
+                                      Maindeck = toMainorSide,
                                       Removed_from_game = FALSE))
         deck$changes <- isolate(rbind(deck$changes, new_row))
 

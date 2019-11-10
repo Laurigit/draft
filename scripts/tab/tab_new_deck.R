@@ -9,6 +9,7 @@ new_deck_list <- rbind(rv_new_deck$main, rv_new_deck$side, rv_new_deck$basic_lan
 new_deck_list[, MID := NULL]
 new_deck_list[, Converted_Cost := NULL]
 new_deck_list[, Colors := NULL]
+new_deck_list[, monesko_kortti := seq_len(.N), by = Name]
 #new_deck_list <- new_deck_list[1:4]
 #new_deck_list <- data.table(Name = c("Grasp of Phantoms", "Tumble Magnet","Alloy Myr","Freed from the Real","Stangg","Stangg"), monesko_kortti = c(1, 1, 1, 1, 1, 2), Maindeck = c(1,1,1,1,0,0))
 required_data(c("STG_CARDS", "STG_DECKS_DIM"))
@@ -25,11 +26,17 @@ my_latest_side_decklists <- rbind(my_latest_side_decklists_no_basics, ssLands)
 #my_latest_side_decklists[MID == 397879]
 
 #get kortit from sides
-joini <- my_latest_side_decklists[new_deck_list, on = .(Name, monesko_kortti)]
 
+joini <- my_latest_side_decklists[new_deck_list, on = .(Name, monesko_kortti)]
+#check if joini has more rounds the input decklist. If true, it means that the ninesides were wrong. For example, black card was in blue side
+dontAddCard <- FALSE
+if (nrow(joini) > nrow(new_deck_list)) {
+  warning("observeEvent(input$add_deck,{", "NEW DECK LIST WOULD HAVE MORE CARDS THAN INPUT")
+  dontAddCard <- TRUE
+}
 cards_not_found_from_sides$cards <- joini[is.na(DRAFT_CARDS_ID)]
 
-if (nrow(cards_not_found_from_sides$cards) == 0 ) {
+if (nrow(cards_not_found_from_sides$cards) == 0 & dontAddCard == FALSE) {
 
 
   #first create new deck
@@ -74,12 +81,13 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
     Free_PFI <- as.numeric(dbQ("SELECT MAX(Pakka_form_ID) FROM CARDS", con) + 1)
 
     #remove the old Pakka_ID column which contains the info where the card was
-    joini[, Pakka_ID := NULL]
+    joini[, Old_Pakka_ID := Pakka_ID]
 
     new_deck_with_info <- cbind(joini, Pakka_form_ID = Free_PFI, Pakka_ID, CARD_ID = NULL)
     new_deck_with_info[, monesko_kortti := NULL]
     new_deck_with_info[, basic_land := NULL]
-
+    changed_sides <- new_deck_with_info[, .N, by = Old_Pakka_ID][, Old_Pakka_ID]
+    new_deck_with_info[, Old_Pakka_ID := NULL]
     #get DRAFT_CARDS_ID for lands
     max_DCID <- dbQ("SELECT MAX(DRAFT_CARDS_ID) AS MAXDID FROM CARDS", con)[, MAXDID]
 
@@ -88,11 +96,12 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
     dbWriteTable(con, "CARDS", new_deck_with_info, append = TRUE, row.names = FALSE)
     updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
     #create new sides
-    changed_sides <- new_deck_with_info[, .N, by = Pakka_ID][, Pakka_ID]
+
 
     for(update_sides in changed_sides) {
       remove <- new_deck_with_info[Pakka_ID == update_sides, DRAFT_CARDS_ID]
       new_side <- remove_DIDs_from_deck(update_sides, remove, STG_CARDS, con)
+
       dbWriteTable(con, "CARDS", new_side, append = TRUE, row.names = FALSE)
       updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
     }
@@ -118,7 +127,7 @@ observeEvent(input$load_new_deck_MIDS, {
   #joinaa name
 
 
-  kortti_dt[, monesko_kortti := seq_len(.N), by = Name]
+
   if (input$load_to_main_or_side == "Main") {
 
         rv_new_deck$main <- kortti_dt
@@ -140,7 +149,7 @@ output$show_new_deck <- renderUI({
   req(rv_new_deck$main)
 
   decki <- rbind(rv_new_deck$main, rv_new_deck$side, rv_new_deck$basic_lands)
-
+  decki[, monesko_kortti := seq_len(.N), by = Name]
   decki[, image_id := paste0("img_", Name, monesko_kortti, Maindeck)]
   decki[, colOrder := Converted_Cost]
   decki[, is_basic_land := FALSE]
@@ -303,7 +312,7 @@ observeEvent(input$add_basic_land_new_deck,{
   replicate_rows <- join_name[rep(1:.N,input$count_of_lands)]
   replicate_rows[, Maindeck := 1]
   replicate_rows[, basic_land := 1]
-  replicate_rows[, ':=' (Converted_Cost = 0, Colors = "NULL", monesko_kortti = seq_len(.N))]
+  replicate_rows[, ':=' (Converted_Cost = 0, Colors = "NULL")]
   rv_new_deck$basic_lands <- rbind(rv_new_deck$basic_lands, replicate_rows)
 },
 ignoreInit = TRUE, ignoreNULL = TRUE)
