@@ -17,7 +17,7 @@ user_logged <- reactiveValues(count = 0)
 
 server <- function(input, output, session) {
   omistaja_ID_calc <- reactiveValues(value = NULL)
-
+  required_data("ADM_CARD_IMAGES")
   #UI SETTINGS
   shinyjs::disable(id = "save_picks")
 
