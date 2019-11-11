@@ -36,4 +36,6 @@ for(input_kansio in input_kansio_list) {
   }
 }
 con <- connDB(con)
+
 dbSendQuery(con, 'SET NAMES utf8')
+require_data("ADM_CARD_IMAGES")

@@ -8,6 +8,8 @@ readCardsFromTextArea <- function(textAreaInput_text, con) {
 # Oakhame Ranger // Bring Back; 0
 # Gogin Guide; 425921"
 
+
+
   taulu <- data.table(read.csv(text = textAreaInput_text, sep = ";", dec = ",", header = FALSE))
   setnames(taulu, c("V1", "V2"), c("Name", "MID"))
 
@@ -20,7 +22,7 @@ readCardsFromTextArea <- function(textAreaInput_text, con) {
   })
 
 
-if (try_res != "ERROR") {
+if (try_res[[1]] != "ERROR") {
   MIDs <- dbQ(paste0("SELECT Name from CARDS_DIM"),  con)
   new_cards <- setdiff(taulu[, Name], MIDs[, Name])
   for (x in new_cards) {
