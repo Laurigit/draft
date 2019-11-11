@@ -63,7 +63,7 @@ output$draftitSideBar <- renderUI({
       my_i <- i
       image_id <- uudet_kortit[i, image_id]
       # print(image_id)
-      image_nm <- paste0(uudet_kortit[i, MID], "_card.jpg")
+      image_nm <- paste0(uudet_kortit[i, MID], "_card_small.jpg")
       # print(image_nm)
       output[[image_id]] <-  renderImage({
 
@@ -82,11 +82,13 @@ print(jaljella_olevat)
     column(width = 11, offset = 1,
            lapply( 1:nrow(jaljella_olevat), function(x) {
              MIDi <- jaljella_olevat[x, image_id]
-             imageOutput(MIDi,
+             tags$div(imageOutput(MIDi,
                          height = "40px",
+                         width = "100%",
                          dblclick = dblclickOpts(id = MIDi)
                          #  hover = hoverOpts(id = nimi)
-             )
+                              ),
+                      Width = "100%")
 
 
            })
