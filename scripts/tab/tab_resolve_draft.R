@@ -85,9 +85,9 @@ column(3,
            # imageOutput("")
            #  HTML('div(class="topimg",img(src=464104_card.jpg,height="100%", width="100%"))))')
 
-
-              tags$img(src = paste0(all_picks[x, MID], "_card.jpg"))
-                      # style = "object-fit: cover;")#, style = 'object-fit = "cover";height = 100px;'))
+#   style = "object-fit: cover;"),
+              tags$img(src = paste0(all_picks[x, MID], "_card.jpg"),  height = "220px")
+                    # style = 'object-fit = "cover";height = 100px;')
            })
 
     )
