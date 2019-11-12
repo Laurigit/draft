@@ -7,7 +7,8 @@ small_or_normal <- function(card_post_fix, cardMID) {
 
 
     #cardNameInput <- "Vampire Aristocrat"
-
+#cardMID <- 152648
+   # card_post_fix <-"_card_small.jpg"
     url <- paste0("https://api.scryfall.com/cards/multiverse/", cardMID)
     raw.result <- GET(url = url)
     result_json <- fromJSON(rawToChar(raw.result$content))
@@ -31,7 +32,7 @@ small_or_normal <- function(card_post_fix, cardMID) {
 getCardImg_full <- function(cardMID) {
 
   #check if exists
-  #cardMID <- 207886
+  #cardMID <- 152648
   #fixedName <- stringi::stri_trans_general(cardNameInput, "Latin-ASCII")
 
  small_or_normal("_card_small.jpg", cardMID)

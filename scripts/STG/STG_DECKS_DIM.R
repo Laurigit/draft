@@ -2,7 +2,7 @@
 required_data("SRC_DECKS_DIM")
 STG_DECKS_DIM <- SRC_DECKS_DIM[Side != -1, .(Divari = as.numeric(Divari),
                                    Picked = as.numeric(Picked),
-                                   Omistaja_ID,
+                                   Omistaja_ID = str_sub(Omistaja_nimi, 1, 1),
                                    Pakka_No = as.numeric(Pakka),
                                    Pakka_ID = as.numeric(rivi_id),
                                    Nimi,
