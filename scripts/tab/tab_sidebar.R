@@ -107,7 +107,7 @@ observe({
 
 
 observeEvent(input$saveDraftedCards,{
-  required_data(c("STG_CARDS", "STG_CARDS_DIM", "STG_DECKS_DIM"))
+  required_data(c("STG_CARDS", "STG_CARDS_DIM", "STG_DECKS_DIM", "STG_DRAFT_CARDS"))
   #need old list
   #create new decklist
   #save it with new pfi
