@@ -37,7 +37,7 @@ levita_muut <- joini[is_basic_land == FALSE, .(Name, Text, Cost, Converted_Cost,
 
 
 
-levita_muut[, image_file := paste0(MID, "_card.jpg")]
+levita_muut[, image_file := paste0(MID, "_card_small.jpg")]
 
 #appendaa
 levita_data <-  rbind(levita_muut, join_image_id_to_lands, fill = TRUE)
