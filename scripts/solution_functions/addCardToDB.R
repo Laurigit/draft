@@ -1,7 +1,8 @@
-addCardToDB <- function(MID, con) {
- res <-  getCard_by_MID(MID)
-#MID <- 394550
- getCardImg_full(MID)
+addCardToDB <- function(Name, con) {
+
+ res <-  getCard_from_SF(Name)
+
+
   dbIoU("CARDS_DIM", res, con)
 }
 

@@ -257,7 +257,7 @@ output$show_new_deck <- renderUI({
             output[[nimi[[1]]]] <-  renderImage({
 
               # output[[image_id]] <-  renderImage({
-              list(src = paste0("./www/", MID, "_card.jpg"),#image_nm,
+              list(src = paste0("./www/", MID, "_card_small.jpg"),#image_nm,
                    alt = "Image failed to render"
               )
             }, deleteFile = FALSE)
