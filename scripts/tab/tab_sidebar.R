@@ -120,6 +120,7 @@ drafikortit <-  deck$changes[source ==  paste0("Draft", input$select_draft)]
     new_dl_loop <- createNewDecklist_after_draft(new_DCIDs, pakkaloop, STG_CARDS, STG_CARDS_DIM, STG_DRAFT_CARDS, STG_DECKS_DIM)
 
     #ammutaan kantaan
+    new_dl_loop[, Valid_from_DT := now(tz = "EET")]
     dbWriteTable(con, "CARDS", new_dl_loop, row.names = FALSE, append = TRUE)
     required_data("ADM_DI_HIERARKIA")
     updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())

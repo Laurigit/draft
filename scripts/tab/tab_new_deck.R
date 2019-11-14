@@ -92,7 +92,7 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
     max_DCID <- dbQ("SELECT MAX(DRAFT_CARDS_ID) AS MAXDID FROM CARDS", con)[, MAXDID]
 
     new_deck_with_info[DRAFT_CARDS_ID == "", DRAFT_CARDS_ID := seq_len(.N) + max_DCID]
-
+    new_deck_with_info[, Valid_from_DT := now(tz = "EET")]
     dbWriteTable(con, "CARDS", new_deck_with_info, append = TRUE, row.names = FALSE)
     updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
     #create new sides
@@ -101,7 +101,7 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
     for(update_sides in changed_sides) {
       remove <- new_deck_with_info[Pakka_ID == update_sides, DRAFT_CARDS_ID]
       new_side <- remove_DIDs_from_deck(update_sides, remove, STG_CARDS, con)
-
+      new_side[, Valid_from_DT := now(tz = "EET")]
       dbWriteTable(con, "CARDS", new_side, append = TRUE, row.names = FALSE)
       updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
     }

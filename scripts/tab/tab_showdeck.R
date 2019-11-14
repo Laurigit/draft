@@ -94,7 +94,7 @@ observeEvent(input$save_changes_button,{
                                   STG_CARDS,
                                   STG_CARDS_DIM,
                                   STG_DRAFT_CARDS)
-
+  new_dl[, Valid_from_DT := now(tz = "EET")]
   dbWriteTable(con, "CARDS", new_dl, row.names = FALSE, append = TRUE)
   required_data("ADM_DI_HIERARKIA")
   updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())

@@ -11,6 +11,7 @@ library(clipr)
 library(qdapRegex)
 library(magick)
 library(dragulaR)
+library(lubridate)
 options(shiny.trace=FALSE)
 
 
