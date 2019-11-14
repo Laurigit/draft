@@ -13,11 +13,21 @@ small_or_normal <- function(card_post_fix, cardMID) {
     raw.result <- GET(url = url)
     result_json <- fromJSON(rawToChar(raw.result$content))
 
-    if (card_post_fix == "_card_small.jpg") {
-      image_url <- result_json$image_uris$small
-    } else {
-      image_url <- result_json$image_uris$normal
-    }
+
+      if (card_post_fix == "_card_small.jpg") {
+        image_url <- result_json$image_uris$small
+      } else {
+        image_url <- result_json$image_uris$normal
+      }
+      if (is.null(image_url)) {
+          if (card_post_fix == "_card_small.jpg") {
+            image_url <- result_json$card_faces$image_uris$small[1]
+          } else {
+            image_url <- result_json$card_faces$image_uris$normal[1]
+          }
+      }
+
+
 
 
     download.file(url = image_url, destfile = paste0("../common_data/", cardMID, card_post_fix), mode = "wb")
