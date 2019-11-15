@@ -2,7 +2,8 @@
 required_data("ADM_VISUALIZE_CARDS")
 tabItem(tabName = "tab_showdeck",
         fluidPage(
-          fluidRow( uiOutput("deck_selector"))
+          fluidRow( column(10, uiOutput("deck_selector")),
+                    column(2, textOutput("deck_stats")))
          ,
          fluidRow(
            column(width = 1,

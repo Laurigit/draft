@@ -4,8 +4,8 @@ required_data(c("STG_CARDS_DIM", "STG_CARDS", "ADM_LAND_IMAGES", "STG_DECKS_DIM"
 sscols_DIM <- STG_CARDS_DIM
 
 #ota vaan max pakka_If
-max_PID <- STG_CARDS[, .(Pakka_form_ID = max(Pakka_form_ID)), by = .(Pakka_ID)]
-sscols <- STG_CARDS[Pakka_form_ID %in% max_PID[, Pakka_form_ID], .(Pakka_form_ID, MID, DRAFT_CARDS_ID, Maindeck, Pakka_ID)]
+#max_PID <- STG_CARDS[, .(Pakka_form_ID = max(Pakka_form_ID)), by = .(Pakka_ID)]
+sscols <- STG_CARDS[, .(Pakka_form_ID, MID, DRAFT_CARDS_ID, Maindeck, Pakka_ID)]
 
 joini_all <- sscols_DIM[sscols, on = "MID", allow.cartesian = TRUE]
 
