@@ -6,8 +6,7 @@ tabItem(tabName = "tab_showdeck",
                     column(2, textOutput("deck_stats")))
          ,
          fluidRow(
-           column(width = 1,
-                  actionButton(inputId = "save_changes_button", "Save changes")),
+
            column(width = 4,
            radioButtons("main_side", "main or side", choices = list("Main", "Side", "Both", "Neither"),
                         inline = TRUE)),
@@ -26,7 +25,9 @@ tabItem(tabName = "tab_showdeck",
            column(width = 1, actionButton(inputId = "add_basic_land", label =  "Add land")),
 
           column(width = 1, actionButton(inputId = "remove_basic_land", label = "Remove Land")),
-            column(width = 1, actionButton(inputId = "reset_changes", label = "Reset changes"))
+            column(width = 1, actionButton(inputId = "reset_changes", label = "Reset changes")),
+          column(width = 1,
+                 actionButton(inputId = "save_changes_button", "Commit changes to maindceck"))
          ),
 
         #imageOutput("img2985"),
