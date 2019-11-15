@@ -2,7 +2,10 @@
 required_data(c("STG_CARDS_DIM", "STG_CARDS", "ADM_LAND_IMAGES", "STG_DECKS_DIM"))
 
 sscols_DIM <- STG_CARDS_DIM
-sscols <- STG_CARDS[, .(Pakka_form_ID, MID, DRAFT_CARDS_ID, Maindeck, Pakka_ID)]
+
+#ota vaan max pakka_If
+max_PID <- STG_CARDS[, .(Pakka_form_ID = max(Pakka_form_ID)), by = .(Pakka_ID)]
+sscols <- STG_CARDS[Pakka_form_ID %in% max_PID[, Pakka_form_ID], .(Pakka_form_ID, MID, DRAFT_CARDS_ID, Maindeck, Pakka_ID)]
 
 joini_all <- sscols_DIM[sscols, on = "MID", allow.cartesian = TRUE]
 
@@ -47,5 +50,5 @@ levita_data[, image_id := paste0("img_", DRAFT_CARDS_ID)]
 #lisataan riveja countin mukaan, jotta osataan piirtaa oikee maara kortteja
 
 
-ADM_VISUALIZE_CARDS <- levita_data[Pakka_form_ID > 465]#[sample(nrow(levita_data))[1:3500]]
+ADM_VISUALIZE_CARDS <- levita_data#[Pakka_form_ID > 465]#[sample(nrow(levita_data))[1:3500]]
 #ADM_VISUALIZE_CARDS[is.na(Converted_Cost)]
