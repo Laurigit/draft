@@ -8,7 +8,8 @@ temp <- SRC_CARDS_DIM[, .(MID = as.numeric(MID),
                                    Converted_Cost = as.numeric(Converted_Cost),
                                    Rarity,
                                    Colors,
-                                   Stats)]
+                                   Stats,
+                                    Type)]
 
 #fix land MIDs
 
@@ -25,3 +26,13 @@ joinlandi <- landitaulu[temp, on = "Name"]
 joinlandi[, MID := ifelse(is.na(land_MID), MID, land_MID)]
 joinlandi[, land_MID := NULL]
 STG_CARDS_DIM <- joinlandi
+
+
+#join_ss_aggr[, ':=' (
+#Type_exact = word(Type, start = 1, sep = " — "),
+#Tribe_total = word(Type, start = 2, sep =" — ")
+#)]
+#join_ss_aggr[, ':=' (Race = word(Tribe_total, start = 1, sep = " "),
+#                     Class = word(Tribe_total, start = 2, sep = " "),
+#                     Subclass = word(Tribe_total, start = 3, sep = " "),
+#                     Subtype = word(Type_exact, start = -2, end = -2, sep = " "))]

@@ -18,7 +18,7 @@ mid <- tryCatch({
   result <- data.table(MID = res[['multiverse_ids']][loopJson][[1]],
                        Name =  res[['name']][loopJson],
                        Cost = res[['mana_cost']][loopJson],
-                       Converted_cost =  res[['cmc']][loopJson],
+                       Converted_Cost =  res[['cmc']][loopJson],
                        Type = res[['type_line']][loopJson],
                        Text =  res[['oracle_text']][loopJson],
                        Stats = paste0(res[['power']][loopJson], "/", res[['toughness']][loopJson]),
@@ -39,10 +39,15 @@ mid <- tryCatch({
 #   print(mid[, MID])
 # }
 }
-aggr <- mid_name_table[, .(MID = max(MID)), by = .(Name, Cost, Converted_cost, Type, Text, Stats, Colors, Rarity)]
-aggr[, ':=' (Name = iconv(x = Name, to = "UTF-8"),
-             Type = iconv(x= Type, to = "UTF-8"),
+aggr <- mid_name_table[, .(MID = max(MID)), by = .(Name, Cost, Converted_Cost, Type, Text, Stats, Colors, Rarity)]
+aggr[, ':=' (#Name = iconv(x = Name, to = "UTF-8"),
+#
              Text = iconv(x = Text, to = "UTF-8"))]
-
+aggr[, Type :=  gsub("—", "-", Type)]
+aggr[, Card_ID := ""]
 con <- connDB(con)
-dbWriteTable(con, "CARDS_DIM", aggr, row.names = FALSE, append = TRUE)
+
+dbSendQuery(con, 'SET NAMES utf8')
+
+#dbWriteTable(con, "CARDS_DIM", aggr, row.names = FALSE, append = FALSE, overwrite =TRUE)
+#dbWriteTable(con, "delme_CARDS_DIM_delme", aggr, row.names = FALSE,  overwrite =TRUE)
