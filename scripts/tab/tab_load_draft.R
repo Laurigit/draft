@@ -4,8 +4,8 @@ observeEvent(input$reload, {
 
   #leike <- gsub("[^0-9.-]", "", input$clip)
 
-
-  draftiTaulu <- readCardsFromTextArea(input$clip, con)
+required_data("STG_CARDS_DIM")
+  draftiTaulu <- readCardsFromTextArea(input$clip, con, STG_CARDS_DIM)
 
   draftiTaulu[, PICK_ORDER := seq_len(.N)]
   draftiTaulu[, PICK_DT := as.IDate(Sys.Date(), tz = "EET")]

@@ -1,7 +1,7 @@
 #STG_CARDS_DIM
 required_data("SRC_CARDS_DIM")
 temp <- SRC_CARDS_DIM[, .(MID = as.numeric(MID),
-                                   Card_ID = as.numeric(Card_ID),
+                                   #Card_ID = as.numeric(Card_ID),
                                    Name = iconv(x = Name, to = "UTF-8"),
                                    Text,
                                    Cost,

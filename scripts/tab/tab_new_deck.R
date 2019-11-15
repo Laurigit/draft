@@ -128,8 +128,8 @@ observeEvent(input$load_new_deck_MIDS, {
   #input <- NULL
   #rv_new_deck <- NULL
   #input$new_dect_text_area <- "40001 40002 40003 40001 40001 40002 40005"
-
-  kortti_dt <- readCardsFromTextArea(input$new_deck_text_area, con)
+  required_data("STG_CARDS_DIM")
+  kortti_dt <- readCardsFromTextArea(input$new_deck_text_area, con, STG_CARDS_DIM)
   #kortit <- c(40001, 40002, 40002, 40003)
   required_data("STG_CARDS_DIM")
   #joinaa name

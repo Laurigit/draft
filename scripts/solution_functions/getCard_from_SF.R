@@ -1,5 +1,5 @@
 
-getCard_from_SF <- function(input_card_name) {
+getCard_from_SF <- function(input_card_name, STG_CARDS_DIM) {
 
   #check if exists
   #fixedName <- stringi::stri_trans_general(cardNameInput, "Latin-ASCII")
@@ -14,16 +14,17 @@ getCard_from_SF <- function(input_card_name) {
 
   raw_iconv  <- content(raw.result, "text", encoding = "UTF-8")
   result_json <- fromJSON(raw_iconv)
-  mid <- result_json$multiverse_ids
+  mid <- STG_CARDS_DIM[Name == input_card_name, MID]
   if (!is.numeric(mid)) {
-    #backupMID
-    #https://api.magicthegathering.io/v1/cards?name=%22Goblin%20Guide%22
-    # urli_bu <- paste0('https://api.magicthegathering.io/v1/cards?name=\"',  input_card_name, '\"')
+    # #backupMID
+    # #https://api.magicthegathering.io/v1/cards?name=%22Goblin%20Guide%22
+    # # urli_bu <- paste0('https://api.magicthegathering.io/v1/cards?name=\"',  input_card_name, '\"')
+    #
+    # urli_bu <- paste0('https://api.magicthegathering.io/v1/cards?name=',  urlName)
+    # raw.result_bu1 <- GET(url = urli_bu)
+    # result_json_bu <- fromJSON(rawToChar(raw.result_bu1$content))
+    # mid <- max(result_json_bu$cards$multiverseid, na.rm = TRUE)
 
-    urli_bu <- paste0('https://api.magicthegathering.io/v1/cards?name=',  urlName)
-    raw.result_bu1 <- GET(url = urli_bu)
-    result_json_bu <- fromJSON(rawToChar(raw.result_bu1$content))
-    mid <- max(result_json_bu$cards$multiverseid, na.rm = TRUE)
 
   }
   if (is.null(result_json$colors)) {

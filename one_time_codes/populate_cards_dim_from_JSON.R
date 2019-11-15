@@ -49,5 +49,5 @@ con <- connDB(con)
 
 dbSendQuery(con, 'SET NAMES utf8')
 
-#dbWriteTable(con, "CARDS_DIM", aggr, row.names = FALSE, append = FALSE, overwrite =TRUE)
+#dbWriteTable(con, "CARDS_DIM", aggr, row.names = FALSE, append = TRUE, overwrite =FALSE)
 #dbWriteTable(con, "delme_CARDS_DIM_delme", aggr, row.names = FALSE,  overwrite =TRUE)

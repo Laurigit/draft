@@ -7,12 +7,13 @@ observeEvent(input$load_setup_draft, {
   print("Painettu")
   req(input$loadSetupDraft_area)
 con <- connDB(con)
-  setupDraft$cards <- readCardsFromTextArea(input$loadSetupDraft_area, con)
+required_data("STG_CARDS_DIM")
+  setupDraft$cards <- readCardsFromTextArea(input$loadSetupDraft_area, con, STG_CARDS_DIM)
   setupDraft$cards[, rivi := seq_len(.N)]
   setupDraft$cards[, kuva_id := paste0("id_", rivi)]
   setupDraft$cards[, filu := paste0(MID, "_card.jpg")]
   lapply(setupDraft$cards[, Name], function(x) {
-    addCardToDB(x, con)
+    addCardToDB(x, con, STG_CARDS_DIM)
   })
 
   lapply(setupDraft$cards[, MID], function(x) {

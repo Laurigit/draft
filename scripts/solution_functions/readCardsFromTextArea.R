@@ -1,4 +1,4 @@
-readCardsFromTextArea <- function(textAreaInput_text, con) {
+readCardsFromTextArea <- function(textAreaInput_text, con, STG_CARDS_DIM) {
 
 
 #   textAreaInput_text <- "Silverflame Squire // On Alert; 0
@@ -16,14 +16,14 @@ readCardsFromTextArea <- function(textAreaInput_text, con) {
   #fix missing MIDs
  # tulos <- getCard_from_SF("Aethersnipe")[,MID]
   try_res <- tryCatch({
-    taulu[MID == 0, MID := getCard_from_SF(Name)[,MID], by = Name]
+    taulu[MID == 0, MID := getCard_from_SF(Name, STG_CARDS_DIM)[,MID], by = Name]
   }, error = function(e) {
     "ERROR"
   })
 
 
 if (try_res[[1]] != "ERROR") {
-  MIDs <- dbQ(paste0("SELECT Name from CARDS_DIM"),  con)
+  MIDs <- STG_CARDS_DIM
   new_cards <- setdiff(taulu[, Name], MIDs[, Name])
   for (x in new_cards) {
     res <- getCard_from_SF(x)
