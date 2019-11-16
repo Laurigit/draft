@@ -2,6 +2,7 @@
 cards_not_found_from_sides <- reactiveValues(cards = NULL)
 
 observeEvent(input$add_deck,{
+
 con <- connDB(con)
 required_data("ADM_LAND_IMAGES")
 #very first check if the cards are in the sideboard
@@ -60,7 +61,6 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
                         rivi_id = rivi_id,
                         Picked = 1,
                         Omistaja = omistaja_Nro,
-                        Omistaja_ID = omistaja_kirain,
                         Omistaja_Nimi = session$user,
                         Pakka = free_pakka_no,
                         Manastack_Deck_ID = "",
