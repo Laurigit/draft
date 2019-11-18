@@ -97,12 +97,13 @@ required_data("ADM_DI_HIERARKIA")
                                                     Maindeck = as.character(),
                                                     Removed_from_game = as.numeric()))
 
-  observeEvent( values$lastUpdated, {
+  observeEvent(values$lastUpdated, {
 # täällä seurataan tuplaklikkauksia ja hoidetaan niitten seurauksia.
     print("TOIMIII")
     req(input$myDecks)
     req(ReactDraftCards$cards_left)
     req(input[[values$lastUpdated]])
+
     print(values$lastUpdated)
    # print(input[[values$lastUpdated]] )
     if (input[[values$lastUpdated]]$x >= 0) {
@@ -183,11 +184,14 @@ required_data("ADM_DI_HIERARKIA")
 
 
   observe({
+
     req(ReactDraftCards$image_ids, main$cards, side$cards)
+
     #input <- NULL
    # input <- c("eka", "toka", "img1", "img3332")
     #imagelist <- names(input)
    # imagelist <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$pif, image_id]
+
     print("BEFORE IMAGE LIST")
     mainCards <- main$cards[, image_id]
     sideCards <- side$cards[, image_id]

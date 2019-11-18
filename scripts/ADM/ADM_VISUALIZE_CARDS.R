@@ -51,5 +51,5 @@ levita_data[, image_id := paste0("img_", DRAFT_CARDS_ID)]
 #lisataan riveja countin mukaan, jotta osataan piirtaa oikee maara kortteja
 
 
-ADM_VISUALIZE_CARDS <- levita_data#[Pakka_form_ID > 465]#[sample(nrow(levita_data))[1:3500]]
+ADM_VISUALIZE_CARDS <- levita_data#[Pakka_form_ID > 475]#[sample(nrow(levita_data))[1:3500]]
 #ADM_VISUALIZE_CARDS[is.na(Converted_Cost)]
