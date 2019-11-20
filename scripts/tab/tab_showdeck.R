@@ -92,15 +92,18 @@ observeEvent(input$save_changes_button,{
                   "STG_CARDS_DIM",
                   "STG_DRAFT_CARDS"
                   ))
+
   new_DCIDs <- deck$changes[Pakka_ID == input$myDecks & source == "Side", .(DRAFT_CARDS_ID, MID)]
   removed_DCIDs <- deck$changes[Pakka_ID == input$myDecks & source == "Main", DRAFT_CARDS_ID]
   Pakka_ID_input <- input$myDecks
+  con <- connDB(con)
   new_dl <-  createNewDecklist_after_changes(new_DCIDs,
                                   removed_DCIDs,
                                   Pakka_ID_input,
                                   STG_CARDS,
                                   STG_CARDS_DIM,
-                                  STG_DRAFT_CARDS)
+                                  STG_DRAFT_CARDS,
+                                  con)
   new_dl[, Valid_from_DT := now(tz = "EET")]
   dbWriteTable(con, "CARDS", new_dl, row.names = FALSE, append = TRUE)
   required_data("ADM_DI_HIERARKIA")
@@ -301,9 +304,11 @@ observeEvent(input$add_basic_land,{
     req(deck$changes)
 
     changed_MID <- input$basic_land
+
     #get free DCID
+
     #check first if lands are already added
-    min_id <- deck$changes[, min(DRAFT_CARDS_ID)]
+    min_id <- deck$changes[basic_land == TRUE, min(DRAFT_CARDS_ID)]
     #if min id is positive then this is first new land
     first_land <- ifelse(min_id < 0, FALSE, TRUE)
     #get free DCID based on the result
@@ -317,7 +322,8 @@ observeEvent(input$add_basic_land,{
                                   Pakka_ID = input$myDecks,
                                   DRAFT_CARDS_ID = input_draft_cards_id,
                                   Maindeck = 1,
-                                  Removed_from_game = FALSE))
+                                  Removed_from_game = FALSE,
+                                  basic_land = TRUE))
     print("Ennen ländiä")
     print(deck$changes )
     deck$changes <- isolate(rbind(deck$changes, new_row))

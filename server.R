@@ -95,7 +95,8 @@ required_data("ADM_DI_HIERARKIA")
                                                     Pakka_ID = numeric(),
                                                     DRAFT_CARDS_ID = numeric(),
                                                     Maindeck = as.character(),
-                                                    Removed_from_game = as.numeric()))
+                                                    Removed_from_game = as.numeric(),
+                                              basic_land = as.numeric()))
 
   observeEvent(values$lastUpdated, {
 # täällä seurataan tuplaklikkauksia ja hoidetaan niitten seurauksia.
@@ -136,7 +137,8 @@ required_data("ADM_DI_HIERARKIA")
                                       MID = changed_MID, Pakka_ID = input$myDecks,
                                       DRAFT_CARDS_ID = draft_card_id,
                                       Maindeck = toMainorSide,
-                                      Removed_from_game = FALSE))
+                                      Removed_from_game = FALSE,
+                                      basic_land = FALSE))
         deck$changes <- isolate(rbind(deck$changes, new_row))
 
         #delete from draftmain
@@ -152,7 +154,8 @@ required_data("ADM_DI_HIERARKIA")
                                       Pakka_ID = input$myDecks,
                                       DRAFT_CARDS_ID = draft_card_id,
                                       Maindeck = -1,
-                                      Removed_from_game = TRUE))
+                                      Removed_from_game = TRUE,
+                                      basic_land = FALSE))
 
         deck$changes <- isolate(rbind(deck$changes, new_row))
         print("Poistettu Mainista tulos")
@@ -161,6 +164,7 @@ required_data("ADM_DI_HIERARKIA")
 
       } else if (clicked == "Side") {
         print("Side clicked")
+
         changed_MID <- ADM_VISUALIZE_CARDS[image_id == values$lastUpdated, max(MID)]
         draft_card_id <- ADM_VISUALIZE_CARDS[image_id == values$lastUpdated, max(DRAFT_CARDS_ID)]
         new_row <- isolate(data.table(source = paste0("Side"),
@@ -168,7 +172,8 @@ required_data("ADM_DI_HIERARKIA")
                                       Pakka_ID = input$myDecks,
                                       DRAFT_CARDS_ID = draft_card_id,
                                       Maindeck = 1,
-                                      Removed_from_game = FALSE))
+                                      Removed_from_game = FALSE,
+                                      basic_land = FALSE))
         deck$changes <- isolate(rbind(deck$changes, new_row))
         print("Laitettu sidestä tulos")
         print(deck$changes)
