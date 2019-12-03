@@ -1,12 +1,17 @@
 #load("../mstat2/external_files/MANASTACK_CARDS.RData")
 
 output$deck_stats <- renderText({
-
-  required_data(c("STG_CARDS", "STG_CARDS_DIM"))
+req(input$myDecks)
+  required_data(c("STG_CARDS", "STG_CARDS_DIM", "STG_DECKS_DIM"))
+  con <- connDB(con)
+  stat_pfi <- dbSelectAll("STAT_PFI", con)
+  #input <- NULL
+  #input$myDecks <- 3
 pfi <- STG_CARDS[Pakka_ID == input$myDecks, max(Pakka_form_ID)]
  res <- count_deck_stats(pfi, STG_CARDS, STG_CARDS_DIM)
-
- paste0("Total cards = ", res$card_count, " Land pct = ", paste0(round(as.numeric(res$land_count) / as.numeric(res$card_count), 2) * 100), "%")
+ pakka_NM <- STG_DECKS_DIM[Pakka_ID == input$myDecks, Nimi]
+ PFI_card_count <- floor(stat_pfi[Deck == pakka_NM, Deck_size] + 40)
+ paste0("Required cards = ", PFI_card_count,  " Total cards = ", res$card_count, " Land pct = ", paste0(round(as.numeric(res$land_count) / as.numeric(res$card_count), 3) * 100), "%")
 })
 
 required_data(c("ADM_VISUALIZE_CARDS", "ADM_LAND_IMAGES"))
