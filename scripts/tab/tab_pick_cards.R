@@ -4,6 +4,7 @@ output$select_booster <- renderUI({
   print(input$load_setup_draft)
   #dont del next print
   print(global_update_data$update)
+  print(local_update_data$update)
   #############dont del
 
   required_data(c("ADM_UNPICKED_DRAFT"))
@@ -50,7 +51,7 @@ observeEvent(input$save_picks, {
   picke_order[, kuva_id := NULL]
   dbWriteTable(con, "DRAFT_PICKORDER", picke_order, row.names = FALSE, append = TRUE)
   updateData("SRC_DRAFT_PICKORDER", ADM_DI_HIERARKIA, globalenv())
-  global_update_data$update <- isolate(global_update_data$update + 1)
+  local_update_data$update <- isolate(local_update_data$update + 1)
 })
 
 
