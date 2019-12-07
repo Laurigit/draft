@@ -7,10 +7,12 @@ tabItem(tabName = "tab_showdeck",
          ,
          fluidRow(
 
-           column(width = 4,
+           column(width = 3,
            radioButtons("main_side", "main or side", choices = list("Main", "Side", "Both", "Neither"),
                         inline = TRUE)),
-           column(width = 4,
+           column(width = 2,
+                  uiOutput("card_age_selector")),
+           column(width = 3,
 
                   radioButtons("basic_land", "Basic land", choiceNames = ADM_LAND_IMAGES[, .N, by = .(MID, Name)][, Name],
                                choiceValues  = ADM_LAND_IMAGES[, .N, by = .(MID, Name)][, MID],

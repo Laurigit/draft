@@ -130,11 +130,21 @@ output$boxes <- renderUI({
   print("output$boxes")
   # input <- NULL
   # input$pfi <- 72
-  #input$myDecks <- 1
+  #input$myDecks <- 43
+  #input$Card_age_selector <-40
  # kaadettu_all <-  get_sorted_cards(ADM_VISUALIZE_CARDS, 129)
   show_pfi <- STG_CARDS[Pakka_ID == input$myDecks, max(Pakka_form_ID)]
 
-  draw_deck_pfi <- ADM_VISUALIZE_CARDS[Pakka_form_ID == show_pfi]
+  draw_deck_pfi_all <- ADM_VISUALIZE_CARDS[Pakka_form_ID == show_pfi]
+#apply age filter
+
+  if (input$Card_age_selector == "All") {
+    draw_deck_pfi <- draw_deck_pfi_all
+  } else {
+
+    draw_deck_pfi <- draw_deck_pfi_all[Card_age >= as.numeric(input$Card_age_selector)]
+  }
+
 
  kaadettu_all <-  get_sorted_cards(draw_deck_pfi)
  kaadettu <- kaadettu_all$id
@@ -192,40 +202,7 @@ output$boxes <- renderUI({
         side_height <- "60px"
         showLands <- TRUE
       }
-      #check if basic land
-      # if (nimi %in% c("Mountain", "Forest", "Swamp", "Plains", "Island", "Wastes"))  {
-      #   value_input <-  kaadettu_all$blands[Name == nimi, N]
-      #   if (nimi == "Island") {
-      #       land_color <- "blue"
-      #   } else if ((nimi == "Forest")) {
-      #     land_color <- "green"
-      #   }else if ((nimi == "Plains")) {
-      #     land_color <- "yellow"
-      #   }else if ((nimi == "Swamp")) {
-      #     land_color <- "black"
-      #   }else if ((nimi == "Mountain")) {
-      #     land_color <- "red"
-      #
-      # }else if ((nimi == "Wastes")) {
-      #   land_color <- "purple"
-      # }
-      #
-      #
-      #   column(width = columnWidth,
-      #         if ( showLands == TRUE) {
-      #          box(title = NULL,
-      #              paste0(value_input, " ", nimi),
-      #            background = land_color,
-      #           width = NULL,
-      #       collapsible = FALSE,
-      #       height = "40px"
-      #           )
-      #         } else {
-      #     HTML("")
-      #   }
-      #     )
-      #  # HTML('<div id = "logo"><h4>paste0(nimi, " ", value_input)</h4>, background = land_color </div>')
-      #} else
+
       if (nimi %in% "Side") {
         column(width = 12, imageOutput("sideboard_bar", width = "1600px", height = "70px"))
         # print("else if")
@@ -386,6 +363,14 @@ ignoreInit = TRUE, ignoreNULL = TRUE)
 
 observeEvent(input$reset_changes,{
   deck$changes <- deck$changes[1 == 0]
+})
+
+output$card_age_selector <- renderUI({
+  required_data("STAT_SIDE_CARD_AGE")
+  req(session$user)
+
+  myAges <- c("All", sort(STAT_SIDE_CARD_AGE()[Omistaja_ID == omistaja_ID_calc$value, .N, by = .(Card_age)][, Card_age]))
+  selectInput(inputId = "Card_age_selector", label = "Age_older_than", choices = myAges, selected = "All", multiple = FALSE)
 })
 
 #reset
