@@ -3,7 +3,8 @@ tabItem(tabName = "tab_pick_cards",
 fluidPage(
   fluidRow(
   column(4, uiOutput("select_booster")),
-  column(4, actionButton("save_picks", label = "Save ordered picks"))
+  column(4, actionButton("save_picks", label = "Save ordered picks")),
+  column(4, uiOutput(outputId = "myLegalColors"))
 
 
   ),

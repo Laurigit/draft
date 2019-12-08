@@ -1,0 +1,3 @@
+#STAT_CURRENT_PAKKA
+con <- connDB(con)
+STAT_CURRENT_PAKKA <- dbSelectAll("STAT_CURRENT_PAKKA", con)

@@ -22,6 +22,14 @@ my_to_do <- ADM_UNPICKED_DRAFT[OMISTAJA_ID == omistaja_ID_calc$value, .N, by = B
 
 })
 
+output$myLegalColors <- renderUI({
+  required_data("STG_DECKS_DIM")
+  colors <- STAT_CURRENT_PAKKA()
+ # browser()
+  My_active_decks <- STG_DECKS_DIM[Retired == 0 & Side == 0 & Omistaja_ID == omistaja_ID_calc$value, Pakka_ID]
+  myDecks <- colors[Pakka_ID %in% My_active_decks, .N , by = Top2_colors][, Top2_colors]
+  HTML(myDecks)
+})
 
 output$picK_order <- renderUI({
   kortit <- STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector]

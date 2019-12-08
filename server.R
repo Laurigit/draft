@@ -24,6 +24,13 @@ server <- function(input, output, session) {
     dbQ("SELECT count(Name) FROM betmtg2.STAT_SIDE_CARD_AGE", con)},
     valueFunc = function() { dbSelectAll("STAT_SIDE_CARD_AGE", con)}
   )
+  STAT_CURRENT_PAKKA <- reactivePoll(30000, session, checkFunc = function() {
+    con <- connDB(con)
+    dbQ("SELECT count(Colors) FROM betmtg2.STAT_CURRENT_PAKKA", con)},
+    valueFunc = function() { dbSelectAll("STAT_CURRENT_PAKKA", con)}
+  )
+
+
 
   omistaja_ID_calc <- reactiveValues(value = NULL)
   required_data("ADM_CARD_IMAGES")
