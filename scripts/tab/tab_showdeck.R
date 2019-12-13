@@ -110,6 +110,7 @@ observeEvent(input$save_changes_button,{
                                   STG_DRAFT_CARDS,
                                   con)
   new_dl[, Valid_from_DT := now(tz = "EET")]
+  browser()
   dbWriteTable(con, "CARDS", new_dl, row.names = FALSE, append = TRUE)
   required_data("ADM_DI_HIERARKIA")
   updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
@@ -348,7 +349,8 @@ observeEvent(input$remove_basic_land,{
                                   Pakka_ID = input$myDecks,
                                   DRAFT_CARDS_ID = removed_DCID,
                                   Maindeck = -1,
-                                  Removed_from_game = TRUE))
+                                  Removed_from_game = TRUE,
+                                  basic_land = TRUE))
     deck$changes <- isolate(rbind(deck$changes, new_row))
   } else {
     #remove from temporaryli added cards
@@ -358,6 +360,7 @@ observeEvent(input$remove_basic_land,{
   print(deck$changes )
 
   print("Jälkeen ländiä")
+
 },
 ignoreInit = TRUE, ignoreNULL = TRUE)
 
