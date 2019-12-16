@@ -52,6 +52,7 @@ uusi_peli <- dashboardBody(
 
   ),
   tabItems(
+    source("./scripts/ui/ui_deck_editor.R",local = TRUE)$value,
     source("./scripts/ui/ui_setup_draft.R",local = TRUE)$value,
     source("./scripts/ui/ui_load_draft.R",local = TRUE)$value,
     source("./scripts/ui/ui_new_deck.R",local = TRUE)$value,
@@ -66,6 +67,7 @@ uusi_peli <- dashboardBody(
 #SIDEBAR
 sidebar <- dashboardSidebar(
   sidebarMenu(id = "sidebarmenu",
+              menuItem("Deck editor", tabName = "tab_deck_editor", icon = icon("gamepad")),
               menuItem("Setup draft", tabName = "tab_setup_draft", icon = icon("gamepad")),
               menuItem("Pick cards", tabName = "tab_pick_cards", icon = icon("gamepad")),
               menuItem("Resolve draft", tabName = "tab_resolve_draft", icon = icon("gamepad")),

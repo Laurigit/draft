@@ -9,6 +9,8 @@ temp <- SRC_CARDS_DIM[, .(MID = as.numeric(MID),
                                    Rarity,
                                    Colors,
                                    Stats,
+                                   Power = word(Stats, 1, 1, sep = "/"),
+                                    Toughness = word(Stats, 2, 2, sep = "/"),
                                     Type)]
 
 #fix land MIDs
