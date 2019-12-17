@@ -1,29 +1,69 @@
 
-table_to_render_react <- reactive({
-
+output$filters <- renderUI({
+  req(input$choose_decklist)
 
   testDeck <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
                                                                             Count, Name_count, is_basic_land, Maindeck)]
+  testDeck[is.na(testDeck)] <- -1
   rest <- create_deck_filters(testDeck)
-  ressit <- rest[1, .(subset_list = list(options[[1]][1:5])), by = filter]
+  fluidRow(
+    lapply(1:nrow(rest), function(filtterLoop){
+      rowData <- rest[filtterLoop]
+      column(width = 1,
+
+             checkboxGroupInput(inputId = rowData[, filter], label = rowData[, filter], choices = rowData[, options][[1]],
+                                selected = rowData[, options][[1]]))
+    }),
+    column(width = 1,
+           selectInput(inputId =  "row_sort", label = "Row sort", choices = rest[, filter])),
+    column(width = 1,
+           selectInput(inputId = "col_sort", label = "Column sort", choices = rest[, filter]))
+
+  )
+})
+
+
+table_to_render_react <- reactive({
+
+#take dep
+  input$update_deck_filter
+  #DONT DEL ME UP
+
+  testDeck <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
+                                                                            Count, Name_count, is_basic_land, Maindeck)]
+
+  testDeck[is.na(testDeck)] <- -1
+
+
+  rest <- create_deck_filters(testDeck)
+  #create filter data
+  filter_dataset <- data.table(filter = as.character(), options = as.character())
+isolate({
+  for (filter_input_loop in 1:nrow(rest)) {
+    row_data <- rest[filter_input_loop]
+    new_row <- data.table(filter = row_data[, filter], options = list(input[[row_data[, filter]]]))
+    filter_dataset <- rbind(filter_dataset, new_row, fill = TRUE)
+  }
+  #ressit <- rest[1, .(subset_list = list(options[[1]][1:5])), by = filter]
+print(filter_dataset)
+  ressit <- filter_dataset
   total_string <- NULL
+
   for(koodiloop in 1:nrow(ressit)) {
-    eka_rivi <-   paste0(ressit[koodiloop, filter], ' %in% ' ,ressit[koodiloop, subset_list])
+    eka_rivi <-   paste0(ressit[koodiloop, filter], ' %in% ' ,ressit[koodiloop, options])
     if(koodiloop > 1) {
       total_string <- paste0(eka_rivi, " & ", total_string)
     } else {
       total_string <- paste0(eka_rivi)
     }
   }
-  # create_string <- paste0(lapply(ressit, function(x) {
-  #   paste0(ressit[, filter], ' %in% ' ,ressit[, subset_list])
-  # }), sep = "|")
-  # create_string
+})
   syntax <- (total_string)
+
   filtered_deck <- testDeck[eval(parse(text = syntax))]
 
-  row_dim <- "Power"
-  column_sort_dim <- "Maindeck"
+  row_dim <- input$row_sort
+  column_sort_dim <- input$col_sort
 
   table_to_render <- filtered_deck[order(get(row_dim), get(column_sort_dim))][,  .(x = get(row_dim), Name,
                                                                                    y = seq_len(.N)),
@@ -54,9 +94,9 @@ output$decklist <- renderUI({
                getCardImg_full(MIDi)
                output[[kuva_id]] <-  renderImage({
 
-                 # output[[image_id]] <-  renderImage({
                  list(src = paste0("./www/", MIDi, "_card.jpg"),#image_nm,
-                      alt = "Image failed to render"
+                      alt = "Image failed to render",
+                      width = "150px"
                  )
                }, deleteFile = FALSE)
                imageOutput(kuva_id,

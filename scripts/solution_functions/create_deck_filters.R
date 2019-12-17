@@ -16,6 +16,7 @@ for (filter in filterCols) {
   row_data <- data.table(filter, options = list(uniik))
   filter_table <- rbind(filter_table, row_data)
 }
+result <- filter_table[filter != "Name"]
 
-return(filter_table)
+return(result)
 }

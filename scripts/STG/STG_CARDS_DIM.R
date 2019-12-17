@@ -4,14 +4,14 @@ temp <- SRC_CARDS_DIM[, .(MID = as.numeric(MID),
                                    #Card_ID = as.numeric(Card_ID),
                                    Name = iconv(x = Name, to = "UTF-8"),
                                    Text,
-                                   Cost,
+                                   Cost = as.numeric(Cost),
                                    Converted_Cost = as.numeric(Converted_Cost),
                                    Rarity,
                                    Colors,
                                    Stats,
-                                   Power = word(Stats, 1, 1, sep = "/"),
-                                    Toughness = word(Stats, 2, 2, sep = "/"),
-                                    Type)]
+                                   Power = as.numeric(word(Stats, 1, 1, sep = "/")),
+                                   Toughness = as.numeric(word(Stats, 2, 2, sep = "/")),
+                                   Type)]
 
 #fix land MIDs
 
