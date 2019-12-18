@@ -3,7 +3,7 @@ output$filters <- renderUI({
   req(input$choose_decklist)
 
   testDeck <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
-                                                                            Count, Name_count, is_basic_land, Maindeck)]
+                                                                            Card_age, is_basic_land, Maindeck)]
   testDeck[is.na(testDeck)] <- -1
   rest <- create_deck_filters(testDeck)
   fluidRow(
@@ -30,7 +30,7 @@ table_to_render_react <- reactive({
   #DONT DEL ME UP
 
   testDeck <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
-                                                                            Count, Name_count, is_basic_land, Maindeck)]
+                                                                            Card_age, is_basic_land, Maindeck)]
 
   testDeck[is.na(testDeck)] <- -1
 
@@ -41,7 +41,7 @@ table_to_render_react <- reactive({
 isolate({
   for (filter_input_loop in 1:nrow(rest)) {
     row_data <- rest[filter_input_loop]
-    new_row <- data.table(filter = row_data[, filter], options = list(input[[row_data[, filter]]]))
+    new_row <- data.table(filter = row_data[, filter], options = list(c(input[[row_data[, filter]]],"ADDED_TO_PURKKA_WHEN_ONLY_1_SELECTED")))
     filter_dataset <- rbind(filter_dataset, new_row, fill = TRUE)
   }
   #ressit <- rest[1, .(subset_list = list(options[[1]][1:5])), by = filter]
@@ -96,11 +96,11 @@ table_to_render[, drag_ID:= paste0("Drag", x)]
 agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 
 
-  fluidPage(id = "Drag3YY",
+  fluidPage(
 
     lapply(table_to_render[, unique(x)], function(rivi) {
 
-      column(id = paste0(agg_to_x[x == rivi, drag_ID], "X"),
+      column(id = paste0(agg_to_x[x == rivi, drag_ID]),
              width = 1,
             offset = 0,
              lapply(table_to_render[x == rivi, unique(y)], function(sarake) {
@@ -108,16 +108,16 @@ agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
                card_name <-  table_to_render[x == rivi & y == sarake, Name]
                MIDi <- sscols_cards[Name == card_name, MID]
                getCardImg_full(MIDi)
-               # output[[kuva_id]] <-  renderImage({
-               #
-               #   list(src = paste0("./www/", MIDi, "_card.jpg"),#image_nm,
-               #        alt = "Image failed to render",
-               #        width = "150px"
-               #   )
-               # }, deleteFile = FALSE)
-               # tags$div(drag = kuva_id, imageOutput(kuva_id,
-               #             height = "100px"))
-               tags$img(src = paste0(MIDi, "_card.jpg"), height = "200px", drag = kuva_id)
+               output[[kuva_id]] <-  renderImage({
+
+                 list(src = paste0("./www/", MIDi, "_card.jpg"),#image_nm,
+                      alt = "Image failed to render",
+                      width = "150px"
+                 )
+               }, deleteFile = FALSE)
+               tags$div(drag = kuva_id, imageOutput(kuva_id,
+                           height = "100px"))
+               #tags$img(src = paste0(MIDi, "_card.jpg"), height = "200px", drag = kuva_id)
                # HTML(paste0('<div drag = "drag_',
                #             kuva_id,
                #             '" ',
@@ -140,8 +140,8 @@ output$dragOut <- renderDragula({
  table_to_render[, drag_ID:= paste0("Drag", x)]
 agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 #browser()
-#dragula(as.character(agg_to_x[,drag_ID]))
-dragula(c("Drag0", "Drag1", "Drag2X", "Drag3YY", "Drag4" ,"Drag5"))
+dragula(as.character(agg_to_x[,drag_ID]))
+#dragula(c("Drag0", "Drag1", "Drag2", "Drag3", "Drag4" ,"Drag5"))
  #dragula(c("Drag0","Drag1"))
 })
 
