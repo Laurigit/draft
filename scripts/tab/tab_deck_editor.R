@@ -80,7 +80,7 @@ output$elementsOutput <- renderUI({
 })
 output$card_dragular<- renderUI({
 
-  res <- dragulaValue(input$Drag1)
+  res <- input$dragOut
 
   res
 })
@@ -100,7 +100,7 @@ agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 
     lapply(table_to_render[, unique(x)], function(rivi) {
 
-      column(id = agg_to_x[x == rivi, drag_ID],
+      column(id = paste0(agg_to_x[x == rivi, drag_ID], "X"),
              width = 1,
             offset = 0,
              lapply(table_to_render[x == rivi, unique(y)], function(sarake) {
@@ -136,9 +136,12 @@ agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 
 
 output$dragOut <- renderDragula({
-  table_to_render <- table_to_render_react()
-  table_to_render[, drag_ID:= paste0("Drag", x)]
-  agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
-  dragula(as.character(agg_to_x[,drag_ID]))
+ table_to_render <- table_to_render_react()
+ table_to_render[, drag_ID:= paste0("Drag", x)]
+agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
+#browser()
+#dragula(as.character(agg_to_x[,drag_ID]))
+dragula(c("Drag0", "Drag1", "Drag2X", "Drag3", "Drag4" ,"Drag5"))
+ #dragula(c("Drag0","Drag1"))
 })
 
