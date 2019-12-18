@@ -72,39 +72,73 @@ print(filter_dataset)
   table_to_render
 })
 
+
+output$elementsOutput <- renderUI({
+  # reset elementsOutput after dataset changes
+  req(input$dataset)
+  div()
+})
+output$card_dragular<- renderUI({
+
+  res <- dragulaValue(input$Drag1)
+
+  res
+})
+
+
 #tab_deck_editor
 output$decklist <- renderUI({
 
   table_to_render <- table_to_render_react()
   required_data("STG_CARDS_DIM")
   sscols_cards <- STG_CARDS_DIM[, .(MID, Name)]
+table_to_render[, drag_ID:= paste0("Drag", x)]
+agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
+
 
   fluidPage(
-    # for (sarake in 1:table_to_render[, max(x)]) {
-    #
-    # }
+
     lapply(table_to_render[, unique(x)], function(rivi) {
 
-      column(width = 1,
-             offset = 0,
+      column(id = agg_to_x[x == rivi, drag_ID],
+             width = 1,
+            offset = 0,
              lapply(table_to_render[x == rivi, unique(y)], function(sarake) {
                kuva_id <- table_to_render[x == rivi & y == sarake, paste0(x, Name, y)]
                card_name <-  table_to_render[x == rivi & y == sarake, Name]
                MIDi <- sscols_cards[Name == card_name, MID]
                getCardImg_full(MIDi)
-               output[[kuva_id]] <-  renderImage({
-
-                 list(src = paste0("./www/", MIDi, "_card.jpg"),#image_nm,
-                      alt = "Image failed to render",
-                      width = "150px"
-                 )
-               }, deleteFile = FALSE)
-               imageOutput(kuva_id,
-                           height = "100px")
+               # output[[kuva_id]] <-  renderImage({
+               #
+               #   list(src = paste0("./www/", MIDi, "_card.jpg"),#image_nm,
+               #        alt = "Image failed to render",
+               #        width = "150px"
+               #   )
+               # }, deleteFile = FALSE)
+               # tags$div(drag = kuva_id, imageOutput(kuva_id,
+               #             height = "100px"))
+               tags$img(src = paste0(MIDi, "_card.jpg"), height = "200px", drag = kuva_id)
+               # HTML(paste0('<div drag = "drag_',
+               #             kuva_id,
+               #             '" ',
+               #             imageOutput(kuva_id,
+               #                         height = "100px"),
+               #             '</div>'))
              })
       )
     })
 
+
+
   )
+
+})
+
+
+output$dragOut <- renderDragula({
+  table_to_render <- table_to_render_react()
+  table_to_render[, drag_ID:= paste0("Drag", x)]
+  agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
+  dragula(as.character(agg_to_x[,drag_ID]))
 })
 
