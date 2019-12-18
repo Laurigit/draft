@@ -96,7 +96,7 @@ table_to_render[, drag_ID:= paste0("Drag", x)]
 agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 
 
-  fluidPage(
+  fluidPage(id = "Drag3YY",
 
     lapply(table_to_render[, unique(x)], function(rivi) {
 
@@ -141,7 +141,7 @@ output$dragOut <- renderDragula({
 agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 #browser()
 #dragula(as.character(agg_to_x[,drag_ID]))
-dragula(c("Drag0", "Drag1", "Drag2X", "Drag3", "Drag4" ,"Drag5"))
+dragula(c("Drag0", "Drag1", "Drag2X", "Drag3YY", "Drag4" ,"Drag5"))
  #dragula(c("Drag0","Drag1"))
 })
 
