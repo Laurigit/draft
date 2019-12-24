@@ -1,4 +1,4 @@
-connDB <- function(con) {
+connDB <- function(con, dbname_input = "betmtg_test") {
   con <- tryCatch({
 
     res <- dbFetch(dbSendQuery(con, "SHOW TABLES"))
@@ -11,7 +11,7 @@ connDB <- function(con) {
                      password = 'betmtg_pw',
                      host = '35.228.73.82',
                      port = 3306,
-                     dbname = 'betmtg2')
+                     dbname = dbname_input)
   })
   return(con)
 }

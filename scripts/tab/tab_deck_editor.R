@@ -3,7 +3,7 @@ output$filters <- renderUI({
   req(input$choose_decklist)
 
   testDeck <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
-                                                                            Card_age, is_basic_land, Maindeck)]
+                                                                            Card_age, is_basic_land, Maindeck,image_id)]
   testDeck[is.na(testDeck)] <- -1
   rest <- create_deck_filters(testDeck)
   fluidRow(
@@ -30,7 +30,7 @@ table_to_render_react <- reactive({
   #DONT DEL ME UP
 
   testDeck <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
-                                                                            Card_age, is_basic_land, Maindeck)]
+                                                                            Card_age, is_basic_land, Maindeck, image_id)]
 
   testDeck[is.na(testDeck)] <- -1
 
@@ -65,7 +65,7 @@ print(filter_dataset)
   row_dim <- input$row_sort
   column_sort_dim <- input$col_sort
 
-  table_to_render <- filtered_deck[order(get(row_dim), get(column_sort_dim))][,  .(x = get(row_dim), Name,
+  table_to_render <- filtered_deck[order(get(row_dim), get(column_sort_dim))][,  .(x = get(row_dim), Name, image_id,
                                                                                    y = seq_len(.N)),
                                                                               by =  get(row_dim)]
   table_to_render[, get := NULL]
@@ -80,9 +80,10 @@ output$elementsOutput <- renderUI({
 })
 output$card_dragular<- renderUI({
 
-  res <- input$dragOut
+  res <-   remove_cards_list <- unlist(input$dragOut[["removeCards"]])
 
-  res
+
+  HTML(res)
 })
 
 
@@ -104,7 +105,7 @@ agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
              width = 1,
             offset = 0,
              lapply(table_to_render[x == rivi, unique(y)], function(sarake) {
-               kuva_id <- table_to_render[x == rivi & y == sarake, paste0(x, Name, y)]
+               kuva_id <- table_to_render[x == rivi & y == sarake, image_id]
                card_name <-  table_to_render[x == rivi & y == sarake, Name]
                MIDi <- sscols_cards[Name == card_name, MID]
                getCardImg_full(MIDi)
@@ -140,7 +141,7 @@ output$dragOut <- renderDragula({
  table_to_render[, drag_ID:= paste0("Drag", x)]
 agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 #browser()
-dragula(c("elementsOutput", as.character(agg_to_x[,drag_ID])))
+dragula(c("removeCards", as.character(agg_to_x[,drag_ID])))
 #dragula(c("Drag0", "Drag1", "Drag2", "Drag3", "Drag4" ,"Drag5"))
  #dragula(c("Drag0","Drag1"))
 })

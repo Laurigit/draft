@@ -52,15 +52,80 @@ output$sideSelection <- renderUI({
 
   if (input$sideMenu == "Remove cards") {
     uiOutput("remove_cards_slot")
-  } else {
+  } else if(input$sideMenu == "Add cards") {
+    uiOutput("add_cards_slot")
+    } else {
     uiOutput("draftitSideBar")
   }
 })
 
 output$remove_cards_slot <- renderUI({
+  fluidPage(
+    fluidRow(
+      actionButton("SaveRemove", "Save removed cards")
+    ),
+
   fluidRow(
-    h2("Remove"), uiOutput("elementsOutput", style = "min-height:200px;background-color:grey;")
+    h2("Remove"), uiOutput("removeCards", style = "min-height:200px;background-color:grey;")
   )
+  )
+})
+
+output$add_cards_slot <- renderUI({
+  fluidPage(
+    fluidRow(
+      actionButton("AddCardToDeck", "Add card to deck")
+    ),
+
+    fluidRow(
+      textInput("add_card_by_text", "Add card name"),
+      actionButton("find_card", "Find card")
+    ),
+    fluidRow(
+        uiOutput("preview_added_card")
+    )
+  )
+})
+
+
+output$preview_added_card <- renderUI({
+  #add dep
+  input$find_card
+  ###
+  required_data("STG_CARDS_DIM")
+  browser()
+  isolate(etsi_MID <- STG_CARDS_DIM[Name == input$add_card_by_text, MID])
+  output$preview_add_card <-  renderImage({
+
+    list(src = paste0("./www/", etsi_MID, "_card.jpg"),#image_nm,
+         alt = "Image failed to render",
+         width = "150px"
+    )
+  }, deleteFile = FALSE)
+  tags$div(imageOutput("preview_add_card",
+                                       height = "100px"))
+
+})
+
+
+
+
+observeEvent(input$SaveRemove, {
+  browser()
+  remove_cards_list <- unlist(input$dragOut[["removeCards"]])
+  find_image_id <- word(remove_cards_list, 2, 2, sep = "_")
+  input$choose_decklist
+  required_data("STG_CARDS")
+  #con <- connDB(con)
+  pfi_remove <- input$choose_decklist
+  required_data("STG_DECKS_DIM")
+  remove_pakka_id <- STG_CARDS[Pakka_form_ID == pfi_remove, max(Pakka_ID)]
+  new_decklist <- remove_DIDs_from_deck(input_Pakka_ID = remove_pakka_id,
+                                        removed_DIDs = find_image_id, STG_CARDS, con)
+  new_decklist[, Valid_from_DT := now(tz = "EET")]
+  dbWriteTable(con, "CARDS", new_decklist, row.names = FALSE, append = TRUE)
+  required_data("ADM_DI_HIERARKIA")
+  updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
 })
 
 output$draftitSideBar <- renderUI({
@@ -114,13 +179,7 @@ print(jaljella_olevat)
 
 })
 
-observe({
-  # req(ReactDraftCards$cards_left)
-  # cards_left <- nrow(ReactDraftCards$cards_left)
-  # if (cards_left == 0) {shinyjs::enable("saveDraftedCards")} else {
-  #   shinyjs::disable("saveDraftedCards")
-  # }
-})
+
 
 
 observeEvent(input$saveDraftedCards,{
