@@ -140,7 +140,7 @@ output$dragOut <- renderDragula({
  table_to_render[, drag_ID:= paste0("Drag", x)]
 agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 #browser()
-dragula(as.character(agg_to_x[,drag_ID]))
+dragula(c("elementsOutput", as.character(agg_to_x[,drag_ID])))
 #dragula(c("Drag0", "Drag1", "Drag2", "Drag3", "Drag4" ,"Drag5"))
  #dragula(c("Drag0","Drag1"))
 })

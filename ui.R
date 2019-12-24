@@ -78,7 +78,11 @@ sidebar <- dashboardSidebar(
               actionButton("saveDraftedCards", "Save drafted cards"),
               uiOutput("show_last"),
               uiOutput("select_draft"),
-              uiOutput("draftitSideBar")
+              #uiOutput("draftitSideBar"),
+              selectInput("sideMenu", label = "Action", choices = c("Draft", "Remove cards", "Add cards")),
+              uiOutput("sideSelection")
+
+
 
 
 

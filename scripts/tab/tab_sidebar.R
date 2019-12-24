@@ -47,6 +47,22 @@ req(input$todo_Drafts)
 }, ignoreNULL = TRUE, ignoreInit = TRUE)
 
 
+
+output$sideSelection <- renderUI({
+
+  if (input$sideMenu == "Remove cards") {
+    uiOutput("remove_cards_slot")
+  } else {
+    uiOutput("draftitSideBar")
+  }
+})
+
+output$remove_cards_slot <- renderUI({
+  fluidRow(
+    h2("Remove"), uiOutput("elementsOutput", style = "min-height:200px;background-color:grey;")
+  )
+})
+
 output$draftitSideBar <- renderUI({
   req(input$todo_Drafts)
   print("kuvat pitäs päivittyy")
