@@ -69,6 +69,8 @@ print(filter_dataset)
                                                                                    y = seq_len(.N)),
                                                                               by =  get(row_dim)]
   table_to_render[, get := NULL]
+  table_to_render[, image_id_new :=   paste0(x, Name, y)]
+
   table_to_render
 })
 
@@ -104,7 +106,7 @@ agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
              width = 1,
             offset = 0,
              lapply(table_to_render[x == rivi, unique(y)], function(sarake) {
-               kuva_id <- table_to_render[x == rivi & y == sarake, paste0(x, Name, y)]
+               kuva_id <- table_to_render[x == rivi & y == sarake, image_id_new]
                card_name <-  table_to_render[x == rivi & y == sarake, Name]
                MIDi <- sscols_cards[Name == card_name, MID]
                getCardImg_full(MIDi)
