@@ -78,7 +78,7 @@ print(filter_dataset)
   table_to_render[, get := NULL]
   #table_to_render[, image_id_new :=   paste0(x, Name, y)]
 #print(table_to_render)
-
+  js$refreshDragulaR("dragula")
   table_to_render
 
 })
@@ -110,12 +110,18 @@ output$deck_editor_select_deck <- renderUI({
 })
 
 
+output$outer_render <- renderUI({
+
+})
+
 #tab_deck_editor
 output$decklist <- renderUI({
+req( table_to_render_react())
+  req(input$update_deck_filter)
   #take dep
-  input$update_deck_filter
-input$row_sort
- input$col_sort
+
+print("PIIRRETAAN")
+
   #DONT DEL ME UP
   table_to_render <- table_to_render_react()
   required_data("STG_CARDS_DIM")
@@ -167,10 +173,16 @@ agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 
 })
 
+observeEvent(input$updateDRAG, {
+  js$refreshDragulaR("dragOut")
+})
 
 output$dragOut <- renderDragula({
   #DEPEND
   table_to_render_react()
+  input$update_deck_filter
+
+  input$updateDRAG
   ##
  table_to_render <- table_to_render_react()[1 != 0]
  table_to_render[, drag_ID:= paste0("Drag", x)]
@@ -178,7 +190,9 @@ agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 print("DRAGULA")
 print(table_to_render)
 #browser()
+#
 dragula(c("removeCard", as.character(agg_to_x[,drag_ID])))
+
 #dragula(c("Drag0", "Drag1", "Drag2", "Drag3", "Drag4" ,"Drag5"))
  #dragula(c("Drag0","Drag1"))
 })
