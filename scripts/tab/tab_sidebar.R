@@ -66,7 +66,7 @@ output$remove_cards_slot <- renderUI({
     ),
 
   fluidRow(
-    h2("Remove"), uiOutput("removeCards", style = "min-height:200px;background-color:grey;")
+    h2("Remove"), uiOutput("removeCard", style = "min-height:200px;background-color:grey;")
   )
   )
 })
@@ -78,22 +78,36 @@ output$add_cards_slot <- renderUI({
     ),
 
     fluidRow(
-      textInput("add_card_by_text", "Add card name"),
+      textInput("add_card_by_text", "Type card name"),
       actionButton("find_card", "Find card")
     ),
     fluidRow(
+      actionButton("add_card_to_deck", "Add card to deck"),
         uiOutput("preview_added_card")
+
     )
   )
 })
 
+observeEvent(input$add_card_to_deck, {
+  required_data(c("STG_CARDS_DIM", "STG_CARDS", "STG_DECKS_DIM"))
+
+  con <- connDB(con)
+  add_to_pakka_id <- input$choose_decklist
+
+  new_dl_after_adding <- add_outlier_card_return_new_dl(input_card_name = input$add_card_by_text,
+                                                      Pakka_ID_input = add_to_pakka_id, STG_CARDS, STG_CARDS_DIM, STG_DECKS_DIM, con)
+  dbWriteTable(con, "CARDS", new_dl_after_adding, row.names = FALSE, append = TRUE)
+  required_data("ADM_DI_HIERARKIA")
+  updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
+
+})
 
 output$preview_added_card <- renderUI({
   #add dep
   input$find_card
   ###
   required_data("STG_CARDS_DIM")
-  browser()
   isolate(etsi_MID <- STG_CARDS_DIM[Name == input$add_card_by_text, MID])
   output$preview_add_card <-  renderImage({
 
@@ -107,22 +121,26 @@ output$preview_added_card <- renderUI({
 
 })
 
+#save card to db
+
 
 
 
 observeEvent(input$SaveRemove, {
-  browser()
-  remove_cards_list <- unlist(input$dragOut[["removeCards"]])
-  find_image_id <- word(remove_cards_list, 2, 2, sep = "_")
-  input$choose_decklist
+
+  remove_cards_list <- unlist(input$dragOut[["removeCard"]])
+
+  find_image_id <- table_to_render_react()[image_id_new %in% remove_cards_list, DRAFT_CARDS_ID]
+
   required_data("STG_CARDS")
   #con <- connDB(con)
-  pfi_remove <- input$choose_decklist
-  required_data("STG_DECKS_DIM")
-  remove_pakka_id <- STG_CARDS[Pakka_form_ID == pfi_remove, max(Pakka_ID)]
+
+
+  remove_pakka_id <- input$choose_decklist
   new_decklist <- remove_DIDs_from_deck(input_Pakka_ID = remove_pakka_id,
                                         removed_DIDs = find_image_id, STG_CARDS, con)
   new_decklist[, Valid_from_DT := now(tz = "EET")]
+
   dbWriteTable(con, "CARDS", new_decklist, row.names = FALSE, append = TRUE)
   required_data("ADM_DI_HIERARKIA")
   updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())

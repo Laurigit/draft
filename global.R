@@ -41,4 +41,4 @@ con <- connDB(con)
 #con <- connDB(con, "betmtg2")
 
 dbSendQuery(con, 'SET NAMES utf8')
-#dbQ("SHOW TABLES", con)
+dbQ("SHOW TABLES", con)

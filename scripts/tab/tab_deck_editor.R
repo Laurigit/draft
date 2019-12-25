@@ -2,8 +2,9 @@
 output$filters <- renderUI({
   req(input$choose_decklist)
 
-  testDeck <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
-                                                                            Card_age, is_basic_land, Maindeck)]
+  testDeck <- ADM_VISUALIZE_CARDS[Pakka_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
+                                                                            Card_age, is_basic_land, Maindeck, DRAFT_CARDS_ID,
+                                                                            image_id_new)]
   testDeck[is.na(testDeck)] <- -1
   rest <- create_deck_filters(testDeck)
   fluidRow(
@@ -29,8 +30,9 @@ table_to_render_react <- reactive({
   input$update_deck_filter
   #DONT DEL ME UP
 
-  testDeck <- ADM_VISUALIZE_CARDS[Pakka_form_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
-                                                                            Card_age, is_basic_land, Maindeck)]
+  testDeck <- ADM_VISUALIZE_CARDS[Pakka_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
+                                                                            Card_age, is_basic_land, Maindeck, DRAFT_CARDS_ID,
+                                                                            image_id_new)]
 
   testDeck[is.na(testDeck)] <- -1
 
@@ -65,19 +67,21 @@ print(filter_dataset)
   row_dim <- input$row_sort
   column_sort_dim <- input$col_sort
 
-  table_to_render <- filtered_deck[order(get(row_dim), get(column_sort_dim))][,  .(x = get(row_dim), Name,
+  table_to_render <- filtered_deck[order(get(row_dim), get(column_sort_dim))][,  .(x = get(row_dim), Name,DRAFT_CARDS_ID,image_id_new,
                                                                                    y = seq_len(.N)),
                                                                               by =  get(row_dim)]
   table_to_render[, get := NULL]
-  table_to_render[, image_id_new :=   paste0(x, Name, y)]
+  #table_to_render[, image_id_new :=   paste0(x, Name, y)]
+print(table_to_render)
 
   table_to_render
+
 })
 
 
-output$elementsOutput <- renderUI({
+output$removeCard <- renderUI({
   # reset elementsOutput after dataset changes
-  req(input$dataset)
+  #req(input$dataset)
   div()
 })
 output$card_dragular<- renderUI({
@@ -85,6 +89,19 @@ output$card_dragular<- renderUI({
   res <- input$dragOut
 
   res
+})
+
+output$deck_editor_select_deck <- renderUI({
+  #DEPENDS
+  input$add_card_to_deck
+  input$SaveRemove
+  ############################
+
+  required_data("ADM_CURRENT_PAKKA")
+  deck_sorted <- ADM_CURRENT_PAKKA[order(Pakka_Name)]
+  deck_options <- deck_sorted[, Pakka_ID]
+  names(deck_options) <- deck_sorted[, Pakka_Name]
+  radioButtons(inputId = "choose_decklist", "Choose decklist", choices = deck_options, inline = TRUE)
 })
 
 
@@ -138,11 +155,14 @@ agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 
 
 output$dragOut <- renderDragula({
+  #DEPEND
+  table_to_render_react()
+  ##
  table_to_render <- table_to_render_react()
  table_to_render[, drag_ID:= paste0("Drag", x)]
 agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 #browser()
-dragula(c("elementsOutput", as.character(agg_to_x[,drag_ID])))
+dragula(c("removeCard", as.character(agg_to_x[,drag_ID])))
 #dragula(c("Drag0", "Drag1", "Drag2", "Drag3", "Drag4" ,"Drag5"))
  #dragula(c("Drag0","Drag1"))
 })

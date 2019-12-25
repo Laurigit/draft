@@ -48,6 +48,8 @@ levita_muut[, image_file := paste0(MID, "_card_small.jpg")]
 #appendaa
 levita_data <-  rbind(levita_muut, join_image_id_to_lands, fill = TRUE)
 levita_data[, image_id := paste0("img_", DRAFT_CARDS_ID)]
+levita_data[, image_id_new := ifelse(DRAFT_CARDS_ID > 0, paste0("img_", DRAFT_CARDS_ID, "_pos"),
+                                     paste0("img_", abs(DRAFT_CARDS_ID), "_neg"))]
 levita_data[, Name_count := seq_len(.N), by = .(Pakka_form_ID, Name, Maindeck)]
 #levita_data[, image_id := paste0("img", seq_len(.N))]
 #levita_data[, image_id := DRAFT_CARDS_ID]

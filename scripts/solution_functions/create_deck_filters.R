@@ -16,7 +16,7 @@ for (filter in filterCols) {
   row_data <- data.table(filter, options = list(uniik))
   filter_table <- rbind(filter_table, row_data)
 }
-result <- filter_table[!filter %in% c("Name", "image_id")]
+result <- filter_table[!filter %in% c("Name", "image_id", "DRAFT_CARDS_ID", "image_id_new")]
 
 return(result)
 }
