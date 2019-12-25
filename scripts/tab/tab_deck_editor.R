@@ -73,9 +73,9 @@ print(filter_dataset)
 })
 
 
-output$elementsOutput <- renderUI({
+output$removeCards <- renderUI({
   # reset elementsOutput after dataset changes
-  req(input$dataset)
+ # req(input$dataset)
   div()
 })
 output$card_dragular<- renderUI({
@@ -95,7 +95,6 @@ output$decklist <- renderUI({
   sscols_cards <- STG_CARDS_DIM[, .(MID, Name)]
 table_to_render[, drag_ID:= paste0("Drag", x)]
 agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
-
 
   fluidPage(
 
@@ -141,7 +140,8 @@ output$dragOut <- renderDragula({
  table_to_render[, drag_ID:= paste0("Drag", x)]
 agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 #browser()
-dragula(c("removeCards", as.character(agg_to_x[,drag_ID])))
+#dragula(c("removeCards", as.character(agg_to_x[,drag_ID])))
+dragula(c(as.character(agg_to_x[,drag_ID])))
 #dragula(c("Drag0", "Drag1", "Drag2", "Drag3", "Drag4" ,"Drag5"))
  #dragula(c("Drag0","Drag1"))
 })
