@@ -31,14 +31,14 @@ joini[, is_basic_land := ifelse(Name %in% c("Mountain", "Island", "Forest", "Was
 basics <- joini[is_basic_land == TRUE, .(Count = .N, DRAFT_CARDS_ID = max(DRAFT_CARDS_ID)), by = .(Name, Text, Cost,
                                                                                                    Converted_Cost, Rarity,
                                                                                                    Colors, Power, Toughness,
-                                                             Pakka_form_ID, Maindeck, Pakka_ID, colOrder, is_basic_land,
+                                                             Pakka_form_ID, Maindeck, Pakka_ID, colOrder, is_basic_land, Type_exact, Race, Subtype,
                                                              NineSide)]
 
 #joinaa image id ja MID
 join_image_id_to_lands <- ADM_LAND_IMAGES[basics, on = .(Count, Name)]
 
 levita_muut <- joini[is_basic_land == FALSE, .(Name, Text, Cost, Converted_Cost, Rarity, Colors, Power, Toughness, DRAFT_CARDS_ID,
-                                         Pakka_form_ID, Maindeck, Count = 1, Pakka_ID, colOrder, MID, is_basic_land,
+                                         Pakka_form_ID, Maindeck, Count = 1, Pakka_ID, colOrder, MID, is_basic_land, Type_exact, Race, Subtype,
                                         NineSide)]
 
 

@@ -1,8 +1,8 @@
 #STG_CARDS_DIM
 required_data("SRC_CARDS_DIM")
-temp <- SRC_CARDS_DIM[, .(MID = as.numeric(MID),
+temp <- suppressWarnings(SRC_CARDS_DIM[, .(MID = as.numeric(MID),
                                    #Card_ID = as.numeric(Card_ID),
-                                   Name = iconv(x = Name, to = "UTF-8"),
+                                   Name = Name,iconv(x = Name, to = "UTF-8"),
                                    Text,
                                    Cost = as.numeric(Cost),
                                    Converted_Cost = as.numeric(Converted_Cost),
@@ -11,9 +11,18 @@ temp <- SRC_CARDS_DIM[, .(MID = as.numeric(MID),
                                    Stats,
                                    Power = as.numeric(word(Stats, 1, 1, sep = "/")),
                                    Toughness = as.numeric(word(Stats, 2, 2, sep = "/")),
-                                   Type)]
+                                   Type = gsub("â€”", "-", Type)), by = MID])
 
 #fix land MIDs
+
+temp[, ':=' (
+  Type_exact = word(Type, start = 1, sep = " - "),
+  Tribe_total = word(Type, start = 2, sep =" - ")
+)]
+temp[, ':=' (Race = word(Tribe_total, start = 1, sep = " "),
+                     Class = word(Tribe_total, start = 2, sep = " "),
+                     Subclass = word(Tribe_total, start = 3, sep = " "),
+                     Subtype = word(Type_exact, start = -2, end = -2, sep = " "))]
 
 landitaulu <- data.table(Name = c("Forest","Swamp","Plains",                                  "Mountain",
                                   "Island",

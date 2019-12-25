@@ -4,6 +4,7 @@ output$filters <- renderUI({
 
   testDeck <- ADM_VISUALIZE_CARDS[Pakka_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
                                                                             Card_age, is_basic_land, Maindeck, DRAFT_CARDS_ID,
+                                                                       Type_exact, Subtype,
                                                                             image_id_new)]
   testDeck[is.na(testDeck)] <- -1
   rest <- create_deck_filters(testDeck)
@@ -25,13 +26,14 @@ output$filters <- renderUI({
 
 
 table_to_render_react <- reactive({
-
-#take dep
+  #take dep
   input$update_deck_filter
   #DONT DEL ME UP
 
+
   testDeck <- ADM_VISUALIZE_CARDS[Pakka_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
                                                                             Card_age, is_basic_land, Maindeck, DRAFT_CARDS_ID,
+                                                                       Type_exact, Subtype,
                                                                             image_id_new)]
 
   testDeck[is.na(testDeck)] <- -1
@@ -67,12 +69,15 @@ print(filter_dataset)
   row_dim <- input$row_sort
   column_sort_dim <- input$col_sort
 
-  table_to_render <- filtered_deck[order(get(row_dim), get(column_sort_dim))][,  .(x = get(row_dim), Name,DRAFT_CARDS_ID,image_id_new,
-                                                                                   y = seq_len(.N)),
-                                                                              by =  get(row_dim)]
+  sorted_deck <-  filtered_deck[order(get(row_dim), get(column_sort_dim))]
+  #add x and y coordinates
+  table_to_render <- sorted_deck[,  .(x = get(row_dim), Name,DRAFT_CARDS_ID,image_id_new,
+                   y = seq_len(.N)),
+              by =  list(get(row_dim))]
+
   table_to_render[, get := NULL]
   #table_to_render[, image_id_new :=   paste0(x, Name, y)]
-print(table_to_render)
+#print(table_to_render)
 
   table_to_render
 
@@ -107,7 +112,11 @@ output$deck_editor_select_deck <- renderUI({
 
 #tab_deck_editor
 output$decklist <- renderUI({
-
+  #take dep
+  input$update_deck_filter
+input$row_sort
+ input$col_sort
+  #DONT DEL ME UP
   table_to_render <- table_to_render_react()
   required_data("STG_CARDS_DIM")
   sscols_cards <- STG_CARDS_DIM[, .(MID, Name)]
@@ -126,7 +135,9 @@ agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
                kuva_id <- table_to_render[x == rivi & y == sarake, image_id_new]
                card_name <-  table_to_render[x == rivi & y == sarake, Name]
                MIDi <- sscols_cards[Name == card_name, MID]
-               getCardImg_full(MIDi)
+            #    print(paste0(card_name, " ", sarake, " ", rivi))
+               if (!exists(kuva_id, where = output)) {
+                 getCardImg_full(MIDi)
                output[[kuva_id]] <-  renderImage({
 
                  list(src = paste0("./www/", MIDi, "_card.jpg"),#image_nm,
@@ -134,8 +145,11 @@ agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
                       width = "150px"
                  )
                }, deleteFile = FALSE)
+               }
+               # tags$div(drag = kuva_id, imageOutput(kuva_id,
+               #             height = "100px"))
                tags$div(drag = kuva_id, imageOutput(kuva_id,
-                           height = "100px"))
+                                                    height = "100px"))
                #tags$img(src = paste0(MIDi, "_card.jpg"), height = "200px", drag = kuva_id)
                # HTML(paste0('<div drag = "drag_',
                #             kuva_id,
@@ -158,9 +172,11 @@ output$dragOut <- renderDragula({
   #DEPEND
   table_to_render_react()
   ##
- table_to_render <- table_to_render_react()
+ table_to_render <- table_to_render_react()[1 != 0]
  table_to_render[, drag_ID:= paste0("Drag", x)]
 agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
+print("DRAGULA")
+print(table_to_render)
 #browser()
 dragula(c("removeCard", as.character(agg_to_x[,drag_ID])))
 #dragula(c("Drag0", "Drag1", "Drag2", "Drag3", "Drag4" ,"Drag5"))
