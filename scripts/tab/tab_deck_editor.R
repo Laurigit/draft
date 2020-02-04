@@ -1,13 +1,18 @@
 
 output$filters <- renderUI({
   req(input$choose_decklist)
+  input$choose_decklist
 
   testDeck <- ADM_VISUALIZE_CARDS[Pakka_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
                                                                             Card_age, is_basic_land, Maindeck, DRAFT_CARDS_ID,
                                                                        Type_exact, Subtype,
                                                                             image_id_new)]
   testDeck[is.na(testDeck)] <- -1
-  rest <- create_deck_filters(testDeck)
+  rest_sort <- create_deck_filters(testDeck, remove_extra = FALSE)
+
+
+  rest <- rest_sort[!filter %in%  c("Name", "image_id", "DRAFT_CARDS_ID", "image_id_new")]
+
   fluidRow(
     lapply(1:nrow(rest), function(filtterLoop){
       rowData <- rest[filtterLoop]
@@ -17,9 +22,9 @@ output$filters <- renderUI({
                                 selected = rowData[, options][[1]]))
     }),
     column(width = 1,
-           selectInput(inputId =  "row_sort", label = "Row sort", choices = rest[, filter])),
+           selectInput(inputId =  "row_sort", label = "Row sort", choices = rest_sort[, filter])),
     column(width = 1,
-           selectInput(inputId = "col_sort", label = "Column sort", choices = rest[, filter]))
+           selectInput(inputId = "col_sort", label = "Column sort", choices = rest_sort[, filter]))
 
   )
 })
@@ -28,6 +33,7 @@ output$filters <- renderUI({
 table_to_render_react <- reactive({
   #take dep
   input$update_deck_filter
+  input$choose_decklist
   #DONT DEL ME UP
 
 
@@ -84,17 +90,6 @@ print(filter_dataset)
 })
 
 
-output$removeCard <- renderUI({
-  # reset elementsOutput after dataset changes
-  #req(input$dataset)
-  div()
-})
-output$card_dragular<- renderUI({
-
-  res <- input$dragOut
-
-  res
-})
 
 output$deck_editor_select_deck <- renderUI({
   #DEPENDS
@@ -109,10 +104,6 @@ output$deck_editor_select_deck <- renderUI({
   radioButtons(inputId = "choose_decklist", "Choose decklist", choices = deck_options, inline = TRUE)
 })
 
-
-output$outer_render <- renderUI({
-
-})
 
 #tab_deck_editor
 output$decklist <- renderUI({
@@ -173,16 +164,12 @@ agg_to_x <- table_to_render[, .N, by = .(drag_ID, x)]
 
 })
 
-observeEvent(input$updateDRAG, {
-  js$refreshDragulaR("dragOut")
-})
+
 
 output$dragOut <- renderDragula({
   #DEPEND
   table_to_render_react()
   input$update_deck_filter
-
-  input$updateDRAG
   ##
  table_to_render <- table_to_render_react()[1 != 0]
  table_to_render[, drag_ID:= paste0("Drag", x)]

@@ -36,9 +36,9 @@ for(input_kansio in input_kansio_list) {
     })
   }
 }
-con <- connDB(con)
+#con <- connDB(con)
 #rm(con)
-#con <- connDB(con, "betmtg2")
+con <- connDB(con, "betmtg2")
 
 dbSendQuery(con, 'SET NAMES utf8')
 dbQ("SHOW TABLES", con)

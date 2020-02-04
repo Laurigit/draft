@@ -79,7 +79,7 @@ sidebar <- dashboardSidebar(
               uiOutput("show_last"),
               uiOutput("select_draft"),
               #uiOutput("draftitSideBar"),
-              selectInput("sideMenu", label = "Action", choices = c("Draft", "Remove cards", "Add cards")),
+              selectInput("sideMenu", label = "Action", choices = c("Draft", "Deck editor add")),
               uiOutput("sideSelection")
 
 

@@ -50,26 +50,13 @@ req(input$todo_Drafts)
 
 output$sideSelection <- renderUI({
 
-  if (input$sideMenu == "Remove cards") {
-    uiOutput("remove_cards_slot")
-  } else if(input$sideMenu == "Add cards") {
+ if(input$sideMenu == "Deck editor add") {
     uiOutput("add_cards_slot")
     } else {
     uiOutput("draftitSideBar")
   }
 })
 
-output$remove_cards_slot <- renderUI({
-  fluidPage(
-    fluidRow(
-      actionButton("SaveRemove", "Save removed cards")
-    ),
-
-  fluidRow(
-    h2("Remove"), uiOutput("removeCard", style = "min-height:200px;background-color:grey;")
-  )
-  )
-})
 
 output$add_cards_slot <- renderUI({
   fluidPage(
@@ -126,25 +113,25 @@ output$preview_added_card <- renderUI({
 
 
 
-observeEvent(input$SaveRemove, {
-
-  remove_cards_list <- unlist(input$dragOut[["removeCard"]])
-
-  find_image_id <- table_to_render_react()[image_id_new %in% remove_cards_list, DRAFT_CARDS_ID]
-
-  required_data("STG_CARDS")
-  #con <- connDB(con)
-
-
-  remove_pakka_id <- input$choose_decklist
-  new_decklist <- remove_DIDs_from_deck(input_Pakka_ID = remove_pakka_id,
-                                        removed_DIDs = find_image_id, STG_CARDS, con)
-  new_decklist[, Valid_from_DT := now(tz = "EET")]
-
-  dbWriteTable(con, "CARDS", new_decklist, row.names = FALSE, append = TRUE)
-  required_data("ADM_DI_HIERARKIA")
-  updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
-})
+# observeEvent(input$SaveRemove, {
+#
+#   remove_cards_list <- unlist(input$dragOut[["removeCard"]])
+#
+#   find_image_id <- table_to_render_react()[image_id_new %in% remove_cards_list, DRAFT_CARDS_ID]
+#
+#   required_data("STG_CARDS")
+#   #con <- connDB(con)
+#
+#
+#   remove_pakka_id <- input$choose_decklist
+#   new_decklist <- remove_DIDs_from_deck(input_Pakka_ID = remove_pakka_id,
+#                                         removed_DIDs = find_image_id, STG_CARDS, con)
+#   new_decklist[, Valid_from_DT := now(tz = "EET")]
+#
+#   dbWriteTable(con, "CARDS", new_decklist, row.names = FALSE, append = TRUE)
+#   required_data("ADM_DI_HIERARKIA")
+#   updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
+# })
 
 output$draftitSideBar <- renderUI({
   req(input$todo_Drafts)
