@@ -10,5 +10,5 @@ temp <- SRC_CARDS[, .(MID = as.numeric(MID),
 
 
 #calc running number per MID, PIF
-temp[, monesko_kortti := seq_len(.N), by = .(Name, Pakka_form_ID)]
+temp[, monesko_kortti := seq_len(.N), by = .(Name, Pakka_form_ID, Maindeck)]
 STG_CARDS <- temp

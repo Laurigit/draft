@@ -13,12 +13,13 @@ new_deck_list[, Colors := NULL]
 new_deck_list[, monesko_kortti := seq_len(.N), by = Name]
 #new_deck_list <- new_deck_list[1:4]
 #new_deck_list <- data.table(Name = c("Grasp of Phantoms", "Tumble Magnet","Alloy Myr","Freed from the Real","Stangg","Stangg"), monesko_kortti = c(1, 1, 1, 1, 1, 2), Maindeck = c(1,1,1,1,0,0))
-required_data(c("STG_CARDS", "STG_DECKS_DIM"))
+required_data(c("ADM_CARDS_CURRENT", "STG_DECKS_DIM"))
 #session <- NULL
 #session$user <- "Lauri"
 mysidet <- STG_DECKS_DIM[Omistaja_ID == str_sub(session$user, 1, 1) & Side == 1, Pakka_ID]
-my_latest_side_PFI <- STG_CARDS[Pakka_ID %in% mysidet, .(Pakka_form_ID = max(Pakka_form_ID)), by = Pakka_ID]
-my_latest_side_decklists_no_basics <- STG_CARDS[Pakka_form_ID %in% my_latest_side_PFI[, Pakka_form_ID], .(MID, Pakka_ID, DRAFT_CARDS_ID, Name, monesko_kortti)]
+#my_latest_side_PFI <- STG_CARDS[Pakka_ID %in% mysidet, .(Pakka_form_ID = max(Pakka_form_ID)), by = Pakka_ID]
+#my_latest_side_decklists_no_basics <- STG_CARDS[Pakka_form_ID %in% my_latest_side_PFI[, Pakka_form_ID], .(MID, Pakka_ID, DRAFT_CARDS_ID, Name, monesko_kortti)]
+my_latest_side_decklists_no_basics <- ADM_CARDS_CURRENT[Pakka_ID == mysidet, .(MID, Pakka_ID, DRAFT_CARDS_ID, Name, monesko_kortti)]
 #add basic lands to side
 ssLands <- ADM_LAND_IMAGES[, .(Name, MID, monesko_kortti = Count, DRAFT_CARDS_ID = "", Pakka_ID = "")]
 my_latest_side_decklists <- rbind(my_latest_side_decklists_no_basics, ssLands)
@@ -31,6 +32,7 @@ my_latest_side_decklists <- rbind(my_latest_side_decklists_no_basics, ssLands)
 joini <- my_latest_side_decklists[new_deck_list, on = .(Name, monesko_kortti)]
 #check if joini has more rounds the input decklist. If true, it means that the ninesides were wrong. For example, black card was in blue side
 dontAddCard <- FALSE
+
 if (nrow(joini) > nrow(new_deck_list)) {
   warning("observeEvent(input$add_deck,{", "NEW DECK LIST WOULD HAVE MORE CARDS THAN INPUT")
   dontAddCard <- TRUE
@@ -92,6 +94,7 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
     min_DCID <- dbQ("SELECT MIN(DRAFT_CARDS_ID) AS MAXDID FROM CARDS", con)[, MAXDID]
     new_deck_with_info[DRAFT_CARDS_ID == "", row_counter := seq_len(.N)]
     new_deck_with_info[DRAFT_CARDS_ID == "", DRAFT_CARDS_ID := min_DCID - row_counter, by = row_counter]
+
     new_deck_with_info[, Valid_from_DT := now(tz = "EET")]
     dbWriteTable(con, "CARDS", new_deck_with_info, append = TRUE, row.names = FALSE)
     updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
