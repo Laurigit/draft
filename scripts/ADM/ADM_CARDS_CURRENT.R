@@ -24,6 +24,7 @@ joinaa <- sscols_age[latest_dl, on = .(Pakka_ID = Pakka_ID,
                                        Name = Name)]
 
 res_cols <- joinaa[,. (Maindeck, Name, Card_age,  Pakka_ID, MID, Pakka_form_ID, DRAFT_CARDS_ID)]
+res_cols[, Card_age := ifelse(is.na(Card_age), 0, Card_age)]
 #sort so that oldest is first, then count monesko_kortti again
 sorted <- res_cols[order(Pakka_ID, Pakka_form_ID, Name, Maindeck, -Card_age)]
 sorted[, monesko_kortti := seq_len(.N), by = .(Name, Pakka_form_ID, Maindeck)]
