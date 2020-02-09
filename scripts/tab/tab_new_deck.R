@@ -94,7 +94,7 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
     min_DCID <- dbQ("SELECT MIN(DRAFT_CARDS_ID) AS MAXDID FROM CARDS", con)[, MAXDID]
     new_deck_with_info[DRAFT_CARDS_ID == "", row_counter := seq_len(.N)]
     new_deck_with_info[DRAFT_CARDS_ID == "", DRAFT_CARDS_ID := min_DCID - row_counter, by = row_counter]
-
+    new_deck_with_info[, row_counter := NULL]
     new_deck_with_info[, Valid_from_DT := now(tz = "EET")]
     dbWriteTable(con, "CARDS", new_deck_with_info, append = TRUE, row.names = FALSE)
     updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
