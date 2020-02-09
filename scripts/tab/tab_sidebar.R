@@ -84,6 +84,7 @@ observeEvent(input$add_card_to_deck, {
 
   new_dl_after_adding <- add_outlier_card_return_new_dl(input_card_name = input$add_card_by_text,
                                                       Pakka_ID_input = add_to_pakka_id, STG_CARDS, STG_CARDS_DIM, STG_DECKS_DIM, con)
+  new_dl_after_adding[, Valid_from_DT := now(tz = "EET")]
   dbWriteTable(con, "CARDS", new_dl_after_adding, row.names = FALSE, append = TRUE)
   required_data("ADM_DI_HIERARKIA")
   updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
