@@ -3,10 +3,18 @@
 
 # Define UI for application that draws a histogram
 
+func_oma_Dragulajs <- function() {
+  shinyjs::extendShinyjs(
+    functions = c("shinyjs.refreshDragulaR"),
+    text = "shinyjs.refreshDragulaR = function(params) {\n    dragulaR.get(params[0])()\n}")
+}
+
 uusi_peli <- dashboardBody(
 
   useShinyjs(),
-  useDragulajs(),
+# useDragulajs(),
+#func_oma_Dragulajs(),
+
   # height: 114px;
   tags$head(
     tags$style(
