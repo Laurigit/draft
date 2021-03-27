@@ -1,12 +1,15 @@
 #read bulk to db
-res <- fromJSON(txt = "./external_files/scryfall-default-cards.json")
-
-mid_name_table <-NULL
+res2 <- fromJSON(txt = "./external_files/deck-19f17836-a73c-4476-a149-a83284b9e714.json")
+#include mystery booster separately
+mystery_names <- res2$entries$columna$card_digest$name
+res <- fromJSON(txt = "./external_files/default-cards-20201215100346.json")
+mid_name_table <- NULL
 counter <- 0
 for(loopJson in 1:nrow(res)) {
 counter <- counter + 1
+if (counter %% 1000 == 0) {
 print(counter)
-
+}
 #casting_cost <- res[[14]][2000]
 #setti <- res[['set']][2000]
 
@@ -15,6 +18,7 @@ print(counter)
 #  loopJson <- 20000
 
 mid <- tryCatch({
+
   result <- data.table(MID = res[['multiverse_ids']][loopJson][[1]],
                        Name =  res[['name']][loopJson],
                        Cost = res[['mana_cost']][loopJson],
@@ -25,10 +29,14 @@ mid <- tryCatch({
                        Colors = paste(unlist(res[['colors']][loopJson]), collapse = ""),
                        Set = res[['set']][loopJson],
                        Rarity = res[['rarity']][loopJson])
-  if (result[, Set] %in% c("mma", "mm2", "mm3", "uma", "ema", "m19", "m20", "ima", "mh1", "a25")) {
+  if ((result[, Set] %in% c("mma", "mm2", "mm3", "uma", "ema", "m19", "m20", "ima", "mh1", "a25") |
+      result[, Name %in% mystery_names]) & !is.na(result[, MID]))  {
+   # if (is.na(result[, MID]) == TRUE) {browser()}
+
   mid_name_table <- rbind(result, mid_name_table)
   }
 }, error =  function(e) {
+
   data.table(MID = "errori")
 })
 
