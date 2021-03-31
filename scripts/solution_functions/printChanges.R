@@ -1,6 +1,7 @@
 printChanges <- function(change_dt, input_ADM_VISUALIZE_CARDS, input_STG_CARDS_DIM, input_STG_DECKS_DIM) {
 
 
+  if (nrow(change_dt) > 0) {
   # new_row <- isolate(data.table(source = paste0("Side", input$myDecks),
   #                               MID = changed_MID,
   #                               Pakka_ID = input$myDecks,
@@ -32,6 +33,9 @@ prefix <- ""
     }
     text <- paste0(card, prefix, toDeck, sidetext, "<br>")
     text_tot <- paste0(text_tot, text)
+  }
+  } else {
+    text_tot <- "no changes"
   }
   return(text_tot)
 }

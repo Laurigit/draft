@@ -19,10 +19,10 @@ temp[, ':=' (
   Type_exact = word(Type, start = 1, sep = " - "),
   Tribe_total = word(Type, start = 2, sep =" - ")
 )]
-temp[, ':=' (Race = word(Tribe_total, start = 1, sep = " "),
+suppressWarnings(temp[, ':=' (Race = word(Tribe_total, start = 1, sep = " "),
                      Class = word(Tribe_total, start = 2, sep = " "),
                      Subclass = word(Tribe_total, start = 3, sep = " "),
-                     Subtype = word(Type_exact, start = -2, end = -2, sep = " "))]
+                     Subtype = word(Type_exact, start = -2, end = -2, sep = " "))])
 
 landitaulu <- data.table(Name = c("Forest","Swamp","Plains",                                  "Mountain",
                                   "Island",

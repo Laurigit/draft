@@ -1,5 +1,6 @@
 
 output$filters <- renderUI({
+
   req(input$choose_decklist)
   input$choose_decklist
 
@@ -35,7 +36,7 @@ table_to_render_react <- reactive({
   input$update_deck_filter
   input$choose_decklist
   #DONT DEL ME UP
-
+req(input$choose_decklist)
 
   testDeck <- ADM_VISUALIZE_CARDS[Pakka_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
                                                                             Card_age, is_basic_land, Maindeck, DRAFT_CARDS_ID,
@@ -82,9 +83,10 @@ print(filter_dataset)
               by =  list(get(row_dim))]
 
   table_to_render[, get := NULL]
+
   #table_to_render[, image_id_new :=   paste0(x, Name, y)]
 #print(table_to_render)
-  js$refreshDragulaR("dragula")
+ # js$refreshDragulaR("dragula")
   table_to_render
 
 })

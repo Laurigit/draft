@@ -1,6 +1,6 @@
 #ADM_VISUALIZE_CARDS
 required_data(c("STG_CARDS_DIM", "STG_CARDS", "ADM_LAND_IMAGES", "STG_DECKS_DIM", "STAT_SIDE_CARD_AGE"))
-
+#required_data("STAT_SIDE_CARD_AGE")
 sscols_DIM <- STG_CARDS_DIM
 
 #ota vaan max pakka_If
