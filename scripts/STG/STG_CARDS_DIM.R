@@ -11,7 +11,7 @@ temp <- suppressWarnings(SRC_CARDS_DIM[, .(MID = as.numeric(MID),
                                    Stats,
                                    Power = as.numeric(word(Stats, 1, 1, sep = "/")),
                                    Toughness = as.numeric(word(Stats, 2, 2, sep = "/")),
-                                   Type = gsub("â€”", "-", Type)), by = MID])
+                                   Type = gsub("—", "-", gsub("â€”", "-", Type))), by = MID])
 
 #fix land MIDs
 
