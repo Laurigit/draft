@@ -1,5 +1,57 @@
 #tab_cards_to_decks
 
+output$deck_column <- renderUI({
+  required_data("STG_DECKS_DIM")
+
+  mydecks <- STG_DECKS_DIM[Omistaja_ID == omistaja_ID_calc$value  & Picked == 1, Nimi]
+  half_decks <- round(length(mydecks) / 2)
+
+  splitLayout(cellWidths = c("20%", "80%"),
+              fluidRow(
+                column(width = 1, code("To sideboard"), uiOutput("Drafted_cards_column", style = "min-height:800px;background-color:grey;"))),
+              fluidPage(
+                          fluidRow(
+
+                              lapply(mydecks[1:half_decks], function(deck_name) {
+                                column(width = 3, code(deck_name), uiOutput(deck_name, style = "min-height:400px;background-color:grey;"))
+                              })),
+                              fluidRow(
+                                lapply(mydecks[(half_decks + 1):length(mydecks)], function(deck_name) {
+                                  column(width = 3, code(deck_name), uiOutput(deck_name, style = "min-height:400px;background-color:grey;"))
+                                })
+                              )), dragula(c("Drafted_cards_column", mydecks), id = "drag_cards_to_deck")
+
+              )
+
+  # fluidPage(
+  #
+  #
+  #           fluidRow(
+  #
+  #               lapply(mydecks[1:half_decks], function(deck_name) {
+  #                 column(width = 2, h2(deck_name), uiOutput(deck_name, style = "min-height:200px;background-color:grey;"))
+  #               })),
+  #               fluidRow(
+  #                 lapply(mydecks[(half_decks + 1):length(mydecks)], function(deck_name) {
+  #                   column(width = 2, h2(deck_name), uiOutput(deck_name, style = "min-height:200px;background-color:grey;"))
+  #                 })
+  #               ),
+  #           fluidRow(
+  #
+  #             column(width = 1, h2("Drafted cards"), uiOutput("Drafted_cards_column", style = "min-height:200px;background-color:grey;"))
+  #           ),  dragula(c("Drafted_cards_column", mydecks), id = "drag_cards_to_deck")
+  #
+  #
+  #             # column(width = 3, h2("Output"), uiOutput("D2", style = "min-height:200px;background-color:grey;")),
+  #             # column(width = 3, h2("kolme"), uiOutput("D3", style = "min-height:200px;background-color:grey;")),
+  #             # column(width = 3, h2("nelja"), uiOutput("D4", style = "min-height:200px;background-color:grey;")),
+  #
+  #           )
+
+
+
+})
+
 
 output$Drafted_cards_column <- renderUI({
 #dtc <- data.table( mtcars)
