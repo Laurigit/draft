@@ -34,7 +34,7 @@ join_pakkaid <- ss_decks[draft_info_data, on = "Nimi"]
 
 
 deck_changes_data <- join_pakkaid[, .(DRAFT_CARDS_ID, Pakka_ID)]
-browser()
+
 
 
 
@@ -73,44 +73,27 @@ output$deck_column <- renderUI({
 
 fluidPage(
               fluidRow(
-                column(width = 2, code("First picks"), uiOutput("first_picks", style = "min-height:400;background-color:grey;")),
+                column(width = 3, code("First picks"), uiOutput("first_picks", style = "min-height:100px;")),
                               lapply(mydecks[1:half_decks], function(deck_name) {
-                                column(width = 2, code(deck_name), uiOutput(deck_name, style = "min-height:400px;background-color:grey;"))
+                                column(width = 2, code(deck_name), uiOutput(deck_name, style = "min-height:100px;background-color:grey;"))
                               })),
                               fluidRow(
-                                column(width = 2, code("To sideboard"), uiOutput("Drafted_cards_column", style = "min-height:800px;background-color:grey;")),
+                                column(width = 3, code("To sideboard"),
+                                       box(uiOutput("Drafted_cards_column", style = "height:380px;"),
+                                           height = 380,
+                                           width = 120,
+                                           style = "overflow-y: scroll")
+                                       ),
                                 lapply(mydecks[(half_decks + 1):length(mydecks)], function(deck_name) {
-                                  column(width = 2, code(deck_name), uiOutput(deck_name, style = "min-height:400px;background-color:grey;"))
+                                  column(width = 2, code(deck_name), uiOutput(deck_name, style = "min-height:100px;background-color:grey;"))
                                 })
                               ), dragula(c("Drafted_cards_column",  "first_picks", mydecks), id = "drag_cards_to_deck"),
-              fluidRow(column(offset = 9, width = 3, actionButton("toggle_saving", label = "Save button on/off"), actionButton("save_drafts_to_decks", label= "Save drafted cards to decks")))
+              fluidRow(column(offset = 9, width = 3, actionButton("toggle_saving", label = "Save button on/off"),
+                              disabled(actionButton("save_drafts_to_decks", label= "Save drafted cards to decks"))))
 
 )
 
-  # fluidPage(
-  #
-  #
-  #           fluidRow(
-  #
-  #               lapply(mydecks[1:half_decks], function(deck_name) {
-  #                 column(width = 2, h2(deck_name), uiOutput(deck_name, style = "min-height:200px;background-color:grey;"))
-  #               })),
-  #               fluidRow(
-  #                 lapply(mydecks[(half_decks + 1):length(mydecks)], function(deck_name) {
-  #                   column(width = 2, h2(deck_name), uiOutput(deck_name, style = "min-height:200px;background-color:grey;"))
-  #                 })
-  #               ),
-  #           fluidRow(
-  #
-  #             column(width = 1, h2("Drafted cards"), uiOutput("Drafted_cards_column", style = "min-height:200px;background-color:grey;"))
-  #           ),  dragula(c("Drafted_cards_column", mydecks), id = "drag_cards_to_deck")
-  #
-  #
-  #             # column(width = 3, h2("Output"), uiOutput("D2", style = "min-height:200px;background-color:grey;")),
-  #             # column(width = 3, h2("kolme"), uiOutput("D3", style = "min-height:200px;background-color:grey;")),
-  #             # column(width = 3, h2("nelja"), uiOutput("D4", style = "min-height:200px;background-color:grey;")),
-  #
-  #           )
+
 
 
 
