@@ -90,7 +90,7 @@ fluidPage(
                                 })
                               ), dragula(c("Drafted_cards_column",  "first_picks", mydecks), id = "drag_cards_to_deck"),
               fluidRow(column(offset = 9, width = 3, actionButton("toggle_saving", label = "Save button on/off"),
-                              disabled(actionButton("save_drafts_to_decks", label= "Save drafted cards to decks"))))
+                              hidden(actionButton("save_drafts_to_decks", label= "Save drafted cards to decks"))))
 
 )
 
