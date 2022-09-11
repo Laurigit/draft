@@ -52,15 +52,16 @@ deck_changes_data <- join_pakkaid[, .(DRAFT_CARDS_ID, Pakka_ID)]
     new_dl_loop[, Valid_from_DT := now(tz = "EET")]
     all_new_decklists <- rbind(all_new_decklists, new_dl_loop)
     print(new_dl_loop)
-  #  dbWriteTable(con, "CARDS", new_dl_loop, row.names = FALSE, append = TRUE)
-    required_data("ADM_DI_HIERARKIA")
-   # updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
+  #
   }
+  dbWriteTable(con, "CARDS", all_new_decklists, row.names = FALSE, append = TRUE)
+  required_data("ADM_DI_HIERARKIA")
+   updateData("SRC_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
 
   #merkkaa dräfätyt
   draftit <- deck_changes_data[, .(id = DRAFT_CARDS_ID, PICKED = 1)]
-  #dbIoU("DRAFT_CARDS", draftit, con)
- # updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
+  dbIoU("DRAFT_CARDS", draftit, con)
+  updateData("SRC_DRAFT_CARDS", ADM_DI_HIERARKIA, input_env = globalenv())
   deck$changes <-  deck$changes[1 == 0]
   local_update_data$update <- isolate(local_update_data$update + 1)
 })

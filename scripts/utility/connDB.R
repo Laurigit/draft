@@ -1,4 +1,4 @@
-connDB <- function(con, dbname_input = "betmtg_test") {
+connDB <- function(con, dbname_input = "betmtg2") {
   con <- tryCatch({
 
     res <- dbFetch(dbSendQuery(con, "SHOW TABLES"))

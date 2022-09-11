@@ -13,6 +13,8 @@ new_deck_list[, Colors := NULL]
 new_deck_list[, monesko_kortti := seq_len(.N), by = Name]
 #new_deck_list <- new_deck_list[1:4]
 #new_deck_list <- data.table(Name = c("Grasp of Phantoms", "Tumble Magnet","Alloy Myr","Freed from the Real","Stangg","Stangg"), monesko_kortti = c(1, 1, 1, 1, 1, 2), Maindeck = c(1,1,1,1,0,0))
+
+updateData("SRC_DECKS_DIM", ADM_DI_HIERARKIA, globalenv())
 required_data(c("ADM_CARDS_CURRENT", "STG_DECKS_DIM"))
 #session <- NULL
 #session$user <- "Lauri"
@@ -28,7 +30,7 @@ my_latest_side_decklists <- rbind(my_latest_side_decklists_no_basics, ssLands)
 #my_latest_side_decklists[MID == 397879]
 
 #get kortit from sides
-
+browser()
 joini <- my_latest_side_decklists[new_deck_list, on = .(Name, monesko_kortti)]
 #check if joini has more rounds the input decklist. If true, it means that the ninesides were wrong. For example, black card was in blue side
 dontAddCard <- FALSE
@@ -70,7 +72,7 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
                         Retired = 0,
                         Side = 0,
                         Manastack_name_url = "")
-  dbIns("DECKS_DIM", new_row, con)
+ # dbIns("DECKS_DIM", new_row, con)
   required_data("ADM_DI_HIERARKIA")
   updateData("SRC_DECKS_DIM", ADM_DI_HIERARKIA, globalenv())
 
@@ -96,7 +98,7 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
     new_deck_with_info[DRAFT_CARDS_ID == "", DRAFT_CARDS_ID := as.character(min_DCID - row_counter), by = row_counter]
     new_deck_with_info[, row_counter := NULL]
     new_deck_with_info[, Valid_from_DT := now(tz = "EET")]
-    dbWriteTable(con, "CARDS", new_deck_with_info, append = TRUE, row.names = FALSE)
+  #  dbWriteTable(con, "CARDS", new_deck_with_info, append = TRUE, row.names = FALSE)
     updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
     #create new sides
 
@@ -105,7 +107,7 @@ free_pakka_no <- as.numeric(STG_DECKS_DIM[Omistaja_NM == session$user, max(Pakka
       remove <- new_deck_with_info[Pakka_ID == update_sides, DRAFT_CARDS_ID]
       new_side <- remove_DIDs_from_deck(update_sides, remove, STG_CARDS, con)
       new_side[, Valid_from_DT := now(tz = "EET")]
-      dbWriteTable(con, "CARDS", new_side, append = TRUE, row.names = FALSE)
+     # dbWriteTable(con, "CARDS", new_side, append = TRUE, row.names = FALSE)
       updateData("SRC_CARDS", ADM_DI_HIERARKIA, globalenv())
     }
 

@@ -18,9 +18,14 @@ output$filters <- renderUI({
     lapply(1:nrow(rest), function(filtterLoop){
       rowData <- rest[filtterLoop]
       column(width = 1,
-
+            if (rowData[, filter] == "Card_age") {
+              sliderInput(inputId = rowData[, filter], label = rowData[, filter], min = min(rowData[, options][[1]]),
+                          max  = max(rowData[, options][[1]]),
+                                 value = c(min(rowData[, options][[1]]), max(rowData[, options][[1]])))
+            } else {
              checkboxGroupInput(inputId = rowData[, filter], label = rowData[, filter], choices = rowData[, options][[1]],
-                                selected = rowData[, options][[1]]))
+                                selected = rowData[, options][[1]])
+            })
     }),
     column(width = 1,
            selectInput(inputId =  "row_sort", label = "Row sort", choices = rest_sort[, filter])),
