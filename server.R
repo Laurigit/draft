@@ -67,6 +67,7 @@ updateData("SRC_CARDS_DIM", ADM_DI_HIERARKIA, globalenv(), FALSE)
   isolate(user_logged$count <- user_logged$count + 1)
   session$user <- isolate(func_login(user_logged$count, session$clientData))
   omistaja_ID_calc$value <- ifelse(session$user == "Martti", "M", "L")
+  #omistaja_ID_calc$value <- "M"
 print("OMISTAJA_ID_CAL_C CALUE = ")
 isolate(print(omistaja_ID_calc$value ))
 

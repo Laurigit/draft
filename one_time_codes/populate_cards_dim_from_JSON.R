@@ -1,8 +1,14 @@
 #read bulk to db
+
+#mystery booster normals and mb foils are different deck lists
+
 res2 <- fromJSON(txt = "./external_files/deck-19f17836-a73c-4476-a149-a83284b9e714.json")
+
+res3 <- fromJSON(txt = "./external_files/mystery_booster_foils.json")
 #include mystery booster separately
-mystery_names <- res2$entries$columna$card_digest$name
-res <- fromJSON(txt = "./external_files/default-cards-20201215100346.json")
+mystery_names <- c(res2$entries$columna$card_digest$name,
+                   res3$entries$columnb$card_digest$name)
+res <- fromJSON(txt = "./external_files/default-cards-20210724090325.json")
 mid_name_table <- NULL
 counter <- 0
 for(loopJson in 1:nrow(res)) {
@@ -29,7 +35,11 @@ mid <- tryCatch({
                        Colors = paste(unlist(res[['colors']][loopJson]), collapse = ""),
                        Set = res[['set']][loopJson],
                        Rarity = res[['rarity']][loopJson])
-  if ((result[, Set] %in% c("mma", "mm2", "mm3", "uma", "ema", "m19", "m20", "ima", "mh1", "a25") |
+
+  # if (result[, Name] == "Resurgent Belief") {
+  #   browser()
+  # }
+  if ((result[, Set] %in% c("mma", "mm2", "mm3", "uma", "ema", "m19", "m20", "ima", "mh1", "a25", "mh2") |
       result[, Name %in% mystery_names]) & !is.na(result[, MID]))  {
    # if (is.na(result[, MID]) == TRUE) {browser()}
 
@@ -47,7 +57,8 @@ mid <- tryCatch({
 #   print(mid[, MID])
 # }
 }
-aggr <- mid_name_table[, .(MID = max(MID)), by = .(Name, Cost, Converted_Cost, Type, Text, Stats, Colors, Rarity)]
+aggr <- mid_name_table[, .(MID = max(MID)), by = .(Name, Cost, Converted_Cost, Type, Text, Stats, Colors, Rarity)][MID != 526748]
+
 aggr[, ':=' (#Name = iconv(x = Name, to = "UTF-8"),
 #
              Text = iconv(x = Text, to = "UTF-8"))]
@@ -57,5 +68,5 @@ con <- connDB(con)
 
 dbSendQuery(con, 'SET NAMES utf8')
 
-#dbWriteTable(con, "CARDS_DIM", aggr, row.names = FALSE, append = TRUE, overwrite =FALSE)
+dbWriteTable(con, "CARDS_DIM", aggr, row.names = FALSE, append = TRUE, overwrite =FALSE)
 #dbWriteTable(con, "delme_CARDS_DIM_delme", aggr, row.names = FALSE,  overwrite =TRUE)
