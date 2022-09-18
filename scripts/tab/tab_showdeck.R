@@ -51,7 +51,9 @@ print("output$deck_selector ")
 observe({
 
   #req(session$user)
-
+  #DEPPEN DONT DEL
+  local_update_data$update
+  #DEPPEN DONT DEL
 required_data("STG_DECKS_DIM")
   required_data("ADM_VISUALIZE_CARDS")
   #create dep ÄLÄ TUHOA
