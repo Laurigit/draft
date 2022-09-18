@@ -87,18 +87,20 @@ fluidPage(
                                 deck_header <- mydecks_dt_join[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
                                 column(width = 2, tags$h4(style = "color:red", HTML(deck_header)), uiOutput(deck_name, style = "min-height:100px;background-color:grey;"))
                               })),
-                              fluidRow(
-                                column(width = 3, code("To sideboard"),
-                                       box(uiOutput("Drafted_cards_column", style = "height:380px;"),
-                                           height = 380,
-                                           width = 120,
-                                           style = "overflow-y: scroll")
-                                       ),
-                                lapply(mydecks[(half_decks + 1):length(mydecks)], function(deck_name) {
-                                  deck_header <- mydecks_dt_join[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
-                                  column(width = 2, tags$h4(style = "color:red", HTML(deck_header)), uiOutput(deck_name, style = "min-height:100px;background-color:grey;"))
-                                })
-                              ), dragula(c("Drafted_cards_column",  "first_picks", mydecks), id = "drag_cards_to_deck"),
+              fluidRow(column(width = 12,  style='padding:80px;',"")),
+            fluidRow(
+              column(width = 3, code("To sideboard"),
+                     box(uiOutput("Drafted_cards_column", style = "height:380px;"),
+                         height = 380,
+                         width = 120,
+                         style = "overflow-y: scroll")
+                     ),
+              lapply(mydecks[(half_decks + 1):length(mydecks)], function(deck_name) {
+                deck_header <- mydecks_dt_join[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
+                column(width = 2, tags$h4(style = "color:red", HTML(deck_header)), uiOutput(deck_name, style = "min-height:100px;background-color:grey;"))
+              })
+            ),
+              dragula(c("Drafted_cards_column",  "first_picks", mydecks), id = "drag_cards_to_deck"),
               fluidRow(column(offset = 9, width = 3, actionButton("toggle_saving", label = "Save button on/off"),
                               hidden(actionButton("save_drafts_to_decks", label= "Save drafted cards to decks"))))
 
