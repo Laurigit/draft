@@ -6,7 +6,8 @@ output$filters <- renderUI({
 
   testDeck <- ADM_VISUALIZE_CARDS[Pakka_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
                                                                             Card_age, is_basic_land, Maindeck, DRAFT_CARDS_ID,
-                                                                       Type_exact, Subtype,
+                                                                       Type_exact,
+                                                                       #Subtype,
                                                                             image_id_new)]
   testDeck[is.na(testDeck)] <- -1
   rest_sort <- create_deck_filters(testDeck, remove_extra = FALSE)
@@ -45,7 +46,8 @@ req(input$choose_decklist)
 
   testDeck <- ADM_VISUALIZE_CARDS[Pakka_ID == input$choose_decklist, .(Converted_Cost, Name, Rarity, Colors, Power, Toughness,
                                                                             Card_age, is_basic_land, Maindeck, DRAFT_CARDS_ID,
-                                                                       Type_exact, Subtype,
+                                                                       Type_exact,
+                                                                       #Subtype,
                                                                             image_id_new)]
 
   testDeck[is.na(testDeck)] <- -1
@@ -66,7 +68,13 @@ print(filter_dataset)
   total_string <- NULL
 
   for(koodiloop in 1:nrow(ressit)) {
+    if (ressit[koodiloop, filter] != "Card_age") {
     eka_rivi <-   paste0(ressit[koodiloop, filter], ' %in% ' ,ressit[koodiloop, options])
+    } else {
+
+      eka_rivi <-   paste0("Card_age >= ", ressit[koodiloop, options][[1]][1], " & Card_age <= ", ressit[koodiloop, options][[1]][2])
+    }
+
     if(koodiloop > 1) {
       total_string <- paste0(eka_rivi, " & ", total_string)
     } else {
