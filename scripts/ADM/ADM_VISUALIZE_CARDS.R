@@ -57,7 +57,7 @@ levita_data[, Name_count := seq_len(.N), by = .(Pakka_form_ID, Name, Maindeck)]
 
 
 #yritetään lisätä ikä
-sscols <- STAT_SIDE_CARD_AGE[, .(Pakka_ID, Pakka_form_ID, Omistaja_ID, Name, Card_age, Count, Maindeck)]
+sscols <- STAT_SIDE_CARD_AGE[, .(Pakka_ID, Pakka_form_ID, Omistaja_ID, Name, Card_age, Count = 1, Maindeck)]
 #levita
 levita_age <- sscols[rep(seq_len(nrow(sscols)), Count), ][, Count := NULL]
 levita_age[, Name_count := seq_len(.N), by = .(Name, Pakka_ID, Maindeck)]

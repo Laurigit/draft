@@ -13,7 +13,7 @@ latest_dl <- STG_CARDS[Pakka_form_ID %in% join_current_decks[, maxpfi]]
 
 #yritetään lisätä ikä
 
-sscols <- STAT_SIDE_CARD_AGE[, .(Pakka_ID, Pakka_form_ID, Omistaja_ID, Name, Card_age, Count, Maindeck)]
+sscols <- STAT_SIDE_CARD_AGE[, .(Pakka_ID, Pakka_form_ID, Omistaja_ID, Name, Card_age, Maindeck, Count = 1)]
 #levita
 levita_age <- sscols[rep(seq_len(nrow(sscols)), Count), ][, Count := NULL]
 levita_age[, Name_count := seq_len(.N), by = .(Name, Pakka_ID, Maindeck)]
