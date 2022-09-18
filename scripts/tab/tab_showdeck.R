@@ -5,13 +5,21 @@ req(input$myDecks)
   required_data(c("STG_CARDS", "STG_CARDS_DIM", "STG_DECKS_DIM"))
   con <- connDB(con)
   stat_pfi <- dbSelectAll("STAT_PFI", con)
-  #input <- NULL
-  #input$myDecks <- 3
-pfi <- STG_CARDS[Pakka_ID == input$myDecks, max(Pakka_form_ID)]
+  if (!isRunning()) {
+    input <- NULL
+    input$myDecks <- 3
+  }
+  pfi <- STG_CARDS[Pakka_ID == input$myDecks, max(Pakka_form_ID)]
  res <- count_deck_stats(pfi, STG_CARDS, STG_CARDS_DIM)
  pakka_NM <- STG_DECKS_DIM[Pakka_ID == input$myDecks, Nimi]
  PFI_card_count <- floor(stat_pfi[Deck == pakka_NM, Deck_size] + 40)
- paste0("Required cards = ", PFI_card_count,  " Total cards = ", res$card_count, " Land pct = ", paste0(round(as.numeric(res$land_count) / as.numeric(res$card_count), 3) * 100), "%")
+ paste0("Required cards = ", PFI_card_count,
+        " Total cards = ", res$card_count,
+        " Land% = ", paste0(round(as.numeric(res$land_count) / as.numeric(res$card_count), 3) * 100), "%",
+        " Manasymbol% = ", res$mana_costs,
+        " Creature% = ", paste0(round(as.numeric(res$creature_count) / as.numeric(res$card_count), 3) * 100), "%",
+        " Ins_sorc%% = ", paste0(round(as.numeric(res$inc_or_sorc_count) / as.numeric(res$card_count), 3) * 100), "%"
+        )
 })
 
 required_data(c("ADM_VISUALIZE_CARDS", "ADM_LAND_IMAGES"))
@@ -171,7 +179,7 @@ output$boxes <- renderUI({
  # offset_tulos[is.na(offset_tulos)] <- 0
  # offset_tulos[, rivi := seq_len(.N)]
 
-  offset_counter<- 0
+  offset_counter <- 0
   reset_next_round <- FALSE
 
   lapply(1:max_kortit, function(i) {
@@ -179,7 +187,7 @@ output$boxes <- renderUI({
   reset_next_round <<- FALSE
 
   fluidRow(
-    lapply(1:max_cc, function(j){
+    lapply(1:max_cc, function(j) {
       if (reset_next_round == TRUE) {
         offset_counter <<- 0
         reset_next_round <<- FALSE
@@ -220,6 +228,7 @@ output$boxes <- renderUI({
 
       sarake <- max(j, 1)
       offsetti <- as.numeric(convToNumOffset[rivi == i, sarake, with = FALSE])
+      #print(paste0("i ", i, "j ", j, "offset ", offsetti))
       # print(nimi)
       #  print(paste0("i", i))
       # print(paste0("j", j))
@@ -248,7 +257,7 @@ output$boxes <- renderUI({
         } else {
           row_heigh <- main_height
         }
-
+#if (i == 15 & j == 8) { browser()}
         column(width = columnWidth,
                offset = offset_counter,
               # HTML(paste0('<div id="logo"><img src= "', nimi, '_card.jpg"> </div>'))

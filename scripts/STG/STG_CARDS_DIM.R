@@ -4,7 +4,7 @@ temp <- suppressWarnings(SRC_CARDS_DIM[, .(MID = as.numeric(MID),
                                    #Card_ID = as.numeric(Card_ID),
                                    Name = Name,iconv(x = Name, to = "UTF-8"),
                                    Text,
-                                   Cost = as.numeric(Cost),
+                                   Cost = Cost,
                                    Converted_Cost = as.numeric(Converted_Cost),
                                    Rarity,
                                    Colors,
@@ -12,6 +12,21 @@ temp <- suppressWarnings(SRC_CARDS_DIM[, .(MID = as.numeric(MID),
                                    Power = as.numeric(word(Stats, 1, 1, sep = "/")),
                                    Toughness = as.numeric(word(Stats, 2, 2, sep = "/")),
                                    Type = gsub("—", "-", gsub("â€”", "-", Type))), by = MID])
+
+temp[, Cost_clean := gsub("}", "", Cost)]
+temp[, Cost_clean := gsub("\\{", "", Cost_clean)]
+all_chars <- paste0(temp[, Cost_clean], collapse = "")
+uniqchars <- data.table(kirjaimet = strsplit(all_chars, "")[[1]])[, .N, by = kirjaimet]
+uniqchars[, isnum := !is.na(as.numeric(kirjaimet))]
+manacost_sarakkeet  <- uniqchars[isnum == FALSE  & !kirjaimet %in% c("/", "A", "N"), kirjaimet]
+
+lapply(manacost_sarakkeet, function(inp) {
+  temp[, (inp) := str_count(Cost,inp)]
+
+})
+temp[, AnyColor := as.numeric((gsub("([0-9]+).*$", "\\1", Cost_clean)))]
+temp[, AnyColor := ifelse(is.na(AnyColor), 0, AnyColor)]
+
 
 #fix land MIDs
 

@@ -30,7 +30,7 @@ my_latest_side_decklists <- rbind(my_latest_side_decklists_no_basics, ssLands)
 #my_latest_side_decklists[MID == 397879]
 
 #get kortit from sides
-browser()
+
 joini <- my_latest_side_decklists[new_deck_list, on = .(Name, monesko_kortti)]
 #check if joini has more rounds the input decklist. If true, it means that the ninesides were wrong. For example, black card was in blue side
 dontAddCard <- FALSE

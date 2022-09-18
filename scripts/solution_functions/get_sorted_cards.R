@@ -35,8 +35,15 @@ get_sorted_cards <- function(input_dl) {
   }
   #append side ja maini ja sidevälirivi
   siderivi <- data.table("-1" = "Side")
+
+
   kaadettu_ids <- rbind(kaadettu_main_ids, siderivi, kaadettu_side_ids, fill = TRUE)[, order_No := NULL]
-  kaadettu_ids[, order_No := seq_len(.N)]
+  #this is to fix kaadettu_main_ids in case it does not have all mana costs
+  cols <- colnames(kaadettu_ids)
+
+  new_order <- c(sort(cols)[2:length(cols)], "-1")
+  setcolorder(kaadettu_ids, new_order)
+      kaadettu_ids[, order_No := seq_len(.N)]
 
 
 
