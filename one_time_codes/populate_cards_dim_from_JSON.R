@@ -39,7 +39,7 @@ mid <- tryCatch({
   # if (result[, Name] == "Resurgent Belief") {
   #   browser()
   # }
-  if ((result[, Set] %in% c("mma", "mm2", "mm3", "uma", "ema", "m19", "m20", "ima", "mh1", "a25", "mh2") |
+  if ((result[, Set] %in% c("mma", "mm2", "mm3", "uma", "ema", "m19", "m20", "ima", "mh1", "a25", "mh2", "2xm", "2x2", "m21") |
       result[, Name %in% mystery_names]) & !is.na(result[, MID]))  {
    # if (is.na(result[, MID]) == TRUE) {browser()}
 
@@ -57,16 +57,25 @@ mid <- tryCatch({
 #   print(mid[, MID])
 # }
 }
-aggr <- mid_name_table[, .(MID = max(MID)), by = .(Name, Cost, Converted_Cost, Type, Text, Stats, Colors, Rarity)][MID != 526748]
+aggr <- mid_name_table[, .(MID = max(MID)), by = .(Name, Cost, Converted_Cost, Type, Text, Stats, Colors, Rarity)]#[MID != 526748]
+#aggr[ str_detect(Type, "—")]
+#utf8ToInt("-")
+#aggr[ str_detect(Type, "—")]
+#aggr[, Type2 := str_replace(Type, "—", "-")]
+#aggr <- aggr[ str_detect(Type, "Land — Urza")]
+#str(aggr)
 
 aggr[, ':=' (#Name = iconv(x = Name, to = "UTF-8"),
-#
+
              Text = iconv(x = Text, to = "UTF-8"))]
-aggr[, Type :=  gsub("—", "-", Type)]
+aggr[, ':=' (#Name = iconv(x = Name, to = "UTF-8"),
+
+  Type = iconv(x = Type, to = "UTF-8"))]
+#aggr[, Type :=  gsub("—", "!", Type)]
 aggr[, Card_ID := ""]
 con <- connDB(con)
 
 dbSendQuery(con, 'SET NAMES utf8')
 
-dbWriteTable(con, "CARDS_DIM", aggr, row.names = FALSE, append = TRUE, overwrite =FALSE)
+dbWriteTable(con, "CARDS_DIM", aggr, row.names = FALSE, append = TRUE, overwrite = FALSE)
 #dbWriteTable(con, "delme_CARDS_DIM_delme", aggr, row.names = FALSE,  overwrite =TRUE)
