@@ -8,7 +8,11 @@ res3 <- fromJSON(txt = "./external_files/mystery_booster_foils.json")
 #include mystery booster separately
 mystery_names <- c(res2$entries$columna$card_digest$name,
                    res3$entries$columnb$card_digest$name)
-res <- fromJSON(txt = "./external_files/default-cards-20210724090325.json")
+
+#HEI LAURI!
+#lataa täältä https://scryfall.com/docs/api/bulk-data default cards setti
+
+res <- fromJSON(txt = "./external_files/default-cards-20221117220634.json")
 mid_name_table <- NULL
 counter <- 0
 for(loopJson in 1:nrow(res)) {

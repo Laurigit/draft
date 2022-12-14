@@ -117,13 +117,21 @@ required_data("ADM_DI_HIERARKIA")
 
   observeEvent(values$lastUpdated, {
 # täällä seurataan tuplaklikkauksia ja hoidetaan niitten seurauksia.
-    print("TOIMIII")
+    print("TOIMIIIsds")
     req(input$myDecks)
-    req(ReactDraftCards$cards_left)
+   # req(ReactDraftCards$cards_left)
     req(input[[values$lastUpdated]])
 
     print(values$lastUpdated)
    # print(input[[values$lastUpdated]] )
+
+    #purkkaa, jos ei oo draftattavaa
+
+    if (is.null(ReactDraftCards$image_ids)) {
+
+      ReactDraftCards$image_ids <- isolate(data.table(image_id = -9999999999999999, MID = -99999999999999999999999, DRAFT_CARDS_ID = -99999999999999999))
+    }
+
     if (input[[values$lastUpdated]]$x >= 0) {
     print("TOIMIII2")
 
@@ -207,8 +215,8 @@ required_data("ADM_DI_HIERARKIA")
 
   observe({
 
-    req(ReactDraftCards$image_ids, main$cards, side$cards)
-
+    req(main$cards, side$cards)
+    #req(ReactDraftCards$image_ids, main$cards, side$cards)
     #input <- NULL
    # input <- c("eka", "toka", "img1", "img3332")
     #imagelist <- names(input)
@@ -217,8 +225,15 @@ required_data("ADM_DI_HIERARKIA")
     print("BEFORE IMAGE LIST")
     mainCards <- main$cards[, image_id]
     sideCards <- side$cards[, image_id]
-    draftCards <-   ReactDraftCards$image_ids[, image_id]
-    imagelist <- c(draftCards, mainCards, sideCards)
+    if (is.null(ReactDraftCards$image_ids)) {
+
+      imagelist <- c(mainCards, sideCards)
+    } else {
+      draftCards <-   ReactDraftCards$image_ids[, image_id]
+
+      imagelist <- c(draftCards, mainCards, sideCards)
+    }
+
     print("IMAGLIST")
    # print( imagelist)
   #  print(ADM_VISUALIZE_CARDS[image_id %in% imagelist, Name])
@@ -238,10 +253,10 @@ required_data("ADM_DI_HIERARKIA")
 
 
   eV_show_last <- reactive({
-    req(ReactDraftCards$image_ids)
+   # req(ReactDraftCards$image_ids)
     req( values$lastUpdated)
     print("rivimaara")
-    print(nrow(ReactDraftCards$image_ids))
+   # print(nrow(ReactDraftCards$image_ids))
 
     required_data(c("ADM_VISUALIZE_CARDS", "STG_CARDS_DIM", "STG_DECKS_DIM"))
 
