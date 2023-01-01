@@ -41,18 +41,13 @@ output$picK_order <- renderUI({
   lapply(1:nrow(kortit), function(x) {
 
     rividata <- kortit[x]
-    tags$img(class = "draggable", src = rividata[, filu], height = "200px", drag = rividata[, kuva_id])
+    tags$img(src = rividata[, filu], height = "200px", drag = rividata[, kuva_id])
 
   })
 
 
 })
 
-useShinyjs(script = "
-  $('.draggable').on('dragstart', function(event) {
-    event.preventDefault();
-  });
-")
 
 
 observeEvent(input$save_picks, {

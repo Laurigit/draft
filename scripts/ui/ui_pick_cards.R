@@ -1,4 +1,6 @@
 #ui_pick_cards
+
+
 tabItem(tabName = "tab_pick_cards",
 fluidPage(
   fluidRow(
@@ -14,5 +16,17 @@ fluidPage(
     )
 
 ),
- dragula(c("picK_order"), id = "dragula")
+ dragula(c("picK_order"), id = "dragula"),
+tags$style(
+  HTML("
+           #picK_order {
+
+        overscroll-behavior-y: contain;
+     touch-action: none;
+
+
+
+      }
+           ")
+)
 )
