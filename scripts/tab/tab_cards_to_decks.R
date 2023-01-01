@@ -82,22 +82,23 @@ output$deck_column <- renderUI({
 
 fluidPage(
               fluidRow(
-                column(width = 3, code("First picks"), uiOutput("first_picks", style = "min-height:100px;")),
+                column(width = 3, code("First picks"), uiOutput("first_picks",
+                                                                style = "min-height:100px; overscroll-behavior-y: contain; touch-action: none;")),
                               lapply(mydecks[1:half_decks], function(deck_name) {
                                 deck_header <- mydecks_dt_join[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
-                                column(width = 2, tags$h4(style = "color:red", HTML(deck_header)), uiOutput(deck_name, style = "min-height:100px;background-color:grey;"))
+                                column(width = 2, tags$h4(style = "color:red", HTML(deck_header)), uiOutput(deck_name, style = "min-height:100px;background-color:grey; overscroll-behavior-y: contain; touch-action: none;"))
                               })),
               fluidRow(column(width = 12,  style='padding:80px;',"")),
             fluidRow(
               column(width = 3, code("To sideboard"),
-                     box(uiOutput("Drafted_cards_column", style = "height:380px;"),
+                     box(uiOutput("Drafted_cards_column", style = "height:380px; overscroll-behavior-y: contain; touch-action: none;"),
                          height = 380,
                          width = 120,
-                         style = "overflow-y: scroll")
+                         style = "overflow-y: scroll;")
                      ),
               lapply(mydecks[(half_decks + 1):length(mydecks)], function(deck_name) {
                 deck_header <- mydecks_dt_join[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
-                column(width = 2, tags$h4(style = "color:red", HTML(deck_header)), uiOutput(deck_name, style = "min-height:100px;background-color:grey;"))
+                column(width = 2, tags$h4(style = "color:red", HTML(deck_header)), uiOutput(deck_name, style = "min-height:100px;background-color:grey;overscroll-behavior-y: contain; touch-action: none;"))
               })
             ),
               dragula(c("Drafted_cards_column",  "first_picks", mydecks), id = "drag_cards_to_deck"),
@@ -195,6 +196,8 @@ output$first_picks <- renderUI({
 
 
   uudet_kortit <- ReactDraftCards_d2d$image_ids[PICK_ORDER <= 2]
+  uudet_kortit[, DRAFT_GROUP := .GRP, by = DRAFT_ID]
+  uudet_kortit[, kortteja_pussissa := .N + 1, by = DRAFT_GROUP]
   lapply(paste0("card_", uudet_kortit[, MID]), function(nm) tags$h3(drag = nm, nm))
 
   for (i in 1:nrow(uudet_kortit)) {
@@ -203,14 +206,20 @@ output$first_picks <- renderUI({
       #print(i)
       my_i <- i
       image_id <- uudet_kortit[i, image_id]
+      draft_group <- uudet_kortit[i, DRAFT_GROUP]
+      kortit_pussissa <- uudet_kortit[i, kortteja_pussissa]
       # print(image_id)
       image_nm <- paste0(uudet_kortit[i, MID], "_card_small.jpg")
       # print(image_nm)
       image_output_name_d2d <- paste0(image_id, "_d2d")
+      peruslandi <- image_read(paste0("./www/", image_nm))
+      new_land <- image_annotate(peruslandi, paste0(draft_group, "-", kortit_pussissa), gravity = "north", size = 30, color = "red")
+      new_card_folder <- paste0("./www/", uudet_kortit[i, MID], "_", draft_group, "_card.jpg")
+      image_write(new_land, new_card_folder, format = "jpg")
       output[[image_output_name_d2d]] <-  renderImage({
 
         # output[[image_id]] <-  renderImage({
-        list(src = paste0("./www/",image_nm),#image_nm,
+        list(src = new_card_folder,#paste0("./www/",image_nm),#image_nm,
              alt = "Image failed to render"
         )
       }, deleteFile = FALSE)
