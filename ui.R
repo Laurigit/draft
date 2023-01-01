@@ -24,8 +24,7 @@ uusi_peli <- dashboardBody(
     height: 60px;
      width: 146px;
      overflow: hidden;
-     overscroll-behavior-y: contain;
-     touch-action: none;
+
       }
            ")
     )
