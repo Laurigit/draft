@@ -91,10 +91,9 @@ fluidPage(
               fluidRow(column(width = 12,  style='padding:80px;',"")),
             fluidRow(
               column(width = 3, code("To sideboard"),
-                     box(uiOutput("Drafted_cards_column", style = "height:380px; overscroll-behavior-y: contain; overscroll-behavior-y: contain; touch-action: none;"),
+                     box(uiOutput("Drafted_cards_column", style = "max-width: 150px; height:380px; overflow-x: scroll: overscroll-behavior-y: contain; overscroll-behavior-y: contain; touch-action: none;"),
                          height = 380,
-                         width = 120,
-                         style = "overflow-y: scroll; overflow-x: scroll")
+                         style = "overflow-x: scroll; min-width: 180px")
                      ),
               lapply(mydecks[(half_decks + 1):length(mydecks)], function(deck_name) {
                 deck_header <- mydecks_dt_join[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
