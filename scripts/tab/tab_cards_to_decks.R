@@ -83,7 +83,7 @@ output$deck_column <- renderUI({
 fluidPage(
               fluidRow(
                 column(width = 3, code("First picks"), uiOutput("first_picks",
-                                                                style = "min-height:100px; overscroll-behavior-y: contain;")),
+                                                                style = "min-height:100px; overscroll-behavior-y: contain; touch-action: none;")),
                               lapply(mydecks[1:half_decks], function(deck_name) {
                                 deck_header <- mydecks_dt_join[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
                                 column(width = 2, tags$h4(style = "color:red", HTML(deck_header)), uiOutput(deck_name, style = "min-height:100px;background-color:grey; overscroll-behavior-y: contain; touch-action: none;"))
@@ -91,7 +91,7 @@ fluidPage(
               fluidRow(column(width = 12,  style='padding:80px;',"")),
             fluidRow(
               column(width = 3, code("To sideboard"),
-                     box(uiOutput("Drafted_cards_column", style = "height:380px; overscroll-behavior-y: contain;"),
+                     box(uiOutput("Drafted_cards_column", style = "height:380px; overscroll-behavior-y: contain; overscroll-behavior-y: contain; touch-action: none;"),
                          height = 380,
                          width = 120,
                          style = "overflow-y: scroll;")
