@@ -32,6 +32,7 @@ output$myLegalColors <- renderUI({
 })
 
 output$picK_order <- renderUI({
+
   kortit <- STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector]
   kortit[, rivi := seq_len(.N)]
   kortit[, kuva_id := paste0("id_pick_", rivi, "_", MID)]
@@ -51,13 +52,21 @@ output$picK_order <- renderUI({
 
 
 observeEvent(input$save_picks, {
-
+  browser()
+  if (input$radio_first_pick_correct == "Lauri") {
+    fp_in_data <- 0
+  } else if (input$radio_first_pick_correct == "Martti") {
+    fp_in_data <- 1
+  } else {
+    fp_in_data <- -1
+  }
 
   picke_order <- data.table(kuva_id = unlist(input$dragula))
   picke_order[, PICK_ORDER := seq_len(.N)]
   picke_order[, MID := as.integer(word(kuva_id, 4, sep = fixed("_")))]
   picke_order[, Booster_ID := input$booster_selector]
   picke_order[, Omistaja_ID := str_sub(session$user, 1, 1)]
+  picke_order[, first_pick := fp_in_data]
   picke_order[, kuva_id := NULL]
   dbWriteTable(con, "DRAFT_PICKORDER", picke_order, row.names = FALSE, append = TRUE)
   updateData("SRC_DRAFT_PICKORDER", ADM_DI_HIERARKIA, globalenv())
@@ -94,5 +103,84 @@ observeEvent(input$dragula, {
     shinyjs::enable("save_picks")
   }
 
+})
+observeEvent(input$button_delete_booster, {
+  updateSelectInput(
+    session = getDefaultReactiveDomain(),
+    inputId = input$allow_delete_booster,
+    selected = "No"
+  )
+  shinyjs::disable("button_delete_booster")
+  dbQ(paste0("DELETE FROM DRAFT_BOOSTER WHERE Booster_ID = ", input$booster_selector), con)
+  updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, globalenv())
+  global_update_data$update <- isolate(global_update_data$update + 1)
+  })
+
+observeEvent(input$allow_delete_booster, {
+
+  if (input$allow_delete_booster == "No") {
+    shinyjs::disable("button_delete_booster")}
+  else {shinyjs::enable("button_delete_booster")}
+})
+
+observeEvent(input$random_first_pick_correct, {
+  rand_val <-  runif(1)
+  print(rand_val)
+  if (rand_val <  0.5 ) {
+    updateSelectInput(inputId = "radio_first_pick_correct", session, selected = "Lauri")
+  } else {
+    updateSelectInput(inputId = "radio_first_pick_correct", session, selected = "Martti")
+  }
 
 })
+
+observeEvent(input$lock_first_pick, {
+
+  #0 on lauri, 1 on martti fp
+  if (input$radio_first_pick_correct == "Lauri") {
+    fp_in_data <- 0
+  } else if (input$radio_first_pick_correct == "Martti") {
+    fp_in_data <- 1
+  } else {
+    fp_in_data <- -1
+  }
+
+  dbQ(paste0("UPDATE DRAFT_BOOSTER SET first_pick = ", fp_in_data, " WHERE Booster_ID =", input$booster_selector), con)
+  updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, globalenv())
+  global_update_data$update <- isolate(global_update_data$update + 1)
+
+})
+
+observeEvent(input$unlock_first_pick,{
+  shinyjs::enable("lock_first_pick")
+  shinyjs::enable("radio_first_pick_correct")
+  shinyjs::enable("random_first_pick_correct")
+})
+
+observe({
+
+  req(input$booster_selector)
+
+  # I monitor if first pick has been selected for currently active booster
+  global_update_data$update
+  required_data("STG_DRAFT_BOOSTER")
+  if (STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector , .N, by = first_pick][, first_pick] == -1) {
+    #not selected first pick
+    shinyjs::enable("lock_first_pick")
+    shinyjs::enable("radio_first_pick_correct")
+    shinyjs::enable("random_first_pick_correct")
+    updateSelectInput(inputId = "radio_first_pick_correct", session, selected = "Not selected")
+  } else {
+    shinyjs::disable("lock_first_pick")
+    shinyjs::disable("radio_first_pick_correct")
+    shinyjs::disable("random_first_pick_correct")
+    if (STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector , .N, by = first_pick][, first_pick] == 0) {
+      updateSelectInput(inputId = "radio_first_pick_correct", session, selected = "Lauri")
+    } else if (STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector , .N, by = first_pick][, first_pick] == 1) {
+      updateSelectInput(inputId = "radio_first_pick_correct", session, selected = "Martti")
+
+    }
+  }
+})
+
+

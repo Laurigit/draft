@@ -21,6 +21,7 @@ output$show_resolvable_drafts <- renderUI({
   selectInput(inputId = "select_draft_to_resolve", label = "Select booster to resolve", choices = result)
 })
 
+
 observeEvent(input$random_first_pick, {
   if (runif(1) <  0.5 ) {
     updateSelectInput(inputId = "radio_first_pick", session, selected = "Lauri")
@@ -127,4 +128,39 @@ observeEvent(input$accept_and_save,{
   dbQ(paste0("DELETE FROM DRAFT_BOOSTER WHERE Booster_ID = ", delete_booster_id), con)
   updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, globalenv())
   global_update_data$update <- isolate(global_update_data$update + 1)
+})
+
+
+
+observe({
+
+  req(input$select_draft_to_resolve)
+
+  # I monitor if first pick has been selected for currently active booster
+  global_update_data$update
+  required_data("STG_DRAFT_PICKORDER")
+  if (STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick][, first_pick] == -1) {
+    #not selected first pick
+
+    shinyjs::enable("radio_first_pick")
+    shinyjs::enable("random_first_pick")
+    updateSelectInput(inputId = "radio_first_pick", session, selected = "Not selected")
+  } else {
+
+    shinyjs::disable("radio_first_pick")
+    shinyjs::disable("random_first_pick")
+    if (STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick][, first_pick] == 0) {
+      updateSelectInput(inputId = "radio_first_pick", session, selected = "Lauri")
+    } else if (STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick][, first_pick] == 1) {
+      updateSelectInput(inputId = "radio_first_pick", session, selected = "Martti")
+
+    }
+  }
+})
+
+observeEvent(input$unlock_later_first_pick, {
+  shinyjs::enable("radio_first_pick")
+  shinyjs::enable("random_first_pick")
+
+
 })
