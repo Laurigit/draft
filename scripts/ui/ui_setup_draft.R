@@ -9,9 +9,11 @@
 tabItem(tabName = "tab_setup_draft",
         fluidPage(
          # verbatimTextOutput("order"),
-            fluidRow(column(4, textAreaInput(inputId = "loadSetupDraft_area", label = "Load full booster")),
-                     column(4, actionButton(inputId = "load_setup_draft", "Load cards")),
-                     column(4, actionButton(inputId = "save_to_be_drafted", "Save as draft cards"))
+            fluidRow(column(4, textAreaInput(inputId = "loadSetupDraft_area", label = "Load full booster", height = "400px", width = "400px"))),
+                    fluidRow(
+                      column(4, actionButton(inputId = "load_setup_draft", "Load cards")),
+                     column(4, actionButton(inputId = "save_to_be_drafted", "Save as draft cards")),
+                     column(4, textOutput(outputId = "card_count_output"))
                       ),
 
 

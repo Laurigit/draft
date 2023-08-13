@@ -1,7 +1,8 @@
 #tab_setup_draft
 
 setupDraft <- reactiveValues(cards = NULL,
-                             result = NULL)
+                             result = NULL,
+                             cardCount = NULL)
 
 observeEvent(input$load_setup_draft, {
   print("Painettu")
@@ -19,10 +20,15 @@ required_data("STG_CARDS_DIM")
   lapply(setupDraft$cards[, MID], function(x) {
     getCardImg_full(x)
   })
-
+setupDraft$cardCount <- setupDraft$cards[, .(countti = .N)][, countti]
   print(setupDraft$cards)
 
 
+})
+
+output$card_count_output <- renderText({
+  req(setupDraft$cardCount)
+  setupDraft$cardCount
 })
 
 observeEvent(input$save_to_be_drafted, {

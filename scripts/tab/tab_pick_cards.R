@@ -164,7 +164,15 @@ observe({
   # I monitor if first pick has been selected for currently active booster
   global_update_data$update
   required_data("STG_DRAFT_BOOSTER")
-  if (STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector , .N, by = first_pick][, first_pick] == -1) {
+
+  read_first_pick <- STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector , .N, by = first_pick][, first_pick]
+print(read_first_pick)
+    if (is.na(read_first_pick)) {
+    used_fp_value <- -1
+  } else {
+    used_fp_value <- read_first_pick
+  }
+  if (used_fp_value  == -1) {
     #not selected first pick
     shinyjs::enable("lock_first_pick")
     shinyjs::enable("radio_first_pick_correct")
@@ -174,7 +182,7 @@ observe({
     shinyjs::disable("lock_first_pick")
     shinyjs::disable("radio_first_pick_correct")
     shinyjs::disable("random_first_pick_correct")
-    if (STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector , .N, by = first_pick][, first_pick] == 0) {
+    if (used_fp_value  == 0) {
       updateSelectInput(inputId = "radio_first_pick_correct", session, selected = "Lauri")
     } else if (STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector , .N, by = first_pick][, first_pick] == 1) {
       updateSelectInput(inputId = "radio_first_pick_correct", session, selected = "Martti")
