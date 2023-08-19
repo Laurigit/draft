@@ -61,7 +61,7 @@ mid <- tryCatch({
 #   print(mid[, MID])
 # }
 }
-aggr <- mid_name_table[, .(MID = max(MID)), by = .(Name, Cost, Converted_Cost, Type, Text, Stats, Colors, Rarity)]#[MID != 526748]
+aggr <- mid_name_table[, .(MID = max(MID)), by = .(Name, Cost, Converted_Cost, Type, Text, Stats, Colors, Rarity, Set)]#[MID != 526748]
 #aggr[ str_detect(Type, "—")]
 #utf8ToInt("-")
 #aggr[ str_detect(Type, "—")]
@@ -80,6 +80,8 @@ aggr[, Card_ID := ""]
 con <- connDB(con)
 
 dbSendQuery(con, 'SET NAMES utf8')
-
+#dbWriteTable(con, "CARDS_DIM_with_set", aggr, row.names = FALSE, append = TRUE, overwrite = FALSE)
+#OTA SET POIS ENNEN KU LISÄÄT UUSIA KORTTEJA OIKEESEEN DATAAN
+#aggr[, Set := NULL]
 #dbWriteTable(con, "CARDS_DIM", aggr, row.names = FALSE, append = TRUE, overwrite = FALSE)
 #dbWriteTable(con, "delme_CARDS_DIM_delme", aggr, row.names = FALSE,  overwrite =TRUE)
