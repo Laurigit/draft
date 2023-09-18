@@ -109,6 +109,7 @@ observeEvent(input$accept_and_save,{
   con <- connDB(con)
 
   maxDraft <- as.numeric(dbQ("SELECT MAX(DRAFT_ID) FROM DRAFT_CARDS", con)) + 1
+
   if (is.na(maxDraft)) {
     maxDraft <- 1
   }
@@ -139,7 +140,14 @@ observe({
   # I monitor if first pick has been selected for currently active booster
   global_update_data$update
   required_data("STG_DRAFT_PICKORDER")
-  if (STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick][, first_pick] == -1) {
+
+  amount_of_rows_for_if <- nrow(STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick])
+  if (amount_of_rows_for_if > 0) {
+    test_if_enable_random_first_pick <- STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick][, first_pick]
+  } else {
+    test_if_enable_random_first_pick <- -1
+  }
+  if (test_if_enable_random_first_pick == -1) {
     #not selected first pick
 
     shinyjs::enable("radio_first_pick")
@@ -149,6 +157,7 @@ observe({
 
     shinyjs::disable("radio_first_pick")
     shinyjs::disable("random_first_pick")
+
     if (STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick][, first_pick] == 0) {
       updateSelectInput(inputId = "radio_first_pick", session, selected = "Lauri")
     } else if (STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick][, first_pick] == 1) {
