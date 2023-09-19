@@ -141,7 +141,10 @@ observe({
   global_update_data$update
   required_data("STG_DRAFT_PICKORDER")
 
+
   amount_of_rows_for_if <- nrow(STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick])
+
+
   if (amount_of_rows_for_if > 0) {
     test_if_enable_random_first_pick <- STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick][, first_pick]
   } else {
@@ -158,9 +161,9 @@ observe({
     shinyjs::disable("radio_first_pick")
     shinyjs::disable("random_first_pick")
 
-    if (STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick][, first_pick] == 0) {
+    if (test_if_enable_random_first_pick == 0) {
       updateSelectInput(inputId = "radio_first_pick", session, selected = "Lauri")
-    } else if (STG_DRAFT_PICKORDER[Booster_ID == input$select_draft_to_resolve , .N, by = first_pick][, first_pick] == 1) {
+    } else if (test_if_enable_random_first_pick == 1) {
       updateSelectInput(inputId = "radio_first_pick", session, selected = "Martti")
 
     }

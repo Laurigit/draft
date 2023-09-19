@@ -13,6 +13,7 @@ library(magick)
 library(dragulaR)
 library(lubridate)
 options(shiny.trace=FALSE)
+options(shiny.fullstacktrace = FALSE)
 
 
 sourcelist <- data.table(polku = c(dir("./scripts/", recursive = TRUE)))

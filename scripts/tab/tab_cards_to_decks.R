@@ -40,9 +40,11 @@ deck_changes_data <- join_pakkaid[, .(DRAFT_CARDS_ID, Pakka_ID)]
 
 
   #drafikortit <-  deck$changes[source ==  paste0("Draft", input$select_draft)]
-  Pakka_IDt <- deck_changes_data[, .N, by = Pakka_ID][, Pakka_ID]
+  Pakka_IDt <- deck_changes_data[, .N, by = Pakka_ID][!is.na(Pakka_ID), Pakka_ID]
   pfi_looper <- STG_CARDS[, max(Pakka_form_ID)] + 1
   all_new_decklists <- NULL
+  print(pfi_looper)
+
   for (pakkaloop in Pakka_IDt) {
     new_DCIDs <- deck_changes_data[Pakka_ID == pakkaloop, .( DRAFT_CARDS_ID)]
     new_dl_loop <- createNewDecklist_after_draft(new_DCIDs, pakkaloop, STG_CARDS, STG_CARDS_DIM, STG_DRAFT_CARDS, STG_DECKS_DIM,
@@ -52,7 +54,7 @@ deck_changes_data <- join_pakkaid[, .(DRAFT_CARDS_ID, Pakka_ID)]
     #ammutaan kantaan
     new_dl_loop[, Valid_from_DT := now(tz = "EET")]
     all_new_decklists <- rbind(all_new_decklists, new_dl_loop)
-    print(new_dl_loop)
+   # print(new_dl_loop)
   #
   }
   dbWriteTable(con, "CARDS", all_new_decklists, row.names = FALSE, append = TRUE)
@@ -82,6 +84,7 @@ output$deck_column <- renderUI({
 
 fluidPage(
               fluidRow(
+
                 column(width = 3, code("First picks"), uiOutput("first_picks",
                                                                 style = "min-height:100px; overscroll-behavior-y: contain; touch-action: none;")),
                               lapply(mydecks[1:half_decks], function(deck_name) {
@@ -129,16 +132,15 @@ output$Drafted_cards_column <- renderUI({
   lapply(paste0("card_", uudet_kortit[, MID]), function(nm) tags$h3(drag = nm, nm))
 
   for (i in 1:nrow(uudet_kortit)) {
-    #print("sidekortit piirtyy")
-    local({
-      #print(i)
+     local({
+
       my_i <- i
       image_id <- uudet_kortit[i, image_id]
       draft_group <- uudet_kortit[i, DRAFT_GROUP]
       kortit_pussissa <- uudet_kortit[i, kortteja_pussissa]
-      # print(image_id)
+
       image_nm <- paste0(uudet_kortit[i, MID], "_card_small.jpg")
-      # print(image_nm)
+
       image_output_name_d2d <- paste0(image_id, "_d2d")
       peruslandi <- image_read(paste0("./www/", image_nm))
     #  browser()
@@ -162,7 +164,8 @@ output$Drafted_cards_column <- renderUI({
 
   #piirretään vaan jäljellä olevat
   jaljella_olevat <- ReactDraftCards_d2d$cards_left[PICK_ORDER > 2]
-  print(jaljella_olevat)
+
+
 
   # fluidRow(
   #   column(width = 11, offset = 1,
@@ -200,16 +203,16 @@ output$first_picks <- renderUI({
   lapply(paste0("card_", uudet_kortit[, MID]), function(nm) tags$h3(drag = nm, nm))
 
   for (i in 1:nrow(uudet_kortit)) {
-    #print("sidekortit piirtyy")
+
     local({
-      #print(i)
+
       my_i <- i
       image_id <- uudet_kortit[i, image_id]
       draft_group <- uudet_kortit[i, DRAFT_GROUP]
       kortit_pussissa <- uudet_kortit[i, kortteja_pussissa]
-      # print(image_id)
+
       image_nm <- paste0(uudet_kortit[i, MID], "_card_small.jpg")
-      # print(image_nm)
+
       image_output_name_d2d <- paste0(image_id, "_d2d")
       peruslandi <- image_read(paste0("./www/", image_nm))
       new_land <- image_annotate(peruslandi, paste0(draft_group), gravity = "north", size = 30, color = "red")
@@ -227,8 +230,6 @@ output$first_picks <- renderUI({
 
   #piirretään vaan jäljellä olevat
   jaljella_olevat <- ReactDraftCards_d2d$cards_left[PICK_ORDER <= 2]
-  print("FIRST pick")
-  print(jaljella_olevat)
 
   # fluidRow(
   #   column(width = 11, offset = 1,

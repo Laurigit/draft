@@ -52,7 +52,7 @@ output$picK_order <- renderUI({
 
 
 observeEvent(input$save_picks, {
-  browser()
+
   if (input$radio_first_pick_correct == "Lauri") {
     fp_in_data <- 0
   } else if (input$radio_first_pick_correct == "Martti") {
@@ -184,7 +184,7 @@ print(read_first_pick)
     shinyjs::disable("random_first_pick_correct")
     if (used_fp_value  == 0) {
       updateSelectInput(inputId = "radio_first_pick_correct", session, selected = "Lauri")
-    } else if (STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector , .N, by = first_pick][, first_pick] == 1) {
+    } else if (used_fp_value == 1) {
       updateSelectInput(inputId = "radio_first_pick_correct", session, selected = "Martti")
 
     }
