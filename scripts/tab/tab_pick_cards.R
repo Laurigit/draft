@@ -136,6 +136,17 @@ observeEvent(input$random_first_pick_correct, {
 
 observeEvent(input$lock_first_pick, {
 
+currently_selected <- as.numeric(isolate(input$booster_selector))
+required_data(c("ADM_UNPICKED_DRAFT"))
+select_after_lock <- ADM_UNPICKED_DRAFT[OMISTAJA_ID == omistaja_ID_calc$value, .N, by = Booster_ID][Booster_ID > currently_selected, min(Booster_ID)]
+if (is.infinite(select_after_lock)) {
+  select_after_lock <-  ADM_UNPICKED_DRAFT[OMISTAJA_ID == omistaja_ID_calc$value, .N, by = Booster_ID][, max(Booster_ID)]
+}
+
+
+
+
+
   #0 on lauri, 1 on martti fp
   if (input$radio_first_pick_correct == "Lauri") {
     fp_in_data <- 0
@@ -148,7 +159,7 @@ observeEvent(input$lock_first_pick, {
   dbQ(paste0("UPDATE DRAFT_BOOSTER SET first_pick = ", fp_in_data, " WHERE Booster_ID =", input$booster_selector), con)
   updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, globalenv())
   global_update_data$update <- isolate(global_update_data$update + 1)
-
+  updateSelectInput(inputId = "booster_selector", selected = select_after_lock)
 })
 
 observeEvent(input$unlock_first_pick,{

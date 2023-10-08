@@ -13,6 +13,7 @@ observeEvent(input$save_drafts_to_decks, {
   #save it with new pfi
   #old_decklist <- STG_CARDS[Pakka_form_ID == 250]
   # Pakka_IDt <- deck_changes$draft[, .N, by = Pakka_ID][, Pakka_ID]
+
 dragula_status_from_draft <- dragulaValue(input$drag_cards_to_deck)
 how_many_slots_in_list <- length(dragula_status_from_draft)
 full_data <- NULL
@@ -129,12 +130,14 @@ output$Drafted_cards_column <- renderUI({
 
   uudet_kortit[, DRAFT_GROUP := .GRP, by = DRAFT_ID]
   uudet_kortit[, kortteja_pussissa := .N + 1, by = DRAFT_GROUP]
+
   lapply(paste0("card_", uudet_kortit[, MID]), function(nm) tags$h3(drag = nm, nm))
 
   for (i in 1:nrow(uudet_kortit)) {
      local({
 
       my_i <- i
+
       image_id <- uudet_kortit[i, image_id]
       draft_group <- uudet_kortit[i, DRAFT_GROUP]
       kortit_pussissa <- uudet_kortit[i, kortteja_pussissa]
@@ -143,7 +146,7 @@ output$Drafted_cards_column <- renderUI({
 
       image_output_name_d2d <- paste0(image_id, "_d2d")
       peruslandi <- image_read(paste0("./www/", image_nm))
-    #  browser()
+
 
       new_land <- image_annotate(peruslandi, paste0(draft_group, "-", kortit_pussissa), gravity = "north", size = 30, color = "red")
       new_card_folder <- paste0("./www/", uudet_kortit[i, MID], "_", draft_group, "_card.jpg")
@@ -252,7 +255,7 @@ output$first_picks <- renderUI({
 })
 
 observeEvent(input$drag_cards_to_deck, {
-#  browser()
+
   print(dragulaValue(input$drag_cards_to_deck))
 })
 
