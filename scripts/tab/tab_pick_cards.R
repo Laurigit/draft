@@ -32,7 +32,7 @@ output$myLegalColors <- renderUI({
 })
 
 output$picK_order <- renderUI({
-
+req(input$booster_selector)
   kortit <- STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector]
   kortit[, rivi := seq_len(.N)]
   kortit[, kuva_id := paste0("id_pick_", rivi, "_", MID)]

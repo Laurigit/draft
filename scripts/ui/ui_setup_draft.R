@@ -9,6 +9,7 @@
 tabItem(tabName = "tab_setup_draft",
         fluidPage(
          # verbatimTextOutput("order"),
+          fluidRow(HTML("split boosters by adding goblin token")),
             fluidRow(column(4, textAreaInput(inputId = "loadSetupDraft_area", label = "Load full booster", height = "400px", width = "400px"))),
                     fluidRow(
                       column(4, actionButton(inputId = "load_setup_draft", "Load cards")),
