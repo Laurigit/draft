@@ -14,6 +14,8 @@ observeEvent(input$save_drafts_to_decks, {
   #old_decklist <- STG_CARDS[Pakka_form_ID == 250]
   # Pakka_IDt <- deck_changes$draft[, .N, by = Pakka_ID][, Pakka_ID]
 
+
+
 dragula_status_from_draft <- dragulaValue(input$drag_cards_to_deck)
 how_many_slots_in_list <- length(dragula_status_from_draft)
 full_data <- NULL
@@ -73,12 +75,14 @@ deck_changes_data <- join_pakkaid[, .(DRAFT_CARDS_ID, Pakka_ID)]
 output$deck_column <- renderUI({
   required_data("STG_DECKS_DIM")
   required_data("STAT_CURRENT_PAKKA")
-
+  required_data("STAT_PFI")
+  ss_stat <- STAT_PFI[, .(Nimi = Deck, Deck_size = 40 + round(Deck_size, 1))]
 
   mydecks_dt <- STG_DECKS_DIM[Omistaja_ID == omistaja_ID_calc$value  & Picked == 1, .(Nimi)]
   ssdynamic <- STAT_CURRENT_PAKKA()[, .(Pakka_NM_Dynamic, Pakka_NM, Nimi = Pakka_NM, Cards_in_side, Cards_in_Main)]
   mydecks_dt_join <- ssdynamic[mydecks_dt, on = "Nimi"]
-  mydecks <- mydecks_dt_join[, Pakka_NM]
+  join_cur_count <- ss_stat[mydecks_dt_join, on = .(Nimi)]
+  mydecks <- join_cur_count[, Pakka_NM]
   #mydecks_text <- mydecks_dt_join[, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
   half_decks <- round(length(mydecks) / 2)
 
@@ -88,13 +92,13 @@ fluidPage(
 
                 column(width = 3, code("Drafted cards"), box(uiOutput("Drafted_cards_column", style = "max-width: 150px; height:800px; overflow-x: scroll: overscroll-behavior-y: contain; overscroll-behavior-y: contain; touch-action: none;"),
                                                                          height = 800,
-                                                                         style = "overflow-x: scroll; min-width: 800px")),
+                                                                         style = "overflow-x: scroll; min-width: 700px")),
                               column(width = 9, fluidRow(lapply(mydecks[1:half_decks], function(deck_name) {
-                                deck_header <- mydecks_dt_join[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
+                                deck_header <- join_cur_count[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Deck_size, "/", Cards_in_Main, "/", Cards_in_side)]
                                 column(width = 2, tags$h4(style = "color:red", HTML(deck_header)), uiOutput(deck_name, style = "min-height:100px;background-color:grey; overscroll-behavior-y: contain; touch-action: none;"))
                               })),
                               fluidRow(    lapply(mydecks[(half_decks + 1):length(mydecks)], function(deck_name) {
-                                deck_header <- mydecks_dt_join[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
+                                deck_header <- join_cur_count[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Deck_size, "/", Cards_in_Main, "/", Cards_in_side)]
                                 column(width = 2, tags$h4(style = "color:red", HTML(deck_header)),
                                        uiOutput(deck_name, style = "min-height:100px;background-color:grey;overscroll-behavior-y: contain; touch-action: none;"))
                               })))),
