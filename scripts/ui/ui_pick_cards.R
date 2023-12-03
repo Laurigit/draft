@@ -6,7 +6,8 @@ fluidPage(
   fluidRow(
   column(3, uiOutput("select_booster")),
   column(3, actionButton("save_picks", label = "Save ordered picks")),
-  column(3, uiOutput(outputId = "myLegalColors"))
+  column(3, uiOutput(outputId = "myLegalColors")),
+  column(3, actionButton("randomize_all_first_picks", "Randomize all first picks"))
 
 
   ),

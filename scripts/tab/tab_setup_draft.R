@@ -53,7 +53,7 @@ for (booster_loop in 0:total_loops){
 
 loop_booster_id <- BOOSTER_ID + booster_loop
 loop_data <- cbind(loop_data, loop_booster_id)
-
+loop_data[, random_var := runif(1)]
 dbWriteTable(con, "DRAFT_BOOSTER", loop_data, append = TRUE, row.names = FALSE)
 updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, input_env = globalenv(), FALSE)
 }

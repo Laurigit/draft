@@ -8,7 +8,8 @@ output$select_booster <- renderUI({
   #############dont del
 
   required_data(c("ADM_UNPICKED_DRAFT"))
-my_to_do <- ADM_UNPICKED_DRAFT[OMISTAJA_ID == omistaja_ID_calc$value, .N, by = Booster_ID][, .(Booster_ID)]
+
+my_to_do <- ADM_UNPICKED_DRAFT[OMISTAJA_ID == omistaja_ID_calc$value, .N, by = .(Booster_ID, sort_order)][order(sort_order)][, .(Booster_ID)]
 
   if (nrow(my_to_do) == 0) {
     boosterlist <- "No boosters to draft"
@@ -132,6 +133,30 @@ observeEvent(input$random_first_pick_correct, {
     updateSelectInput(inputId = "radio_first_pick_correct", session, selected = "Martti")
   }
 
+})
+
+observeEvent(input$randomize_all_first_picks, {
+  required_data(c("ADM_UNPICKED_DRAFT"))
+  aggr <- ADM_UNPICKED_DRAFT[!i.first_pick %in% c(0, 1), .(.N), by = Booster_ID]
+  aggr[, arpa := runif(1), by = Booster_ID]
+  sorttaa <- aggr[, .(Booster_ID, arpa)][order(arpa)]
+  omistaja_vect <- c("M", "L")
+  bindaa <- cbind(sorttaa, omistaja_vect)
+  #ota pariton pois
+  if (nrow(bindaa) %% 2 == 1) {
+    bindaa <- bindaa[1:((nrow(bindaa) - 1))]
+  }
+  bindaa[, fp_in_data := ifelse(omistaja_vect == "M", 1, 0)]
+#looppaa
+  if (nrow(sorttaa) >= 2) {
+  for (loopperi in 1:nrow(bindaa)) {
+
+    rividata <- bindaa[loopperi]
+    dbQ(paste0("UPDATE DRAFT_BOOSTER SET first_pick = ", rividata[, fp_in_data], " WHERE Booster_ID =", rividata[, Booster_ID]), con)
+  }
+  updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, globalenv())
+  global_update_data$update <- isolate(global_update_data$update + 1)
+  }
 })
 
 observeEvent(input$lock_first_pick, {
