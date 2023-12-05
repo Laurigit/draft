@@ -76,6 +76,8 @@ output$deck_column <- renderUI({
   required_data("STG_DECKS_DIM")
   required_data("STAT_CURRENT_PAKKA")
   required_data("STAT_PFI")
+  required_data("ADM_VAHENNYSKORTIT")
+
   ss_stat <- STAT_PFI[, .(Nimi = Deck, Deck_size = 40 + round(Deck_size, 1))]
 
   mydecks_dt <- STG_DECKS_DIM[Omistaja_ID == omistaja_ID_calc$value  & Picked == 1, .(Nimi)]
@@ -86,34 +88,181 @@ output$deck_column <- renderUI({
   #mydecks_text <- mydecks_dt_join[, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
   half_decks <- round(length(mydecks) / 2)
 
-
 fluidPage(
               fluidRow(
 
-                column(width = 3, code("Drafted cards"), box(uiOutput("Drafted_cards_column", style = "max-width: 150px; height:800px; overflow-x: scroll: overscroll-behavior-y: contain; overscroll-behavior-y: contain; touch-action: none;"),
-                                                                         height = 800,
-                                                                         style = "overflow-x: scroll; min-width: 700px")),
+                column(width = 3, code("Drafted cards"), box(uiOutput("Drafted_cards_column", style = "max-width: 150px; height:700px; overflow-x: scroll: overscroll-behavior-y: contain; overscroll-behavior-y: contain; touch-action: none;"),
+                                                                         height = 700,
+                                                                         style = "overflow-x: scroll; min-width: 300px")),
                               column(width = 9, fluidRow(lapply(mydecks[1:half_decks], function(deck_name) {
-                                deck_header <- join_cur_count[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Deck_size, "/", Cards_in_Main, "/", Cards_in_side)]
-                                column(width = 2, tags$h4(style = "color:red", HTML(deck_header)), uiOutput(deck_name, style = "min-height:100px;background-color:grey; overscroll-behavior-y: contain; touch-action: none;"))
+
+                                column(width = 2, uiOutput(deck_name, style = "min-height:100px;background-color:grey; overscroll-behavior-y: contain; touch-action: none;"))
                               })),
+                               fluidRow(column(width = 12,  style='padding:80px;',"")),
                               fluidRow(    lapply(mydecks[(half_decks + 1):length(mydecks)], function(deck_name) {
-                                deck_header <- join_cur_count[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", Deck_size, "/", Cards_in_Main, "/", Cards_in_side)]
-                                column(width = 2, tags$h4(style = "color:red", HTML(deck_header)),
-                                       uiOutput(deck_name, style = "min-height:100px;background-color:grey;overscroll-behavior-y: contain; touch-action: none;"))
-                              })))),
-             # fluidRow(column(width = 12,  style='padding:80px;',"")),
+
+                                column(width = 2,
+                                       uiOutput(deck_name, style = "min-height:100px;background-color:grey;overscroll-behavior-y: contain; touch-action: none;")
+                                )
+                              })),
+                              fluidRow(column(width = 12,  style='padding:80px;',""))
+                              )),
+
               dragula(c("Drafted_cards_column",  mydecks), id = "drag_cards_to_deck"),
               fluidRow(column(offset = 9, width = 3, actionButton("toggle_saving", label = "Save button on/off"),
                               hidden(actionButton("save_drafts_to_decks", label= "Save drafted cards to decks"))))
 
 )
 
+})
 
+output$deck_info_top <- renderUI({
+  required_data("STG_DECKS_DIM")
+  required_data("STAT_CURRENT_PAKKA")
+  required_data("STAT_PFI")
+  required_data("ADM_VAHENNYSKORTIT")
+
+  ss_stat <- STAT_PFI[, .(Nimi = Deck, Deck_size = 40 + round(Deck_size, 1))]
+
+  mydecks_dt <- STG_DECKS_DIM[Omistaja_ID == omistaja_ID_calc$value  & Picked == 1, .(Nimi)]
+  ssdynamic <- STAT_CURRENT_PAKKA()[, .(Pakka_NM_Dynamic, Pakka_NM, Nimi = Pakka_NM, Cards_in_side, Cards_in_Main)]
+  mydecks_dt_join <- ssdynamic[mydecks_dt, on = "Nimi"]
+  join_cur_count <- ss_stat[mydecks_dt_join, on = .(Nimi)]
+  mydecks <- join_cur_count[, Pakka_NM]
+  #mydecks_text <- mydecks_dt_join[, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
+  half_decks <- round(length(mydecks) / 2)
+  if (is.null(input$drag_cards_to_deck)) {
+    join_vah_to_deck_infto <- join_cur_count
+    warning(join_vah_to_deck_infto)
+    join_vah_to_deck_infto[, live_deck_size := Deck_size]
+  } else {
+
+
+
+
+    dragula_status_from_draft <- dragulaValue(input$drag_cards_to_deck)
+    isNullList <- function(x) all(!lengths(x))
+
+    if ( isNullList(dragula_status_from_draft)) {
+      join_vah_to_deck_infto <- join_cur_count
+      join_vah_to_deck_infto[, live_deck_size := Deck_size]
+    } else {
+
+  how_many_slots_in_list <- length(dragula_status_from_draft)
+  full_data <- NULL
+  for(loopperi in 1:how_many_slots_in_list) {
+    name <- names(dragula_status_from_draft)[[loopperi]]
+    data <- dragula_status_from_draft[[loopperi]]
+    if (!is.null(data)) {
+      loop_dt <- data.table(card_id_data = data, Deck = name)
+      full_data <- rbind(loop_dt, full_data)
+    }
+  }
+  full_data[, image_id := word(card_id_data, 1, 1, sep = "_")]
+
+
+  draft_info_data <- ReactDraftCards_d2d$image_ids[full_data, on = "image_id"]
+  draft_info_data[, Nimi := ifelse(Deck == "Drafted_cards_column", ifelse(omistaja_ID_calc$value == "L", "L_Side",
+                                                                          "M_Side"), Deck)]
+  ss_decks <- STG_DECKS_DIM[, .(Pakka_ID, Nimi)]
+  join_pakkaid <- ss_decks[draft_info_data, on = "Nimi"]
+  join_vah <- join_pakkaid[ADM_VAHENNYSKORTIT, on = "PICK_ORDER"]
+
+  vahennyskortit <- join_vah[, .(tot_vah = sum(VAHENNYSKORTIT)), , by = Nimi ][!is.na(Nimi )]
+
+  join_vah_to_deck_infto <- vahennyskortit[join_cur_count, on = "Nimi "]
+  join_vah_to_deck_infto[, live_deck_size := ifelse(is.na(tot_vah), Deck_size, Deck_size - tot_vah)]
+  }
+}
+
+
+  fluidPage(
+    fluidRow(
+      column(offset = 3, width = 9, fluidRow(lapply(mydecks[1:half_decks], function(deck_name) {
+        deck_header <- join_vah_to_deck_infto[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", round(live_deck_size, 1), "/", Cards_in_Main, "/", Cards_in_side)]
+        column(width = 2, tags$h4(style = "color:red", HTML(deck_header)))
+      }))))
+
+  )
+
+})
+
+output$deck_info_bot <- renderUI({
+  required_data("STG_DECKS_DIM")
+  required_data("STAT_CURRENT_PAKKA")
+  required_data("STAT_PFI")
+  required_data("ADM_VAHENNYSKORTIT")
+
+  ss_stat <- STAT_PFI[, .(Nimi = Deck, Deck_size = 40 + round(Deck_size, 1))]
+
+  mydecks_dt <- STG_DECKS_DIM[Omistaja_ID == omistaja_ID_calc$value  & Picked == 1, .(Nimi)]
+  ssdynamic <- STAT_CURRENT_PAKKA()[, .(Pakka_NM_Dynamic, Pakka_NM, Nimi = Pakka_NM, Cards_in_side, Cards_in_Main)]
+  mydecks_dt_join <- ssdynamic[mydecks_dt, on = "Nimi"]
+  join_cur_count <- ss_stat[mydecks_dt_join, on = .(Nimi)]
+  mydecks <- join_cur_count[, Pakka_NM]
+  #mydecks_text <- mydecks_dt_join[, paste0(Pakka_NM_Dynamic, "<br>", Cards_in_Main, "/", Cards_in_side)]
+  half_decks <- round(length(mydecks) / 2)
+  if (is.null(input$drag_cards_to_deck)) {
+    join_vah_to_deck_infto <- join_cur_count
+    join_vah_to_deck_infto[, live_deck_size := Deck_size]
+  } else {
+
+
+
+
+    dragula_status_from_draft <- dragulaValue(input$drag_cards_to_deck)
+    isNullList <- function(x) all(!lengths(x))
+
+    if ( isNullList(dragula_status_from_draft)) {
+      join_vah_to_deck_infto <- join_cur_count
+      join_vah_to_deck_infto[, live_deck_size := Deck_size]
+    } else {
+
+
+    how_many_slots_in_list <- length(dragula_status_from_draft)
+    full_data <- NULL
+    for(loopperi in 1:how_many_slots_in_list) {
+      name <- names(dragula_status_from_draft)[[loopperi]]
+      data <- dragula_status_from_draft[[loopperi]]
+      if (!is.null(data)) {
+        loop_dt <- data.table(card_id_data = data, Deck = name)
+        full_data <- rbind(loop_dt, full_data)
+      }
+    }
+    full_data[, image_id := word(card_id_data, 1, 1, sep = "_")]
+
+
+    draft_info_data <- ReactDraftCards_d2d$image_ids[full_data, on = "image_id"]
+    draft_info_data[, Nimi := ifelse(Deck == "Drafted_cards_column", ifelse(omistaja_ID_calc$value == "L", "L_Side",
+                                                                            "M_Side"), Deck)]
+    ss_decks <- STG_DECKS_DIM[, .(Pakka_ID, Nimi)]
+    join_pakkaid <- ss_decks[draft_info_data, on = "Nimi"]
+    join_vah <- join_pakkaid[ADM_VAHENNYSKORTIT, on = "PICK_ORDER"]
+
+    vahennyskortit <- join_vah[, .(tot_vah = sum(VAHENNYSKORTIT)), , by = Nimi ][!is.na(Nimi )]
+
+    join_vah_to_deck_infto <- vahennyskortit[join_cur_count, on = "Nimi "]
+    join_vah_to_deck_infto[, live_deck_size := ifelse(is.na(tot_vah), Deck_size, Deck_size - tot_vah)]
+
+    }
+  }
+
+
+
+  fluidPage(
+    fluidRow(
+      column(offset = 3, width = 9,
+      fluidRow(    lapply(mydecks[(half_decks + 1):length(mydecks)], function(deck_name) {
+        deck_header <- join_vah_to_deck_infto[Pakka_NM == deck_name, paste0(Pakka_NM_Dynamic, "<br>", round(live_deck_size, 1), "/", Cards_in_Main, "/", Cards_in_side)]
+        column(width = 2, tags$h4(style = "color:red", HTML(deck_header))
+        )
+      })))))
 
 
 
 })
+
+
 
 
 output$Drafted_cards_column <- renderUI({
@@ -140,14 +289,14 @@ output$Drafted_cards_column <- renderUI({
       image_id <- uudet_kortit[i, image_id]
       draft_group <- uudet_kortit[i, DRAFT_GROUP]
       kortit_pussissa <- uudet_kortit[i, kortteja_pussissa]
-
+      pikkaus_order <-ceiling(uudet_kortit[i, PICK_ORDER] / 2)
       image_nm <- paste0(uudet_kortit[i, MID], "_card_small.jpg")
 
       image_output_name_d2d <- paste0(image_id, "_d2d")
       peruslandi <- image_read(paste0("./www/", image_nm))
 
 
-      new_land <- image_annotate(peruslandi, paste0(draft_group, "-", kortit_pussissa), gravity = "north", size = 30, color = "red")
+      new_land <- image_annotate(peruslandi, paste0(pikkaus_order), gravity = "north", size = 30, color = "red")
       new_card_folder <- paste0("./www/", uudet_kortit[i, MID], "_", draft_group, "_card.jpg")
       image_write(new_land, new_card_folder, format = "jpg")
       #final_land <- image_annotate(new_land, 3, gravity = "northeast", size = 14, color = "black", location ="+10+8")
@@ -165,7 +314,7 @@ output$Drafted_cards_column <- renderUI({
   }
 
   #piirretään vaan jäljellä olevat
-  jaljella_olevat <- ReactDraftCards_d2d$cards_left[PICK_ORDER > 2]
+  jaljella_olevat <- ReactDraftCards_d2d$cards_left#[PICK_ORDER > 2]
 
 
 

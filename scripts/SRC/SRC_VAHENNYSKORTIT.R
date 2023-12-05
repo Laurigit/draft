@@ -1,0 +1,4 @@
+#SRC_VAHENNYSKORTIT
+con <- connDB(con)
+SRC_VAHENNYSKORTIT <- dbSelectAll("SRC_VAHENNYSKORTIT", con)
+

@@ -17,5 +17,8 @@ tabItem(tabName = "tab_cards_to_decks",
         #
         #   dragula(c("Drafted_cards_column", mydecks), id = "drag_cards_to_deck")
         # )
-        uiOutput("deck_column")
+        uiOutput("deck_info_top"),
+        uiOutput("deck_column"),
+        uiOutput("deck_info_bot")
+
 )
