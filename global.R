@@ -39,6 +39,9 @@ for(input_kansio in input_kansio_list) {
 }
 #con <- connDB(con)
 #rm(con)
+#ÄLÄ POISAT
+rm(STAT_PFI)
+#ÄLÄ POISTA LOPPU
 con <- connDB(con, "betmtg2")
 
 dbSendQuery(con, 'SET NAMES utf8')

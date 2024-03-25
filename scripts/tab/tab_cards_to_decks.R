@@ -78,7 +78,7 @@ output$deck_column <- renderUI({
   required_data("STAT_PFI")
   required_data("ADM_VAHENNYSKORTIT")
 
-  ss_stat <- STAT_PFI[, .(Nimi = Deck, Deck_size = 40 + round(Deck_size, 1))]
+  ss_stat <- STAT_PFI[, .(Nimi = Deck, Deck_size =  round(Deck_size, 1))]
 
   mydecks_dt <- STG_DECKS_DIM[Omistaja_ID == omistaja_ID_calc$value  & Picked == 1, .(Nimi)]
   ssdynamic <- STAT_CURRENT_PAKKA()[, .(Pakka_NM_Dynamic, Pakka_NM, Nimi = Pakka_NM, Cards_in_side, Cards_in_Main)]
@@ -122,7 +122,7 @@ output$deck_info_top <- renderUI({
   required_data("STAT_PFI")
   required_data("ADM_VAHENNYSKORTIT")
 
-  ss_stat <- STAT_PFI[, .(Nimi = Deck, Deck_size = 40 + round(Deck_size, 1))]
+  ss_stat <- STAT_PFI[, .(Nimi = Deck, Deck_size = round(Deck_size, 1))]
 
   mydecks_dt <- STG_DECKS_DIM[Omistaja_ID == omistaja_ID_calc$value  & Picked == 1, .(Nimi)]
   ssdynamic <- STAT_CURRENT_PAKKA()[, .(Pakka_NM_Dynamic, Pakka_NM, Nimi = Pakka_NM, Cards_in_side, Cards_in_Main)]
@@ -193,7 +193,7 @@ output$deck_info_bot <- renderUI({
   required_data("STAT_PFI")
   required_data("ADM_VAHENNYSKORTIT")
 
-  ss_stat <- STAT_PFI[, .(Nimi = Deck, Deck_size = 40 + round(Deck_size, 1))]
+  ss_stat <- STAT_PFI[, .(Nimi = Deck, Deck_size = round(Deck_size, 1))]
 
   mydecks_dt <- STG_DECKS_DIM[Omistaja_ID == omistaja_ID_calc$value  & Picked == 1, .(Nimi)]
   ssdynamic <- STAT_CURRENT_PAKKA()[, .(Pakka_NM_Dynamic, Pakka_NM, Nimi = Pakka_NM, Cards_in_side, Cards_in_Main)]
