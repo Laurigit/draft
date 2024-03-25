@@ -14,16 +14,16 @@ required_data("STG_CARDS_DIM")
   setupDraft$cards[, rivi := seq_len(.N)]
   setupDraft$cards[, kuva_id := paste0("id_", rivi)]
   setupDraft$cards[, filu := paste0(MID, "_card.jpg")]
-  setupDraft$cards[, loop_countteri := cumsum(Name == "Goblin Token")]
-  lapply(setupDraft$cards[Name != "Goblin Token", Name], function(x) {
+  setupDraft$cards[, loop_countteri := cumsum(Name %in% .("Goblin Token", "Angel Token", "Soldier Token", "Saproling Token", "Zombie Token", "Spirit Token"))]
+  lapply(setupDraft$cards[!Name %in% .("Goblin Token", "Angel Token", "Soldier Token", "Saproling Token", "Zombie Token", "Spirit Token"), Name], function(x) {
     print(x)
     addCardToDB(x, con, STG_CARDS_DIM)
   })
 
-  lapply(setupDraft$cards[Name != "Goblin Token", MID], function(x) {
+  lapply(setupDraft$cards[!Name %in% .("Goblin Token", "Angel Token", "Soldier Token", "Saproling Token", "Zombie Token", "Spirit Token"), MID], function(x) {
     getCardImg_full(x)
   })
-setupDraft$cardCount <- setupDraft$cards[Name != "Goblin Token", .(countti = .N), by = loop_countteri][, countti]
+setupDraft$cardCount <- setupDraft$cards[!Name %in% .("Goblin Token", "Angel Token", "Soldier Token", "Saproling Token", "Zombie Token", "Spirit Token"), .(countti = .N), by = loop_countteri][, countti]
 
 print(setupDraft$cards)
 
@@ -51,7 +51,7 @@ if (is.na(BOOSTER_ID[, BOOSTER_ID])) {
 
 
 for (booster_loop in 0:total_loops){
-  loop_data <- setupDraft$result[loop_countteri == booster_loop & !Name %in% ("Goblin Token"), .(MID)]
+  loop_data <- setupDraft$result[loop_countteri == booster_loop & !Name %in% .("Goblin Token", "Angel Token", "Soldier Token", "Saproling Token", "Zombie Token", "Spirit Token"), .(MID)]
 
 
 loop_booster_id <- BOOSTER_ID + booster_loop
