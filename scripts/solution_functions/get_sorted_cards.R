@@ -9,6 +9,7 @@ get_sorted_cards <- function(input_dl) {
 
   sorted <- sata[order(Converted_Cost, -is_basic_land, Name)][Maindeck ==  1]#[Converted_Cost > 0 & Converted_Cost < 7]
   side <- sata[order(Converted_Cost, Name)][Maindeck ==  0]
+  #side[, CC_for_ordering := as.numeric(Converted_Cost)]
   #add basic lands
   #blands <- sata[is_basic_land == TRUE, .(.N, image_id = max(image_id)), by = Name][order(-N)]
   # if (nrow(blands) > 0) {
@@ -17,10 +18,11 @@ get_sorted_cards <- function(input_dl) {
   # add_basics <- rbind(land_rows, sorted)
 
   #laske jarjestyes
+  #sorted[, CC_for_ordering := as.numeric(Converted_Cost)]
   sorted[, order_No := seq_len(.N), by = Converted_Cost]
   max_order_no <- sorted[, max(order_No)]
-  side[, order_No := seq_len(.N) + max_order_no, by = Converted_Cost]
 
+  side[, order_No := seq_len(.N) + max_order_no, by = Converted_Cost]
 
   kaadettu_main_ids <- dcast.data.table(sorted, formula =   order_No ~ colOrder, value.var = "image_id" )
   kaadettu_main_MID <- dcast.data.table(sorted, formula =   order_No ~ colOrder, value.var = "MID" )
@@ -41,7 +43,10 @@ get_sorted_cards <- function(input_dl) {
   #this is to fix kaadettu_main_ids in case it does not have all mana costs
   cols <- colnames(kaadettu_ids)
 
-  new_order <- c(sort(cols)[2:length(cols)], "-1")
+  sorted_indices <- order(as.numeric(cols))
+  sorted_vector <- cols[sorted_indices]
+
+  new_order <- c(sorted_vector[2:length(cols)], "-1")
   setcolorder(kaadettu_ids, new_order)
       kaadettu_ids[, order_No := seq_len(.N)]
 
