@@ -272,12 +272,13 @@ output$Drafted_cards_column <- renderUI({
   print("kuvat pitäs päivittyy")
   input$todo_Drafts
   values$lastUpdated
+required_data("ADM_VAHENNYSKORTIT")
 
+  uudet_kortit_no_vah <- ReactDraftCards_d2d$image_ids#[PICK_ORDER > 2]
 
-  uudet_kortit <- ReactDraftCards_d2d$image_ids#[PICK_ORDER > 2]
-
-  uudet_kortit[, DRAFT_GROUP := .GRP, by = DRAFT_ID]
-  uudet_kortit[, kortteja_pussissa := .N + 1, by = DRAFT_GROUP]
+  uudet_kortit_no_vah[, DRAFT_GROUP := .GRP, by = DRAFT_ID]
+  uudet_kortit_no_vah[, kortteja_pussissa := .N + 1, by = DRAFT_GROUP]
+  uudet_kortit <- ADM_VAHENNYSKORTIT[uudet_kortit_no_vah, on = "PICK_ORDER"]
 
   lapply(paste0("card_", uudet_kortit[, MID]), function(nm) tags$h3(drag = nm, nm))
 
@@ -288,6 +289,7 @@ output$Drafted_cards_column <- renderUI({
 
       image_id <- uudet_kortit[i, image_id]
       draft_group <- uudet_kortit[i, DRAFT_GROUP]
+      vahennyskortti_round <- round(uudet_kortit[i, VAHENNYSKORTIT], 2)
       kortit_pussissa <- uudet_kortit[i, kortteja_pussissa]
       pikkaus_order <-ceiling(uudet_kortit[i, PICK_ORDER] / 2)
       image_nm <- paste0(uudet_kortit[i, MID], "_card_small.jpg")
@@ -296,7 +298,7 @@ output$Drafted_cards_column <- renderUI({
       peruslandi <- image_read(paste0("./www/", image_nm))
 
 
-      new_land <- image_annotate(peruslandi, paste0(pikkaus_order), gravity = "north", size = 30, color = "red")
+      new_land <- image_annotate(peruslandi, paste0(vahennyskortti_round), gravity = "north", size = 30, color = "red")
       new_card_folder <- paste0("./www/", uudet_kortit[i, MID], "_", draft_group, "_card.jpg")
       image_write(new_land, new_card_folder, format = "jpg")
       #final_land <- image_annotate(new_land, 3, gravity = "northeast", size = 14, color = "black", location ="+10+8")
@@ -349,8 +351,11 @@ output$first_picks <- renderUI({
 
 
   uudet_kortit <- ReactDraftCards_d2d$image_ids[PICK_ORDER <= 2]
+  ADM_VAHENNYSKORTIT
+
   uudet_kortit[, DRAFT_GROUP := .GRP, by = DRAFT_ID]
   uudet_kortit[, kortteja_pussissa := .N + 1, by = DRAFT_GROUP]
+
   lapply(paste0("card_", uudet_kortit[, MID]), function(nm) tags$h3(drag = nm, nm))
 
   for (i in 1:nrow(uudet_kortit)) {
