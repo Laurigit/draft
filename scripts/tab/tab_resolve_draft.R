@@ -13,7 +13,7 @@ output$show_resolvable_drafts <- renderUI({
 
   if (nrow(STG_DRAFT_PICKORDER) > 0) {
     aggr <- STG_DRAFT_PICKORDER[, .N, by = .(OMISTAJA_ID, Booster_ID)]
-    result <- aggr[, .N, by = Booster_ID][N == 2, Booster_ID]
+    result <- aggr[, .N, by = Booster_ID][order(-Booster_ID)][N == 2, Booster_ID]
   } else {
     result <- "No drafts to resolve"
   }
