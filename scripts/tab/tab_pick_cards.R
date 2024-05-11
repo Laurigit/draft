@@ -202,7 +202,12 @@ observe({
   required_data("STG_DRAFT_BOOSTER")
 
   read_first_pick <- STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector , .N, by = first_pick][, first_pick]
-print(read_first_pick)
+  browser()
+  if (input$booster_selector == "No boosters to draft") {
+    read_first_pick <- NA
+  }
+  print(read_first_pick)
+
     if (is.na(read_first_pick)) {
     used_fp_value <- -1
   } else {
