@@ -43,7 +43,7 @@ mid <- tryCatch({
   # if (result[, Name] == "Resurgent Belief") {
   #   browser()
   # }
-  if ((result[, Set] %in% c("mma", "mm2", "mm3", "uma", "ema", "m19", "m20", "ima", "mh1", "a25", "mh2", "2xm", "2x2", "m21", "dmr", "tsr") |
+  if ((result[, Set] %in% c("mma", "mm2", "mm3", "uma", "ema", "m19", "m20", "ima", "mh1", "a25", "mh2", "2xm", "2x2", "m21", "dmr", "tsr", "dtk") |
       result[, Name %in% mystery_names]) & !is.na(result[, MID]))  {
    # if (is.na(result[, MID]) == TRUE) {browser()}
 

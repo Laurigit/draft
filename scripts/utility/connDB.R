@@ -9,7 +9,7 @@ connDB <- function(con, dbname_input = "betmtg2") {
     con <<- dbConnect(MySQL(),
                      user = 'root',
                      password = 'betmtg_pw',
-                     host = '35.228.73.82',
+                     host = '34.88.252.73',
                      port = 3306,
                      dbname = dbname_input)
   })
