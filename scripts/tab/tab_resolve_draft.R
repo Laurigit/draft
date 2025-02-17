@@ -10,10 +10,16 @@ output$show_resolvable_drafts <- renderUI({
   required_data("ADM_DI_HIERARKIA")
   required_data("STG_DRAFT_PICKORDER")
   required_data("SRC_DRAFT_PICKORDER")
+  required_data("STG_DRAFT_BOOSTER")
+  ss_sortteri <- STG_DRAFT_BOOSTER[, .N, by = .(sort_order, Booster_ID)][, N := NULL]
+
+
 
   if (nrow(STG_DRAFT_PICKORDER) > 0) {
     aggr <- STG_DRAFT_PICKORDER[, .N, by = .(OMISTAJA_ID, Booster_ID)]
-    result <- aggr[, .N, by = Booster_ID][order(-Booster_ID)][N == 2, Booster_ID]
+    join_sort_order <- ss_sortteri[aggr, on = "Booster_ID"]
+    join_sort_order[, sorttaus_na_fix := ifelse(is.na(sort_order), 99999, sort_order)]
+    result <- join_sort_order[, .N, by = .(Booster_ID, sorttaus_na_fix)][order(sorttaus_na_fix)][N == 2, Booster_ID]
   } else {
     result <- "No drafts to resolve"
   }
