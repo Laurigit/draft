@@ -43,7 +43,6 @@ setupDraft$result <- setupDraft$cards[, .(MID, Name, loop_countteri)]
 
 total_loops <- setupDraft$result[, max(loop_countteri)]
 
-
 BOOSTER_ID <- dbQ("SELECT MAX(BOOSTER_ID) as BOOSTER_ID FROM DRAFT_BOOSTER", con) + 1
 if (is.na(BOOSTER_ID[, BOOSTER_ID])) {
   BOOSTER_ID <- 1
@@ -57,6 +56,7 @@ for (booster_loop in 0:total_loops){
 loop_booster_id <- BOOSTER_ID + booster_loop
 loop_data <- cbind(loop_data, loop_booster_id)
 loop_data[, random_var := runif(1)]
+setnames(loop_data, "loop_booster_id", "Booster_ID")
 dbWriteTable(con, "DRAFT_BOOSTER", loop_data, append = TRUE, row.names = FALSE)
 updateData("SRC_DRAFT_BOOSTER", ADM_DI_HIERARKIA, input_env = globalenv(), FALSE)
 }
