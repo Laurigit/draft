@@ -202,7 +202,7 @@ observe({
   required_data("STG_DRAFT_BOOSTER")
 
   read_first_pick <- STG_DRAFT_BOOSTER[Booster_ID == input$booster_selector , .N, by = first_pick][, first_pick]
-  browser()
+
   if (input$booster_selector == "No boosters to draft") {
     read_first_pick <- NA
   }
